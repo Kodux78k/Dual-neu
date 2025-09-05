@@ -1,0 +1,11 @@
+{
+  "name": "Dual Intent Orchestrator",
+  "nodes": [
+    "Webhook /dual/intent",
+    "Switch type",
+    "TTS",
+    "RAG",
+    "Mission",
+    "HTTP Response"
+  ]
+}
