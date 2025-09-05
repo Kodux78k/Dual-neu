@@ -1,0 +1,191 @@
+openapi: 3.0.3
+info:
+  title: Dual Neural API — TTS por Arquétipo
+  version: 0.1.0
+  description: |
+    Endpoints dedicados de TTS neural por arquétipo (12 vozes simbólicas).
+    Use `POST /tts/{archetype}` para gerar voz com timbre e prosódia do arquétipo.
+servers:
+  - url: https://api.seuservidor
+paths:
+  /tts/{archetype}:
+    post:
+      summary: Gera áudio TTS neural para um arquétipo específico
+      parameters:
+        - in: path
+          name: archetype
+          required: true
+          schema:
+            type: string
+            enum: [Atlas, Nova, Vitalis, Pulse, Artemis, Serena, Kaos, Genus, Lumine, Aion, Rhea, Horus]
+          description: Um dos 12 arquétipos
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TTSRequest'
+            examples:
+          atlas:
+            summary: TTS Neural – Atlas
+            value:
+              text: "Ativação Atlas: bem-vindo ao Estado 78K."
+              speed: 1.0
+              pitch: 0.0
+              style: "default"
+              format: "audio/mp3"
+          nova:
+            summary: TTS Neural – Nova
+            value:
+              text: "Ativação Nova: bem-vindo ao Estado 78K."
+              speed: 1.0
+              pitch: 0.0
+              style: "default"
+              format: "audio/mp3"
+          vitalis:
+            summary: TTS Neural – Vitalis
+            value:
+              text: "Ativação Vitalis: bem-vindo ao Estado 78K."
+              speed: 1.0
+              pitch: 0.0
+              style: "default"
+              format: "audio/mp3"
+          pulse:
+            summary: TTS Neural – Pulse
+            value:
+              text: "Ativação Pulse: bem-vindo ao Estado 78K."
+              speed: 1.0
+              pitch: 0.0
+              style: "default"
+              format: "audio/mp3"
+          artemis:
+            summary: TTS Neural – Artemis
+            value:
+              text: "Ativação Artemis: bem-vindo ao Estado 78K."
+              speed: 1.0
+              pitch: 0.0
+              style: "default"
+              format: "audio/mp3"
+          serena:
+            summary: TTS Neural – Serena
+            value:
+              text: "Ativação Serena: bem-vindo ao Estado 78K."
+              speed: 1.0
+              pitch: 0.0
+              style: "default"
+              format: "audio/mp3"
+          kaos:
+            summary: TTS Neural – Kaos
+            value:
+              text: "Ativação Kaos: bem-vindo ao Estado 78K."
+              speed: 1.0
+              pitch: 0.0
+              style: "default"
+              format: "audio/mp3"
+          genus:
+            summary: TTS Neural – Genus
+            value:
+              text: "Ativação Genus: bem-vindo ao Estado 78K."
+              speed: 1.0
+              pitch: 0.0
+              style: "default"
+              format: "audio/mp3"
+          lumine:
+            summary: TTS Neural – Lumine
+            value:
+              text: "Ativação Lumine: bem-vindo ao Estado 78K."
+              speed: 1.0
+              pitch: 0.0
+              style: "default"
+              format: "audio/mp3"
+          aion:
+            summary: TTS Neural – Aion
+            value:
+              text: "Ativação Aion: bem-vindo ao Estado 78K."
+              speed: 1.0
+              pitch: 0.0
+              style: "default"
+              format: "audio/mp3"
+          rhea:
+            summary: TTS Neural – Rhea
+            value:
+              text: "Ativação Rhea: bem-vindo ao Estado 78K."
+              speed: 1.0
+              pitch: 0.0
+              style: "default"
+              format: "audio/mp3"
+          horus:
+            summary: TTS Neural – Horus
+            value:
+              text: "Ativação Horus: bem-vindo ao Estado 78K."
+              speed: 1.0
+              pitch: 0.0
+              style: "default"
+              format: "audio/mp3"
+
+      responses:
+        '200':
+          description: Áudio gerado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TTSResponse'
+  /intent:
+    post:
+      summary: Entrada universal (compatível com o PWA). Para TTS, envie type=tts e archetype.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                type:
+                  type: string
+                  enum: [tts, rag, mission]
+                archetype:
+                  type: string
+                  enum: [Atlas, Nova, Vitalis, Pulse, Artemis, Serena, Kaos, Genus, Lumine, Aion, Rhea, Horus]
+                text:
+                  type: string
+                speed:
+                  type: number
+                  default: 1.0
+                pitch:
+                  type: number
+                  default: 0.0
+                style:
+                  type: string
+                  default: "default"
+                format:
+                  type: string
+                  default: "audio/mp3"
+              required: [type, archetype, text]
+      responses:
+        '200':
+          description: Resposta unificada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TTSResponse'
+components:
+  schemas:
+    TTSRequest:
+      type: object
+      properties:
+        text: {"type":"string","description":"Conteúdo a ser falado"}
+        speed: {"type":"number","default":1.0,"description":"Multiplicador de velocidade (-) lento / (+) rápido"}
+        pitch: {"type":"number","default":0.0,"description":"Ajuste de tom em semitons ou faixa relativa"}
+        style: {"type":"string","default":"default","description":"Etiqueta de estilo (ex.: default, smooth, ritual, focus)"}
+        format: {"type":"string","default":"audio/mp3","enum":["audio/mp3","audio/ogg","audio/wav"]}
+      required: [text]
+    TTSResponse:
+      type: object
+      properties:
+        text: {"type":"string","description":"Legenda opcional/eco do texto"}
+        audioUrl: {"type":"string","description":"URL do áudio resultante"}
+        duration: {"type":"number","description":"Duração em segundos","nullable":true}
+      required: [text, audioUrl]
+
+
+# x-long-tts: quando `long: true`, o servidor deve segmentar/streamar fala longa conforme LONG_TTS.md.

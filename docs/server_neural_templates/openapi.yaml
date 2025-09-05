@@ -1,0 +1,36 @@
+openapi: 3.0.3
+info:
+  title: Dual Neural API
+  version: 0.1.0
+paths:
+  /:
+    get:
+      summary: Healthcheck
+      responses:
+        '200': {{ description: OK }}
+  /intent:
+    post:
+      summary: Intent unificada
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                type: {{ type: string }}
+                archetype: {{ type: string }}
+                text: {{ type: string }}
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  text: {{ type: string }}
+                  audioUrl: {{ type: string }}
+
+
+# x-long-tts: quando `long: true`, o servidor deve segmentar/streamar fala longa conforme LONG_TTS.md.
