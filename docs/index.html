@@ -1,0 +1,2206 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"/>
+  <meta name="theme-color" content="#0b0b0f"/>
+  <link rel="manifest" href="manifest.json"/>
+  <title>Dual.Infodose · Mobile UNO Pro</title>
+  <style>
+    :root{--bg:#0b0b0f;--panel:#12121a;--ink:#eaeaf7;--ink-dim:#b7b7c9;--accent:#8a5cff;--accent-2:#29d3ff;--glass:rgba(255,255,255,.06);--radius:18px;--shadow:0 10px 24px rgba(0,0,0,.35)}
+    *{box-sizing:border-box} html,body{height:100%}
+    body{margin:0;background:radial-gradient(120% 110% at 50% 0%,#14141c 0%,#0b0b0f 60%,#09090c 100%);color:var(--ink);font:15px/1.5 Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Arial;overflow:hidden}
+    #app{height:100%;display:grid;grid-template-rows:64px 1fr 92px;gap:10px;padding:10px}
+    header{display:flex;align-items:center;justify-content:space-between;background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.02));border:1px solid rgba(255,255,255,.06);border-radius:var(--radius);padding:10px 12px;box-shadow:var(--shadow);backdrop-filter:blur(8px)}
+    .brand{display:flex;align-items:center;gap:10px;font-weight:600}
+    .brand .dot{width:10px;height:10px;border-radius:999px;background:conic-gradient(from 0deg,var(--accent),var(--accent-2),var(--accent));box-shadow:0 0 14px var(--accent-2),0 0 24px rgba(137,92,255,.4)}
+    .toolrow{display:flex;gap:10px}
+    .btn{appearance:none;border:none;border-radius:14px;padding:10px 12px;background:var(--glass);color:var(--ink);font-weight:600;border:1px solid rgba(255,255,255,.06);box-shadow:var(--shadow)}
+    .btn:active{transform:scale(.98)} .btn.pill{border-radius:999px;padding:10px 14px}
+    .btn.accent{background:linear-gradient(180deg,rgba(137,92,255,.25),rgba(41,211,255,.18));border-color:rgba(137,92,255,.35)}
+    .stage{position:relative;overflow:hidden;border-radius:var(--radius);background:linear-gradient(180deg,rgba(255,255,255,.04),rgba(255,255,255,.02));border:1px solid rgba(255,255,255,.06);box-shadow:var(--shadow)}
+    canvas#fx{position:absolute;inset:0;opacity:.75;pointer-events:none}
+    .feed{position:absolute;inset:0;padding:14px;overflow:auto;scroll-behavior:smooth}
+    .card{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:12px;margin:0 0 10px 0;backdrop-filter:blur(6px);box-shadow:var(--shadow)}
+    .meta{display:flex;align-items:center;gap:8px;color:var(--ink-dim);font-size:12px}
+    .badge{padding:2px 8px;border-radius:999px;background:rgba(137,92,255,.25);border:1px solid rgba(137,92,255,.5);color:#fff;font-weight:600;font-size:11px}
+    .text{margin-top:6px;white-space:pre-wrap}
+    .audio-row{display:flex;gap:8px;margin-top:8px;align-items:center}
+    audio{width:100%}
+    .dock{display:grid;grid-template-columns:1fr 84px 1fr;align-items:center;gap:10px}
+    .circle{width:84px;height:84px;border-radius:999px;display:grid;place-items:center;border:1px solid rgba(255,255,255,.18);background:radial-gradient(60% 60% at 50% 50%,rgba(137,92,255,.35),rgba(41,211,255,.25)),linear-gradient(180deg,rgba(255,255,255,.08),rgba(255,255,255,.02));box-shadow:0 0 28px rgba(137,92,255,.35),inset 0 0 24px rgba(41,211,255,.2),var(--shadow);position:relative;overflow:hidden}
+    .circle::after{content:"◉";color:#fff;font-weight:900;font-size:28px;letter-spacing:1px;text-shadow:0 0 18px rgba(255,255,255,.6);transform:translateY(-1px)}
+    .panel{position:absolute;right:12px;top:12px;width:min(92vw,420px);background:rgba(10,10,14,.8);border:1px solid rgba(255,255,255,.08);border-radius:16px;box-shadow:var(--shadow);backdrop-filter:blur(10px);padding:12px;display:none;max-height:70vh;overflow:auto}
+    .row{display:flex;gap:10px;align-items:center;margin:8px 0}
+    .row input[type="url"],.row input[type="text"]{flex:1;padding:10px 12px;border-radius:10px;background:#0e0e14;border:1px solid rgba(255,255,255,.12);color:var(--ink)}
+    .subtle{color:var(--ink-dim);font-size:12px}
+    .radio-row{display:flex;gap:8px;flex-wrap:wrap}
+    .chip{padding:8px 10px;border-radius:999px;border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.06);font-weight:600;cursor:pointer;user-select:none}
+    .chip.active{background:linear-gradient(180deg,rgba(137,92,255,.28),rgba(41,211,255,.18));border-color:rgba(137,92,255,.45)}
+    input[type="file"]{display:none} .hide{display:none!important}
+    .sandbox{border:1px dashed rgba(255,255,255,.2);border-radius:12px;overflow:hidden;height:120px}
+
+    /* Chaptered Player */
+    .player{margin-top:10px;padding:10px;border-radius:12px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08)}
+    .player .row{display:flex;align-items:center;gap:10px}
+    .bar{position:relative;height:10px;border-radius:999px;background:rgba(255,255,255,.08);overflow:hidden}
+    .buffer{position:absolute;left:0;top:0;height:100%;background:rgba(41,211,255,.25)}
+    .progress{position:absolute;left:0;top:0;height:100%;background:rgba(137,92,255,.6)}
+    .markers{position:absolute;left:0;top:-2px;height:14px;width:100%;pointer-events:none}
+    .marker{position:absolute;top:0;width:2px;height:14px;background:rgba(255,255,255,.8);opacity:.8;border-radius:2px}
+    .time{font-variant-numeric: tabular-nums; font-size:12px; color:#b7b7c9}
+
+
+    /* Waveform + Labels */
+    .wave{width:100%; height:48px; display:block; background:rgba(255,255,255,.03); border-radius:8px; margin:8px 0 4px 0; overflow:hidden}
+    .wave canvas{width:100%; height:100%; display:block}
+    .labels{position:relative; height:16px; margin-top:2px}
+    .labels .lab{position:absolute; top:0; transform:translateX(-50%); font-size:10px; color:#b7b7c9; white-space:nowrap; opacity:.9}
+
+
+    .chapters{margin-top:6px}
+    .chapters button{margin:2px;padding:4px 8px;font-size:11px;border-radius:8px;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.06);color:#eaeaf7;cursor:pointer}
+    .chapters button.active{background:rgba(137,92,255,.4)}
+
+
+    .chaplist{margin-top:8px; display:flex; flex-wrap:wrap; gap:6px}
+    .chap{padding:6px 8px; border-radius:999px; border:1px solid rgba(255,255,255,.14); background:rgba(255,255,255,.06); font-size:12px; cursor:pointer}
+    .chap.active{background:linear-gradient(180deg, rgba(137,92,255,.28), rgba(41,211,255,.18)); border-color:rgba(137,92,255,.45)}
+    .looprow{display:flex; align-items:center; gap:8px; margin-top:6px}
+
+
+    .exportrow{display:flex; gap:6px; margin-top:6px}
+
+
+    /* Chapter Set Modal */
+    .chapmodal{position:fixed; inset:0; display:none; place-items:center; background:rgba(0,0,0,.4); z-index:9999}
+    .chapmodal .box{width:min(92vw,480px); max-height:70vh; overflow:auto; background:rgba(10,10,14,.9); border:1px solid rgba(255,255,255,.12); border-radius:14px; padding:12px; box-shadow:0 12px 32px rgba(0,0,0,.5); backdrop-filter: blur(8px)}
+    .chapmodal h4{margin:0 0 8px 0; font-size:14px}
+    .chapset{display:flex; align-items:center; gap:8px; padding:8px; border-radius:10px; border:1px solid rgba(255,255,255,.08); background:rgba(255,255,255,.04); margin:6px 0}
+    .chapset .meta{font-size:12px; color:#b7b7c9; gap:6px}
+
+  </style>
+  <!-- Pyodide loader (CDN) -->
+  <script>
+    window.__pyodideReady = false;
+    async function loadPyodideRuntime(){
+      try{
+        const s=document.createElement('script'); s.src="https://cdn.jsdelivr.net/pyodide/v0.25.0/full/pyodide.js"; document.head.appendChild(s);
+        await new Promise((res,rej)=>{ s.onload=res; s.onerror=rej; });
+        window.pyodide = await loadPyodide({ indexURL:"https://cdn.jsdelivr.net/pyodide/v0.25.0/full/" });
+        await window.pyodide.loadPackage([]);
+        const code = `
+def classify_archetype(text):
+    t = (text or "").lower()
+    if any(k in t for k in ["ordem","foco","sistema","engenharia"]):
+        return "Atlas"
+    if any(k in t for k in ["doce","fluido","leve","acolhimento"]):
+        return "Nova"
+    if any(k in t for k in ["sabedoria","estudo","síntese","ritual"]):
+        return "Elysha"
+    return "Dual"
+def summarize(text):
+    tx = (text or "").strip()
+    if not tx: return "Síntese: foco • ordem • leveza."
+    parts = [p.strip() for p in tx.split()[:50]]
+    return "Síntese local: " + " ".join(parts) + (" ..." if len(tx.split())>50 else "")
+`;
+        await window.pyodide.runPythonAsync(code);
+        window.__pyodideReady = true;
+        console.log("Pyodide pronto");
+      }catch(e){ console.warn("Pyodide indisponível; usando simulação local.", e); }
+  
+    // chapter selection + loop
+    let currentSegIndex = 0;
+    let loopEnabled = false;
+    const btnLoop = rootEl.querySelector('[data-act="loop"]');
+    const list = rootEl.querySelector('[data-act="chaplist"]');
+
+    function selectChapter(idx){
+      currentSegIndex = Math.max(0, Math.min(segments.length-1, idx));
+      const seg = segments[currentSegIndex];
+      audio.currentTime = Number(seg.start||0);
+      // visual state
+      if(list){
+        list.querySelectorAll('.chap').forEach((el,i)=> el.classList.toggle('active', i===currentSegIndex));
+    
+    // export handlers
+    const btnJSON = rootEl.querySelector('[data-act="expjson"]');
+    const btnCSV = rootEl.querySelector('[data-act="expcsv"]');
+    if(btnJSON){
+      btnJSON.onclick = ()=>{
+        const payload = segments.map((s,i)=>({index:i, start:+(s.start||0), duration:+(s.duration||0), label: (s.label||'')}));
+        downloadFile('chapters.json', JSON.stringify(payload, null, 2), 'application/json');
+      };
+  
+    // --------- Rehydrate segments (Import JSON) ---------
+    function rebuildWithSegments(newSegs){
+      segments = Array.isArray(newSegs) ? newSegs.map(s=>({
+        start: Number(s.start||0), duration: Number(s.duration||0), label: s.label||''
+      })) : segments;
+
+      // markers
+      marks.innerHTML='';
+      segments.forEach(seg=>{
+        const start = Number(seg.start||0);
+        const pos = (start / audio.duration) * 100;
+        const m = document.createElement('div');
+        m.className='marker';
+        m.style.left = Math.min(99.5, Math.max(0,pos))+'%';
+        m.title = seg.label || ('@'+fmt(start));
+        m.style.pointerEvents='auto';
+        m.onclick = (e)=>{ audio.currentTime = start; };
+        marks.appendChild(m);
+      });
+
+      // labels
+      const labelsEl = rootEl.querySelector('[data-act="labels"]');
+      if(labelsEl) placeLabels(labelsEl, segments, audio.duration);
+
+      // chapter list
+      if(list){
+        list.innerHTML='';
+        segments.forEach((seg,i)=>{
+          const b = document.createElement('button');
+          b.className='chap';
+          b.textContent = (seg.label || ('@'+fmt(Number(seg.start||0)))) + ' · ' + fmt(Number(seg.start||0));
+          b.onclick = ()=> selectChapter(i);
+          list.appendChild(b);
+        });
+        if(segments.length){ selectChapter(0); }
+    
+    // ---- Save/Load to server (Banco de Capítulos) ----
+    const btnSave = rootEl.querySelector('[data-act="chapsave"]');
+    const btnLoad = rootEl.querySelector('[data-act="chapload"]');
+    if(btnSave){
+      btnSave.onclick = async ()=>{
+        const base = getSyncUrl();
+        if(!base){ pushPulse('Sistema','Informe Sync URL no painel para salvar.','warn'); return; }
+        const name = prompt('Nome do set de capítulos:', 'Set '+new Date().toLocaleString());
+        if(!name) return;
+        const payload = {
+          name,
+          audioUrl: src,
+          duration: isFinite(audio.duration)? audio.duration : null,
+          segments: segments,
+          meta: { archetype: null, createdAt: Date.now() }
+        };
+        try{
+          const resp = await postChapterSet(base, payload);
+          pushPulse('Sistema','Set salvo no servidor.', 'info');
+        }catch(e){
+          pushPulse('Sistema','Falha ao salvar set: '+e.message,'warn');
+        }
+      };
+    }
+    if(btnLoad){
+      btnLoad.onclick = async ()=>{
+        const base = getSyncUrl();
+        if(!base){ pushPulse('Sistema','Informe Sync URL no painel para carregar.','warn'); return; }
+        try{
+          const sets = await fetchChapterSets(base);
+          openChapterList(sets, (picked)=>{
+            if(!picked || !Array.isArray(picked.segments)) { pushPulse('Sistema','Set inválido.','warn'); return; }
+            rebuildWithSegments(picked.segments);
+          });
+        }catch(e){
+          pushPulse('Sistema','Falha ao listar sets: '+e.message,'warn');
+        }
+      };
+    }
+
+  }
+
+      // waveform (recompute synthetic — real decode manterá CORS constraints)
+      const waveBox = rootEl.querySelector('[data-act="wave"]');
+      if(waveBox){
+        const cv = waveBox.querySelector('canvas');
+        const dpr = dprSize(cv);
+        const samples = synthWaveFromSegments(segments, audio.duration, Math.floor(cv.width/Math.max(1,dpr)));
+        drawWaveform(cv, samples);
+      }
+
+      pushPulse('Sistema','Capítulos importados no player atual.','info');
+    }
+
+    const btnImp = rootEl.querySelector('[data-act="impjson"]');
+    const inputImp = rootEl.querySelector('[data-act="impfile"]');
+    if(btnImp && inputImp){
+      btnImp.onclick = ()=> inputImp.click();
+      inputImp.onchange = async (e)=>{
+        const f = e.target.files && e.target.files[0];
+        if(!f) return;
+        try{
+          const txt = await f.text();
+          const arr = JSON.parse(txt);
+          // Accept either array of objects or {segments:[...]}
+          const segs = Array.isArray(arr) ? arr : (arr.segments||[]);
+          if(!Array.isArray(segs) || !segs.length){ pushPulse('Sistema','JSON sem segments válidos.','warn'); return; }
+          rebuildWithSegments(segs);
+        }catch(err){
+          pushPulse('Sistema','Falha ao importar JSON: '+err.message,'warn');
+        }finally{
+          e.target.value = '';
+        }
+      };
+    }
+
+  }
+
+    const btnIMP = rootEl.querySelector('[data-act="impjson"]');
+    if(btnIMP){
+      btnIMP.onclick = ()=>{
+        const inp = document.createElement('input');
+        inp.type='file';
+        inp.accept='.json,application/json';
+        inp.onchange = (e)=>{
+          const f = e.target.files[0];
+          if(!f) return;
+          const reader = new FileReader();
+          reader.onload = ev=>{
+            try{
+              const parsed = JSON.parse(ev.target.result);
+              if(Array.isArray(parsed)){
+                // expected array of {start,duration,label}
+                segments.splice(0,segments.length,...parsed);
+                // re-render list + labels
+                if(list){
+                  list.innerHTML='';
+                  segments.forEach((seg,i)=>{
+                    const b = document.createElement('button');
+                    b.className='chap';
+                    b.textContent = (seg.label || ('@'+fmt(Number(seg.start||0)))) + ' · ' + fmt(Number(seg.start||0));
+                    b.onclick = ()=> selectChapter(i);
+                    list.appendChild(b);
+                  });
+                  selectChapter(0);
+                }
+                const labelsEl = rootEl.querySelector('[data-act="labels"]');
+                if(labelsEl) placeLabels(labelsEl, segments, audio.duration||0);
+                pushPulse('Sistema','Chapters importados manualmente.','info');
+              }
+            }catch(err){ alert('Falha ao importar JSON: '+err.message); }
+          };
+          reader.readAsText(f);
+        };
+        inp.click();
+      };
+    }
+
+    if(btnCSV){
+      btnCSV.onclick = ()=>{
+        const rows = segments.map((s,i)=>({start:+(s.start||0), duration:+(s.duration||0), label:(s.label||'')}));
+        downloadFile('chapters.csv', toCSV(rows), 'text/csv');
+      };
+    }
+
+  }
+    }
+
+    if(list){
+      list.innerHTML='';
+      segments.forEach((seg,i)=>{
+        const b = document.createElement('button');
+        b.className='chap';
+        b.textContent = (seg.label || ('@'+fmt(Number(seg.start||0)))) + ' · ' + fmt(Number(seg.start||0));
+        b.onclick = ()=> selectChapter(i);
+        list.appendChild(b);
+      });
+      // default select first
+      if(segments.length){ selectChapter(0); }
+    }
+
+    if(btnLoop){
+      btnLoop.onclick = ()=>{
+        loopEnabled = !loopEnabled;
+        btnLoop.textContent = 'Loop capítulo: ' + (loopEnabled ? 'ON' : 'OFF');
+        btnLoop.className = 'btn ' + (loopEnabled ? 'good' : '');
+      };
+    }
+
+
+    // export chapters
+    const btnExpJson = rootEl.querySelector('[data-act="expjson"]');
+    const btnExpCsv = rootEl.querySelector('[data-act="expcsv"]');
+    function downloadFile(name, content, type){
+      const blob = new Blob([content], {type});
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = name;
+      a.click();
+      setTimeout(()=>URL.revokeObjectURL(a.href), 2000);
+    }
+    if(btnExpJson){
+      btnExpJson.onclick = ()=>{
+        const data = JSON.stringify(segments, null, 2);
+        downloadFile('chapters.json', data, 'application/json');
+      };
+    }
+    if(btnExpCsv){
+      btnExpCsv.onclick = ()=>{
+        const rows = ['start,duration,label'];
+        segments.forEach(s=> rows.push([s.start,s.duration,`"${(s.label||'').replace('"','""')}"`].join(',')) );
+        downloadFile('chapters.csv', rows.join('\n'), 'text/csv');
+      };
+    }
+
+    audio.addEventListener('timeupdate', ()=>{
+      if(!loopEnabled || !segments.length) return;
+      const seg = segments[currentSegIndex];
+      const start = Number(seg.start||0);
+      const end = start + Number(seg.duration||0);
+      if(audio.currentTime >= end - 0.05){ // small epsilon
+        audio.currentTime = start;
+        if(audio.paused) audio.play().catch(()=>{});
+      }
+    });
+
+  }
+    loadPyodideRuntime();
+  // --------- Voice Overrides (UI) ---------
+  function getOverrides(){
+    try{ return JSON.parse(localStorage.getItem('dual.voice.overrides')||'{}'); }catch(e){ return {}; }
+  }
+  function setOverrides(o){
+    localStorage.setItem('dual.voice.overrides', JSON.stringify(o));
+  }
+  function archetypeDefault(a){
+    return VOICE_PROFILES[a] || VOICE_PROFILES['Nova'];
+  }
+  function loadVoiceUI(){
+    const sel = document.getElementById('voiceArchetype');
+    const a = sel.value;
+    const ov = getOverrides();
+    const base = archetypeDefault(a);
+    const cur = ov[a] || base;
+    const sp = document.getElementById('voiceSpeed');
+    const pi = document.getElementById('voicePitch');
+    const st = document.getElementById('voiceStyle');
+    sp.value = cur.speed; pi.value = cur.pitch; st.value = cur.style || 'default';
+    document.getElementById('voiceSpeedVal').textContent = Number(sp.value).toFixed(2);
+    document.getElementById('voicePitchVal').textContent = Number(pi.value).toFixed(2);
+  }
+  function saveVoiceUI(){
+    const a = document.getElementById('voiceArchetype').value;
+    const sp = Number(document.getElementById('voiceSpeed').value);
+    const pi = Number(document.getElementById('voicePitch').value);
+    const st = document.getElementById('voiceStyle').value;
+    const ov = getOverrides();
+    ov[a] = { speed: sp, pitch: pi, style: st };
+    setOverrides(ov);
+    pushPulse('Sistema', 'Voz salva para '+a+': speed '+sp.toFixed(2)+', pitch '+pi.toFixed(2)+', style '+st, 'info');
+  }
+  function resetVoiceUI(){
+    const a = document.getElementById('voiceArchetype').value;
+    const ov = getOverrides();
+    delete ov[a];
+    setOverrides(ov);
+    loadVoiceUI();
+    pushPulse('Sistema', 'Perfil de voz resetado para '+a, 'info');
+  }
+  document.addEventListener('change', (e)=>{
+    if(e.target && (e.target.id==='voiceSpeed' || e.target.id==='voicePitch')){
+      document.getElementById('voiceSpeedVal').textContent = Number(document.getElementById('voiceSpeed').value).toFixed(2);
+      document.getElementById('voicePitchVal').textContent = Number(document.getElementById('voicePitch').value).toFixed(2);
+    }
+    if(e.target && e.target.id==='voiceArchetype'){ loadVoiceUI(); }
+  });
+  document.getElementById('saveVoice').onclick = saveVoiceUI;
+  document.getElementById('resetVoice').onclick = resetVoiceUI;
+  // On panel open, we call loadEndpointsUI(); also call loadVoiceUI()
+  const prevBtnConnect = document.getElementById('btnConnect').onclick;
+  document.getElementById('btnConnect').onclick = ()=>{
+    loadEndpointsUI();
+    loadVoiceUI();
+    panel.style.display = panel.style.display==='block' ? 'none' : 'block';
+  };
+  
+  // --------- Presets A/B per archetype ---------
+  function getOverrides(){ try{ return JSON.parse(localStorage.getItem('dual.voice.overrides')||'{}'); }catch(e){ return {}; } }
+  function setOverrides(o){ localStorage.setItem('dual.voice.overrides', JSON.stringify(o)); }
+  function currentPreset(){ return document.getElementById('voicePreset').value || 'A'; }
+
+  function loadVoiceUI(){
+    const a = document.getElementById('voiceArchetype').value;
+    const p = currentPreset();
+    const ov = getOverrides();
+    const key = a+'_'+p;
+    const base = archetypeDefault(a);
+    const cur = ov[key] || base;
+    document.getElementById('voiceSpeed').value = cur.speed;
+    document.getElementById('voicePitch').value = cur.pitch;
+    document.getElementById('voiceStyle').value = cur.style || 'default';
+    document.getElementById('voiceSpeedVal').textContent = Number(cur.speed).toFixed(2);
+    document.getElementById('voicePitchVal').textContent = Number(cur.pitch).toFixed(2);
+  }
+  function saveVoiceUI(){
+    const a = document.getElementById('voiceArchetype').value;
+    const p = currentPreset();
+    const sp = Number(document.getElementById('voiceSpeed').value);
+    const pi = Number(document.getElementById('voicePitch').value);
+    const st = document.getElementById('voiceStyle').value;
+    const ov = getOverrides();
+    ov[a+'_'+p] = { speed: sp, pitch: pi, style: st };
+    setOverrides(ov);
+    pushPulse('Sistema', `Voz salva (${p}) para ${a}: speed ${sp.toFixed(2)}, pitch ${pi.toFixed(2)}, style ${st}`, 'info');
+  }
+  function resetVoiceUI(){
+    const a = document.getElementById('voiceArchetype').value;
+    const p = currentPreset();
+    const ov = getOverrides();
+    delete ov[a+'_'+p];
+    setOverrides(ov);
+    loadVoiceUI();
+    pushPulse('Sistema', 'Perfil resetado ('+p+') para '+a, 'info');
+  }
+
+  // --------- Auto Preview (short/long) with cooldown ---------
+  let previewCooldown=false;
+  function autoPreview(){
+    if(previewCooldown) return;
+    previewCooldown=true;
+    setTimeout(()=>previewCooldown=false, 4000); // 4s cooldown
+    const a = document.getElementById('voiceArchetype').value;
+    const sp = Number(document.getElementById('voiceSpeed').value);
+    const pi = Number(document.getElementById('voicePitch').value);
+    const st = document.getElementById('voiceStyle').value;
+    const phraseShort = `Prévia curta ${a}, estilo ${st}.`;
+    const phraseLong = `Ativação ${a}: esta é uma fala longa de demonstração, onde você pode sentir a cadência, as pausas e o estilo ${st}.`;
+    try{
+      const u1 = new SpeechSynthesisUtterance(phraseShort);
+      u1.lang = 'pt-BR';
+      const u2 = new SpeechSynthesisUtterance(phraseLong);
+      u2.lang = 'pt-BR';
+      window.speechSynthesis.cancel();
+      window.speechSynthesis.speak(u1);
+      window.speechSynthesis.speak(u2);
+      pushPulse('Sistema','Auto-preview executado para '+a,'info');
+    }catch(e){
+      pushPulse('Sistema','Auto-preview falhou.','warn');
+    }
+  }
+
+  document.addEventListener('change', (e)=>{
+    if(e.target && (e.target.id==='voiceSpeed' || e.target.id==='voicePitch' || e.target.id==='voiceStyle')){
+      document.getElementById('voiceSpeedVal').textContent = Number(document.getElementById('voiceSpeed').value).toFixed(2);
+      document.getElementById('voicePitchVal').textContent = Number(document.getElementById('voicePitch').value).toFixed(2);
+      autoPreview();
+    }
+    if(e.target && e.target.id==='voiceArchetype'){ loadVoiceUI(); }
+    if(e.target && e.target.id==='voicePreset'){ loadVoiceUI(); }
+  });
+
+  // Override enrichTTS to honor A/B presets
+  const _enrichTTS = enrichTTS;
+  function enrichTTS(intent){
+    const enriched = _enrichTTS(intent);
+    if(enriched.type !== 'tts') return enriched;
+    const a = (enriched.archetype||'Nova');
+    const p = currentPreset();
+    const ov = getOverrides();
+    if(ov[a+'_'+p]){
+      enriched.speed = ov[a+'_'+p].speed;
+      enriched.pitch = ov[a+'_'+p].pitch;
+      enriched.style = ov[a+'_'+p].style;
+    }
+    return enriched;
+  }
+
+
+  // --------- Voice Preview (local TTS) ---------
+  document.getElementById('voicePreview').onclick = ()=>{
+    const a = document.getElementById('voiceArchetype').value;
+    const sp = Number(document.getElementById('voiceSpeed').value);
+    const pi = Number(document.getElementById('voicePitch').value);
+    const st = document.getElementById('voiceStyle').value;
+    const phrase = `Prévia ${a}: velocidade ${sp.toFixed(2)}, tom ${pi.toFixed(2)}, estilo ${st}.`;
+    try{
+      const u = new SpeechSynthesisUtterance(phrase);
+      u.lang = 'pt-BR';
+      window.speechSynthesis.cancel();
+      window.speechSynthesis.speak(u);
+      pushPulse('Sistema','Preview local executado.','info');
+    }catch(e){
+      pushPulse('Sistema','Preview falhou no TTS local.','warn');
+    }
+  };
+
+  // --------- Sync Overrides (optional server) ---------
+  function getSyncUrl(){ return (document.getElementById('syncUrl').value || '').trim(); }
+
+  document.getElementById('syncSave').onclick = async ()=>{
+    const url = getSyncUrl();
+    if(!url){ pushPulse('Sistema','Informe a URL do servidor para Sync.','warn'); return; }
+    const payload = { overrides: getOverrides(), ts: Date.now() };
+    try{
+      const r = await fetch(url.replace(/\/$/,'') + '/voice-overrides', {
+        method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload)
+      });
+
+      // chapter list
+      const listEl = rootEl.querySelector('[data-act="chapters"]');
+      if(listEl){
+        listEl.innerHTML='';
+        segments.forEach((seg,i)=>{
+          const b=document.createElement('button');
+          b.textContent=seg.label||('@'+fmt(seg.start||0));
+          b.onclick=()=>{ audio.currentTime=seg.start||0; };
+          listEl.appendChild(b);
+        });
+        // loop control: clicking active toggles loop
+        listEl.querySelectorAll('button').forEach((btn,i)=>{
+          btn.addEventListener('click',()=>{
+            listEl.querySelectorAll('button').forEach(bb=>bb.classList.remove('active'));
+            btn.classList.add('active');
+            let looping=true;
+            const seg=segments[i];
+            const onTime=()=>{
+              if(!looping){ audio.removeEventListener('timeupdate',onTime); return; }
+              if(audio.currentTime>=(seg.start+seg.duration)){ audio.currentTime=seg.start; audio.play(); }
+            };
+            audio.addEventListener('timeupdate',onTime);
+          });
+        });
+      }
+
+      if(!r.ok) throw new Error('HTTP '+r.status);
+      pushPulse('Sistema','Overrides enviados ao servidor.','info');
+    }catch(e){
+      pushPulse('Sistema','Falha no Sync: '+e.message,'warn');
+    }
+  };
+
+  document.getElementById('syncLoad').onclick = async ()=>{
+    const url = getSyncUrl();
+    if(!url){ pushPulse('Sistema','Informe a URL do servidor para Sync.','warn'); return; }
+    try{
+      const r = await fetch(url.replace(/\/$/,'') + '/voice-overrides', { method:'GET' });
+      if(!r.ok) throw new Error('HTTP '+r.status);
+      const data = await r.json();
+      if(data && data.overrides){
+        setOverrides(data.overrides);
+        loadVoiceUI();
+        pushPulse('Sistema','Overrides carregados do servidor.','info');
+      }else{
+        pushPulse('Sistema','Nenhum override encontrado no servidor.','warn');
+      }
+    }catch(e){
+      pushPulse('Sistema','Falha ao carregar Sync: '+e.message,'warn');
+    }
+  };
+
+  // --------- Auto-Preview ---------
+  function isAutoPreview(){ return localStorage.getItem('dual.voice.autoPreview') === '1'; }
+  function setAutoPreview(v){ localStorage.setItem('dual.voice.autoPreview', v ? '1' : '0'); }
+  function updateAutoBtn(){
+    const b = document.getElementById('autoPrevToggle');
+    const on = isAutoPreview();
+    b.textContent = 'Auto-Preview: ' + (on ? 'ON' : 'OFF');
+    b.className = 'btn ' + (on ? 'good' : 'accent');
+  }
+  document.getElementById('autoPrevToggle').onclick = ()=>{ setAutoPreview(!isAutoPreview()); updateAutoBtn(); };
+
+  let autoPrevTimer = null;
+  function scheduleAutoPreview(){
+    if(!isAutoPreview()) return;
+    clearTimeout(autoPrevTimer);
+    autoPrevTimer = setTimeout(()=>{
+      // Use current archetype + sliders to speak a short local phrase
+      const a = document.getElementById('voiceArchetype').value;
+      const sp = Number(document.getElementById('voiceSpeed').value);
+      const pi = Number(document.getElementById('voicePitch').value);
+      const st = document.getElementById('voiceStyle').value;
+      speakLocal(`Prévia ${a} (${st}).`, sp, pi);
+    }, 1200);
+  }
+
+  // Wire auto-preview on slider/style changes
+  ['voiceSpeed','voicePitch','voiceStyle'].forEach(id=>{
+    const el = document.getElementById(id);
+    el.addEventListener('input', scheduleAutoPreview);
+    el.addEventListener('change', scheduleAutoPreview);
+  });
+  document.getElementById('voiceArchetype').addEventListener('change', scheduleAutoPreview);
+  updateAutoBtn();
+
+  // --------- Local TTS with rate/pitch ---------
+  function clamp(v,min,max){ return Math.max(min, Math.min(max, v)); }
+  function synthAvailable(){ return 'speechSynthesis' in window; }
+  function speakLocal(text, speed=1.0, pitchRel=0.0){
+    if(!synthAvailable()) { pushPulse('Sistema','TTS local indisponível.','warn'); return; }
+    try{
+      const u = new SpeechSynthesisUtterance(text);
+      u.lang = 'pt-BR';
+      // Web Speech API rate: 0.1..10; we'll clamp 0.5..2.0
+      u.rate = clamp(speed, 0.5, 2.0);
+      // Web Speech API pitch: 0..2; our relative -1..+1 → map to 0.5..1.5
+      u.pitch = clamp(1 + (pitchRel*0.5), 0.1, 2.0);
+      window.speechSynthesis.cancel();
+      window.speechSynthesis.speak(u);
+    }catch(e){ pushPulse('Sistema','Falha no TTS local.','warn'); }
+  }
+
+  // --------- Long TTS (local: chunked; connector: intent long) ---------
+  function chunkText(t, maxLen){
+    const parts = [];
+    let s = (t||'').trim();
+    if(!s) return parts;
+    const regex = /(.{1,200}(?:[\\.!?]\\s|\\n|$))/g;
+    let m;
+    while((m = regex.exec(s)) !== null){
+      parts.push(m[1].trim());
+    }
+    return parts.length ? parts : [s];
+  }
+  async function speakChunksLocal(text, speed, pitchRel){
+    const chunks = chunkText(text, 200);
+    if(!chunks.length){ pushPulse('Sistema','Nada para falar.','warn'); return; }
+    for(const c of chunks){
+      await new Promise(res=>{
+        const u = new SpeechSynthesisUtterance(c);
+        u.lang='pt-BR';
+        u.rate = clamp(speed||1.0, 0.5, 2.0);
+        u.pitch = clamp(1 + ((pitchRel||0)*0.5), 0.1, 2.0);
+        u.onend = res;
+        try{
+          window.speechSynthesis.speak(u);
+        }catch(e){ res(); }
+      });
+
+      // chapter list
+      const listEl = rootEl.querySelector('[data-act="chapters"]');
+      if(listEl){
+        listEl.innerHTML='';
+        segments.forEach((seg,i)=>{
+          const b=document.createElement('button');
+          b.textContent=seg.label||('@'+fmt(seg.start||0));
+          b.onclick=()=>{ audio.currentTime=seg.start||0; };
+          listEl.appendChild(b);
+        });
+        // loop control: clicking active toggles loop
+        listEl.querySelectorAll('button').forEach((btn,i)=>{
+          btn.addEventListener('click',()=>{
+            listEl.querySelectorAll('button').forEach(bb=>bb.classList.remove('active'));
+            btn.classList.add('active');
+            let looping=true;
+            const seg=segments[i];
+            const onTime=()=>{
+              if(!looping){ audio.removeEventListener('timeupdate',onTime); return; }
+              if(audio.currentTime>=(seg.start+seg.duration)){ audio.currentTime=seg.start; audio.play(); }
+            };
+            audio.addEventListener('timeupdate',onTime);
+          });
+        });
+      }
+
+    }
+  }
+
+  document.getElementById('longPreview').onclick = async ()=>{
+    const a = document.getElementById('voiceArchetype').value;
+    const sp = Number(document.getElementById('voiceSpeed').value);
+    const pi = Number(document.getElementById('voicePitch').value);
+    const txt = (document.getElementById('longText').value||'').trim();
+    if(!txt){ pushPulse('Sistema','Escreva o texto da fala longa.','warn'); return; }
+    pushPulse(a, 'Preview longo (local) iniciado...', 'info', null, {source:'Local'});
+    await speakChunksLocal(txt, sp, pi);
+    pushPulse(a, 'Preview longo (local) concluído.', 'info', null, {source:'Local'});
+  };
+
+  document.getElementById('longSend').onclick = async ()=>{
+    const a = document.getElementById('voiceArchetype').value;
+    const sp = Number(document.getElementById('voiceSpeed').value);
+    const pi = Number(document.getElementById('voicePitch').value);
+    const st = document.getElementById('voiceStyle').value;
+    const txt = (document.getElementById('longText').value||'').trim();
+    if(!txt){ pushPulse('Sistema','Escreva o texto da fala longa.','warn'); return; }
+    // Envia como intent TTS com flag long=true (servidor/n8n faz chunk/stream)
+    await routeIntent({ type:'tts', archetype:a, text: txt, long: true, speed: sp, pitch: pi, style: st, format:'audio/mp3' });
+  };
+
+  // --------- Chaptered Player Renderer ---------
+  function fmt(t){ if(!isFinite(t)||t<0) t=0; const m=Math.floor(t/60), s=Math.floor(t%60); return m+':'+String(s).padStart(2,'0'); }
+  function renderChapterPlayer(rootEl, src, segments){
+    const audio = rootEl.querySelector('audio');
+    const btn = rootEl.querySelector('[data-act="toggle"]');
+    const bar = rootEl.querySelector('.bar');
+    const buf = bar.querySelector('.buffer');
+    const prog = bar.querySelector('.progress');
+    const marks = bar.querySelector('.markers');
+    const curEl = rootEl.querySelector('[data-act="cur"]');
+    const durEl = rootEl.querySelector('[data-act="dur"]');
+
+    audio.preload = 'auto';
+    audio.addEventListener('loadedmetadata', async ()=>{
+      durEl.textContent = fmt(audio.duration);
+      // place markers + labels
+      marks.innerHTML='';
+      segments.forEach(seg=>{
+        const start = Number(seg.start||0);
+        const pos = (start / audio.duration) * 100;
+        const m = document.createElement('div');
+        m.className='marker';
+        m.style.left = Math.min(99.5, Math.max(0,pos))+'%';
+        m.title = seg.label || ('@'+fmt(start));
+        m.style.pointerEvents='auto';
+        m.onclick = (e)=>{ audio.currentTime = start; };
+        marks.appendChild(m);
+      });
+
+      // chapter list
+      const listEl = rootEl.querySelector('[data-act="chapters"]');
+      if(listEl){
+        listEl.innerHTML='';
+        segments.forEach((seg,i)=>{
+          const b=document.createElement('button');
+          b.textContent=seg.label||('@'+fmt(seg.start||0));
+          b.onclick=()=>{ audio.currentTime=seg.start||0; };
+          listEl.appendChild(b);
+        });
+        // loop control: clicking active toggles loop
+        listEl.querySelectorAll('button').forEach((btn,i)=>{
+          btn.addEventListener('click',()=>{
+            listEl.querySelectorAll('button').forEach(bb=>bb.classList.remove('active'));
+            btn.classList.add('active');
+            let looping=true;
+            const seg=segments[i];
+            const onTime=()=>{
+              if(!looping){ audio.removeEventListener('timeupdate',onTime); return; }
+              if(audio.currentTime>=(seg.start+seg.duration)){ audio.currentTime=seg.start; audio.play(); }
+            };
+            audio.addEventListener('timeupdate',onTime);
+          });
+        });
+      }
+
+      // labels under the bar
+      const labelsEl = rootEl.querySelector('[data-act="labels"]');
+      if(labelsEl) placeLabels(labelsEl, segments, audio.duration);
+      // waveform
+      const waveBox = rootEl.querySelector('[data-act="wave"]');
+      if(waveBox){
+        const cv = waveBox.querySelector('canvas');
+        const dpr = dprSize(cv);
+        try{
+          const {ac,buf} = await fetchAndDecode(src);
+          const samples = downsampleBuffer(buf, Math.floor(cv.width/Math.max(1,dpr)));
+          drawWaveform(cv, samples);
+          ac.close();
+        }catch(e){
+          const samples = synthWaveFromSegments(segments, audio.duration, Math.floor(cv.width/Math.max(1,dpr)));
+          drawWaveform(cv, samples);
+        }
+        // redraw on resize
+        const ro = new ResizeObserver(()=>{
+          const dpr2 = dprSize(cv);
+          // simple redraw using synthetic (or we could cache samples)
+          const samples2 = synthWaveFromSegments(segments, audio.duration, Math.floor(cv.width/Math.max(1,dpr2)));
+          drawWaveform(cv, samples2);
+        });
+
+      // chapter list
+      const listEl = rootEl.querySelector('[data-act="chapters"]');
+      if(listEl){
+        listEl.innerHTML='';
+        segments.forEach((seg,i)=>{
+          const b=document.createElement('button');
+          b.textContent=seg.label||('@'+fmt(seg.start||0));
+          b.onclick=()=>{ audio.currentTime=seg.start||0; };
+          listEl.appendChild(b);
+        });
+        // loop control: clicking active toggles loop
+        listEl.querySelectorAll('button').forEach((btn,i)=>{
+          btn.addEventListener('click',()=>{
+            listEl.querySelectorAll('button').forEach(bb=>bb.classList.remove('active'));
+            btn.classList.add('active');
+            let looping=true;
+            const seg=segments[i];
+            const onTime=()=>{
+              if(!looping){ audio.removeEventListener('timeupdate',onTime); return; }
+              if(audio.currentTime>=(seg.start+seg.duration)){ audio.currentTime=seg.start; audio.play(); }
+            };
+            audio.addEventListener('timeupdate',onTime);
+          });
+        });
+      }
+
+        ro.observe(waveBox);
+      }
+    });
+
+      // chapter list
+      const listEl = rootEl.querySelector('[data-act="chapters"]');
+      if(listEl){
+        listEl.innerHTML='';
+        segments.forEach((seg,i)=>{
+          const b=document.createElement('button');
+          b.textContent=seg.label||('@'+fmt(seg.start||0));
+          b.onclick=()=>{ audio.currentTime=seg.start||0; };
+          listEl.appendChild(b);
+        });
+        // loop control: clicking active toggles loop
+        listEl.querySelectorAll('button').forEach((btn,i)=>{
+          btn.addEventListener('click',()=>{
+            listEl.querySelectorAll('button').forEach(bb=>bb.classList.remove('active'));
+            btn.classList.add('active');
+            let looping=true;
+            const seg=segments[i];
+            const onTime=()=>{
+              if(!looping){ audio.removeEventListener('timeupdate',onTime); return; }
+              if(audio.currentTime>=(seg.start+seg.duration)){ audio.currentTime=seg.start; audio.play(); }
+            };
+            audio.addEventListener('timeupdate',onTime);
+          });
+        });
+      }
+
+        const start = Number(seg.start||0);
+        const pos = (start / audio.duration) * 100;
+        const m = document.createElement('div');
+        m.className='marker';
+        m.style.left = Math.min(99.5, Math.max(0,pos))+'%';
+        m.title = seg.label || ('@'+fmt(start));
+        m.style.pointerEvents='auto';
+        m.onclick = (e)=>{ audio.currentTime = start; };
+        marks.appendChild(m);
+      });
+
+      // chapter list
+      const listEl = rootEl.querySelector('[data-act="chapters"]');
+      if(listEl){
+        listEl.innerHTML='';
+        segments.forEach((seg,i)=>{
+          const b=document.createElement('button');
+          b.textContent=seg.label||('@'+fmt(seg.start||0));
+          b.onclick=()=>{ audio.currentTime=seg.start||0; };
+          listEl.appendChild(b);
+        });
+        // loop control: clicking active toggles loop
+        listEl.querySelectorAll('button').forEach((btn,i)=>{
+          btn.addEventListener('click',()=>{
+            listEl.querySelectorAll('button').forEach(bb=>bb.classList.remove('active'));
+            btn.classList.add('active');
+            let looping=true;
+            const seg=segments[i];
+            const onTime=()=>{
+              if(!looping){ audio.removeEventListener('timeupdate',onTime); return; }
+              if(audio.currentTime>=(seg.start+seg.duration)){ audio.currentTime=seg.start; audio.play(); }
+            };
+            audio.addEventListener('timeupdate',onTime);
+          });
+        });
+      }
+
+    });
+
+      // chapter list
+      const listEl = rootEl.querySelector('[data-act="chapters"]');
+      if(listEl){
+        listEl.innerHTML='';
+        segments.forEach((seg,i)=>{
+          const b=document.createElement('button');
+          b.textContent=seg.label||('@'+fmt(seg.start||0));
+          b.onclick=()=>{ audio.currentTime=seg.start||0; };
+          listEl.appendChild(b);
+        });
+        // loop control: clicking active toggles loop
+        listEl.querySelectorAll('button').forEach((btn,i)=>{
+          btn.addEventListener('click',()=>{
+            listEl.querySelectorAll('button').forEach(bb=>bb.classList.remove('active'));
+            btn.classList.add('active');
+            let looping=true;
+            const seg=segments[i];
+            const onTime=()=>{
+              if(!looping){ audio.removeEventListener('timeupdate',onTime); return; }
+              if(audio.currentTime>=(seg.start+seg.duration)){ audio.currentTime=seg.start; audio.play(); }
+            };
+            audio.addEventListener('timeupdate',onTime);
+          });
+        });
+      }
+
+
+    function refreshBuffered(){
+      if(!audio.buffered || audio.buffered.length===0) { buf.style.width='0%'; return; }
+      // Assume we care about the last range end
+      const end = audio.buffered.end(audio.buffered.length-1);
+      buf.style.width = (Math.min(end, audio.duration) / audio.duration * 100) + '%';
+    }
+    function refreshProgress(){
+      prog.style.width = (audio.currentTime / audio.duration * 100) + '%';
+      curEl.textContent = fmt(audio.currentTime);
+      requestAnimationFrame(refreshProgress);
+    }
+    audio.addEventListener('progress', refreshBuffered);
+    audio.addEventListener('timeupdate', refreshBuffered);
+    requestAnimationFrame(refreshProgress);
+
+    btn.onclick = ()=>{
+      if(audio.paused) audio.play().catch(()=>{});
+      else audio.pause();
+    };
+    bar.addEventListener('click', (e)=>{
+      const rect = bar.getBoundingClientRect();
+      const x = (e.clientX - rect.left)/rect.width;
+      audio.currentTime = audio.duration * Math.max(0,Math.min(1,x));
+    });
+
+      // chapter list
+      const listEl = rootEl.querySelector('[data-act="chapters"]');
+      if(listEl){
+        listEl.innerHTML='';
+        segments.forEach((seg,i)=>{
+          const b=document.createElement('button');
+          b.textContent=seg.label||('@'+fmt(seg.start||0));
+          b.onclick=()=>{ audio.currentTime=seg.start||0; };
+          listEl.appendChild(b);
+        });
+        // loop control: clicking active toggles loop
+        listEl.querySelectorAll('button').forEach((btn,i)=>{
+          btn.addEventListener('click',()=>{
+            listEl.querySelectorAll('button').forEach(bb=>bb.classList.remove('active'));
+            btn.classList.add('active');
+            let looping=true;
+            const seg=segments[i];
+            const onTime=()=>{
+              if(!looping){ audio.removeEventListener('timeupdate',onTime); return; }
+              if(audio.currentTime>=(seg.start+seg.duration)){ audio.currentTime=seg.start; audio.play(); }
+            };
+            audio.addEventListener('timeupdate',onTime);
+          });
+        });
+      }
+
+  }
+
+  function dprSize(canvas){
+    const dpr = window.devicePixelRatio||1;
+    const rect = canvas.getBoundingClientRect();
+    canvas.width = Math.max(2, Math.floor(rect.width * dpr));
+    canvas.height = Math.max(2, Math.floor(rect.height * dpr));
+    return dpr;
+  }
+  function drawWaveform(canvas, samples){
+    const ctx = canvas.getContext('2d');
+    const w = canvas.width, h = canvas.height;
+    ctx.clearRect(0,0,w,h);
+    // background gradient fill
+    const g = ctx.createLinearGradient(0,0,0,h);
+    g.addColorStop(0,'rgba(137,92,255,0.35)');
+    g.addColorStop(1,'rgba(41,211,255,0.25)');
+    ctx.fillStyle = g;
+    const mid = h/2;
+    const n = samples.length;
+    for(let i=0;i<n;i++){
+      const x = i/n * w;
+      const amp = Math.max(0, Math.min(1, samples[i]));
+      const y = amp * (h*0.48);
+      ctx.fillRect(x, mid - y, Math.max(1, w/n), y*2);
+    }
+  }
+  function synthWaveFromSegments(segments, totalDur, count=400){
+    // deterministic pseudo-random based on segment index and label
+    const out = new Array(count).fill(0.15);
+    if(!Array.isArray(segments)||!segments.length||!isFinite(totalDur)||totalDur<=0) return out;
+    const segs = segments.map(s=>({start:+(s.start||0), dur:+(s.duration||0), label:(s.label||'')}));
+    for(let i=0;i<count;i++){
+      const t = (i/count)*totalDur;
+      const seg = segs.find(s => t>=s.start && t<=(s.start+s.dur)) || segs[segs.length-1];
+      const base = 0.25 + Math.min(0.6, (seg.dur/totalDur)*0.9);
+      // hash-ish
+      let h=0; for(const ch of seg.label) h=(h*31 + ch.charCodeAt(0))%997;
+      const noise = ((Math.sin(i*0.17 + h) + Math.sin(i*0.05 + h*0.01))*0.5+1)/2 * 0.25;
+      out[i] = Math.max(0.08, Math.min(0.95, base*0.6 + noise));
+    }
+    return out;
+  }
+  async function fetchAndDecode(src){
+    const ac = new (window.AudioContext||window.webkitAudioContext)();
+    const res = await fetch(src, {mode:'cors'});
+    const ab = await res.arrayBuffer();
+    return await new Promise((res,rej)=>{
+      ac.decodeAudioData(ab, buf=>res({ac,buf}), err=>rej(err));
+    });
+
+      // chapter list
+      const listEl = rootEl.querySelector('[data-act="chapters"]');
+      if(listEl){
+        listEl.innerHTML='';
+        segments.forEach((seg,i)=>{
+          const b=document.createElement('button');
+          b.textContent=seg.label||('@'+fmt(seg.start||0));
+          b.onclick=()=>{ audio.currentTime=seg.start||0; };
+          listEl.appendChild(b);
+        });
+        // loop control: clicking active toggles loop
+        listEl.querySelectorAll('button').forEach((btn,i)=>{
+          btn.addEventListener('click',()=>{
+            listEl.querySelectorAll('button').forEach(bb=>bb.classList.remove('active'));
+            btn.classList.add('active');
+            let looping=true;
+            const seg=segments[i];
+            const onTime=()=>{
+              if(!looping){ audio.removeEventListener('timeupdate',onTime); return; }
+              if(audio.currentTime>=(seg.start+seg.duration)){ audio.currentTime=seg.start; audio.play(); }
+            };
+            audio.addEventListener('timeupdate',onTime);
+          });
+        });
+      }
+
+  }
+  function downsampleBuffer(audioBuffer, count=400){
+    const ch0 = audioBuffer.getChannelData(0);
+    const ch1 = audioBuffer.numberOfChannels>1? audioBuffer.getChannelData(1) : null;
+    const block = Math.floor(ch0.length / count) || 1;
+    const out = [];
+    for(let i=0;i<count;i++){
+      const start=i*block, end=Math.min(ch0.length,(i+1)*block);
+      let sum=0, n=0;
+      for(let j=start;j<end;j++){ const v0=Math.abs(ch0[j]); const v1= ch1? Math.abs(ch1[j]):0; sum += (v0+v1)*0.5; n++; }
+      out.push(n? sum/n : 0);
+    }
+    // normalize
+    const max = Math.max(0.0001, ...out);
+    return out.map(v=>v/max);
+  }
+  function placeLabels(labelsEl, segments, totalDur){
+    labelsEl.innerHTML='';
+    if(!Array.isArray(segments)||!segments.length||!isFinite(totalDur)||totalDur<=0) return;
+    segments.forEach(seg=>{
+      const start = Number(seg.start||0);
+      const pos = Math.min(99.5, Math.max(0, (start/totalDur)*100));
+      const span = document.createElement('span');
+      span.className='lab';
+      span.style.left = pos+'%';
+      span.textContent = (seg.label || '@'+fmt(start));
+      labelsEl.appendChild(span);
+    });
+
+      // chapter list
+      const listEl = rootEl.querySelector('[data-act="chapters"]');
+      if(listEl){
+        listEl.innerHTML='';
+        segments.forEach((seg,i)=>{
+          const b=document.createElement('button');
+          b.textContent=seg.label||('@'+fmt(seg.start||0));
+          b.onclick=()=>{ audio.currentTime=seg.start||0; };
+          listEl.appendChild(b);
+        });
+        // loop control: clicking active toggles loop
+        listEl.querySelectorAll('button').forEach((btn,i)=>{
+          btn.addEventListener('click',()=>{
+            listEl.querySelectorAll('button').forEach(bb=>bb.classList.remove('active'));
+            btn.classList.add('active');
+            let looping=true;
+            const seg=segments[i];
+            const onTime=()=>{
+              if(!looping){ audio.removeEventListener('timeupdate',onTime); return; }
+              if(audio.currentTime>=(seg.start+seg.duration)){ audio.currentTime=seg.start; audio.play(); }
+            };
+            audio.addEventListener('timeupdate',onTime);
+          });
+        });
+      }
+
+  }
+
+  function downloadFile(name, content, type='application/json'){
+    const blob = new Blob([content], {type});
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = name;
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(()=>{ URL.revokeObjectURL(a.href); a.remove(); }, 500);
+  }
+  function toCSV(rows){
+    const esc = v => ('"'+String(v).replace(/"/g,'""')+'"');
+    const header = ['index','start','duration','label'];
+    const lines = [header.map(esc).join(',')];
+    rows.forEach((r,i)=>{
+      lines.push([i, r.start||0, r.duration||0, r.label||''].map(esc).join(','));
+    });
+    return lines.join('\n');
+  }
+
+  function getSyncUrl(){ const el=document.getElementById('syncUrl'); return el? (el.value||'').trim() : ''; }
+  async function fetchChapterSets(base){
+    const r = await fetch(base.replace(/\/$/,'') + '/chaptersets', {method:'GET'});
+    if(!r.ok) throw new Error('HTTP '+r.status);
+    return await r.json(); // expected array
+  }
+  async function postChapterSet(base, payload){
+    const r = await fetch(base.replace(/\/$/,'') + '/chaptersets', {
+      method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload)
+    });
+    if(!r.ok) throw new Error('HTTP '+r.status);
+    return await r.json();
+  }
+  function createModal(){
+    let modal = document.querySelector('.chapmodal');
+    if(!modal){
+      modal = document.createElement('div');
+      modal.className='chapmodal';
+      modal.innerHTML = `<div class="box"><h4>Banco de Capítulos</h4><div data-act="list"></div><div style="display:flex;gap:8px;justify-content:flex-end;margin-top:8px"><button class="btn" data-act="close">Fechar</button></div></div>`;
+      document.body.appendChild(modal);
+      modal.querySelector('[data-act="close"]').onclick = ()=> modal.style.display='none';
+      modal.addEventListener('click', (e)=>{ if(e.target===modal) modal.style.display='none'; });
+    }
+    return modal;
+  }
+  function openChapterList(sets, onPick){
+    const modal = createModal();
+    const list = modal.querySelector('[data-act="list"]');
+    list.innerHTML = '';
+    if(!Array.isArray(sets) || !sets.length){
+      list.innerHTML = '<div class="subtle">Nenhum set encontrado.</div>';
+    }else{
+      sets.forEach((s,i)=>{
+        const wrap = document.createElement('div');
+        wrap.className = 'chapset';
+        wrap.innerHTML = `<div style="flex:1">
+            <div style="font-weight:600">${(s.name||'sem-nome')}</div>
+            <div class="meta">${new Date(s.updatedAt||s.createdAt||Date.now()).toLocaleString()} • dur=${(s.duration||0).toFixed? (s.duration||0).toFixed(1) : s.duration} • segs=${(s.segments||[]).length}</div>
+          </div>
+          <button class="btn" data-idx="${i}">Carregar</button>`;
+        wrap.querySelector('button').onclick = ()=>{ modal.style.display='none'; onPick(s); };
+        list.appendChild(wrap);
+      });
+    }
+    modal.style.display='grid';
+  }
+
+  </script>
+</head>
+<body>
+  <div id="app">
+    <header>
+      <div class="brand"><div class="dot"></div>Dual.Infodose · <span id="modeTag">Nuvem</span></div>
+      <div class="toolrow">
+        <button class="btn pill" id="btnConnect">Conectores</button>
+        <button class="btn pill" id="btnFeed">Pulsos</button>
+      </div>
+    </header>
+    <main class="stage">
+      <canvas id="fx"></canvas>
+      <div class="feed" id="feed"></div>
+      <section class="panel" id="panelConnect">
+        <h3>Conectores</h3>
+        <div class="subtle">Local (WASM via Pyodide), Nuvem (n8n) ou Neural (Servidor)</div>
+        <div class="radio-row" id="modeRow">
+          <div class="chip" data-mode="local">Local (WASM)</div>
+          <div class="chip active" data-mode="cloud">Nuvem (n8n)</div>
+          <div class="chip" data-mode="neural">Neural (Servidor)</div>
+        </div>
+        <div class="row"><input id="cloudUrl" type="url" placeholder="URL base n8n (ex: https://seu-n8n/dual)"><button class="btn accent" id="testCloud">Testar</button></div>
+        <div class="row"><input id="neuralUrl" type="url" placeholder="URL API Neural (ex: https://api.seuservidor)"><button class="btn accent" id="testNeural">Testar</button></div>
+        <div class="subtle">Tokens/chaves no servidor; PWA usa tokens efêmeros.</div>
+        <hr style="border:none;height:1px;background:rgba(255,255,255,.08);margin:10px 0"/>
+        <h3>Sandbox remoto</h3>
+        <div class="row"><input id="remoteUrl" type="url" placeholder="https://... (html)"><button class="btn" id="btnLoadRemote">Carregar</button></div>
+        <div class="sandbox"><iframe id="sandbox" sandbox="allow-same-origin allow-scripts" referrerpolicy="no-referrer" style="border:0;width:100%;height:100%"></iframe></div>
+        <hr style="border:none;height:1px;background:rgba(255,255,255,.08);margin:10px 0"/>
+        
+        <hr style="border:none;height:1px;background:rgba(255,255,255,.08);margin:10px 0"/>
+        <h3>Perfis de Voz (12 arquétipos)</h3>
+        <div class="row">
+          <select id="voiceArchetype" class="btn" style="flex:1">
+            <option>Atlas</option><option>Nova</option><option>Vitalis</option><option>Pulse</option>
+            <option>Artemis</option><option>Serena</option><option>Kaos</option><option>Genus</option>
+            <option>Lumine</option><option>Aion</option><option>Rhea</option><option>Horus</option>
+          </select>
+          <button class="btn" id="resetVoice">Reset</button>
+        </div>
+        <div class="row">
+          <label class="label" style="min-width:70px">Speed</label>
+          <input id="voiceSpeed" type="range" min="0.80" max="1.20" step="0.01" style="flex:1"/>
+          <span id="voiceSpeedVal" class="subtle" style="min-width:46px;text-align:right"></span>
+        </div>
+        <div class="row">
+          <label class="label" style="min-width:70px">Pitch</label>
+          <input id="voicePitch" type="range" min="-1.00" max="1.00" step="0.10" style="flex:1"/>
+          <span id="voicePitchVal" class="subtle" style="min-width:46px;text-align:right"></span>
+        </div>
+        <div class="row">
+          <label class="label" style="min-width:70px">Style</label>
+          <select id="voiceStyle" class="btn" style="flex:1">
+            <option>default</option><option>smooth</option><option>focus</option><option>bright</option><option>rhythmic</option>
+            <option>hunter</option><option>calm</option><option>bold</option><option>analytical</option><option>luminous</option>
+            <option>timeless</option><option>warm</option><option>oracle</option>
+          </select>
+          <button class="btn good" id="saveVoice">Salvar</button>
+        </div>
+        
+        <div class="row">
+          <label class="label" style="min-width:70px">Preset</label>
+          <select id="voicePreset" class="btn" style="flex:1">
+            <option value="A">Preset A</option>
+            <option value="B">Preset B</option>
+          </select>
+        </div>
+
+        <div class="subtle">As alterações sobrescrevem o perfil padrão do arquétipo neste dispositivo (armazenadas no navegador).</div>
+        <div class="row">
+          <button class="btn good" id="voicePreview">Preview de Voz</button>
+          <input id="syncUrl" type="url" placeholder="https://api.seuservidor (opcional p/ Sync)" style="flex:1"/>
+          <button class="btn accent" id="syncSave">Sync: Salvar</button>
+          <button class="btn" id="syncLoad">Sync: Carregar</button>
+        </div>
+        <div class="subtle">Preview fala local (nativo do device). Sync grava/lê overrides no seu servidor (opcional).</div>
+        <div class="row">
+          <button class="btn accent" id="autoPrevToggle">Auto-Preview: OFF</button>
+        </div>
+
+        <hr style="border:none;height:1px;background:rgba(255,255,255,.08);margin:10px 0"/>
+        <h3>Falas longas</h3>
+        <div class="row">
+          <textarea id="longText" placeholder="Cole ou escreva aqui o texto da fala longa..." style="min-height:100px; width:100%; padding:10px; border-radius:10px; background:#0e0e14; border:1px solid rgba(255,255,255,.12); color:#eaeaf7"></textarea>
+        </div>
+        <div class="row">
+          <button class="btn good" id="longPreview">Preview Longo (local)</button>
+          <button class="btn" id="longSend">TTS Longo (conector)</button>
+        </div>
+        <div class="subtle">O Preview Longo usa a síntese local do device. O TTS Longo envia ao conector ativo (Nuvem/Neural) com sinalização de long-form.</div>
+
+
+
+        <h3>Preferências</h3>
+        <div class="row">
+          <button class="btn" id="perfLow">Performance: Low</button>
+          <button class="btn" id="perfHigh">Performance: High</button>
+          <button class="btn bad" id="clearFeed">Limpar Pulsos</button>
+        </div>
+      </section>
+    </main>
+    <footer class="dock">
+      <div class="side">
+        <button class="btn pill" id="btnUpload">⧉ PDF</button><input id="file" type="file" accept=".pdf,.txt,.md"/>
+        <button class="btn pill" id="btnMission">Missão 78K</button>
+      </div>
+      <div class="circle" id="btnRitual" title="Toque e fale sua intenção"></div>
+      <div class="side" style="justify-content:flex-end">
+        <button class="btn pill" id="btnNova">TTS Nova</button>
+        <button class="btn pill" id="btnElysha">RAG Elysha</button>
+      </div>
+    </footer>
+  </div>
+
+  <script>
+  const S = {
+    mode: localStorage.getItem('dual.connector.mode') || 'cloud',
+    cloudUrl: localStorage.getItem('dual.endpoints.cloud') || '',
+    neuralUrl: localStorage.getItem('dual.endpoints.neural') || '',
+    perf: localStorage.getItem('dual.perf') || 'high',
+    feedEl: document.getElementById('feed'),
+    modeTag: document.getElementById('modeTag'),
+    firstAudioUnlocked:false
+  };
+
+  // --------- Voice Profiles ---------
+  const VOICE_PROFILES = {"Atlas": {"speed": 0.96, "pitch": -0.5, "style": "focus"}, "Nova": {"speed": 1.04, "pitch": 0.5, "style": "smooth"}, "Vitalis": {"speed": 1.06, "pitch": 0.2, "style": "bright"}, "Pulse": {"speed": 1.08, "pitch": 0.4, "style": "rhythmic"}, "Artemis": {"speed": 0.98, "pitch": -0.2, "style": "hunter"}, "Serena": {"speed": 0.94, "pitch": -0.3, "style": "calm"}, "Kaos": {"speed": 1.12, "pitch": 0.6, "style": "bold"}, "Genus": {"speed": 1.0, "pitch": 0.0, "style": "analytical"}, "Lumine": {"speed": 1.02, "pitch": 0.8, "style": "luminous"}, "Aion": {"speed": 0.92, "pitch": -0.6, "style": "timeless"}, "Rhea": {"speed": 0.97, "pitch": -0.1, "style": "warm"}, "Horus": {"speed": 0.99, "pitch": -0.4, "style": "oracle"}};
+  function enrichTTS(intent){
+    if(intent.type!=='tts') return intent;
+    const a = (intent.archetype||'Nova');
+    const p = VOICE_PROFILES[a] || VOICE_PROFILES['Nova'];
+    return Object.assign({}, intent, { speed:p.speed, pitch:p.pitch, style:p.style, format:intent.format||'audio/mp3' });
+  }
+
+  // SW
+  if('serviceWorker' in navigator){ window.addEventListener('load',()=>{ navigator.serviceWorker.register('./sw.js').catch(console.warn); }); }
+
+  // Particles
+  const fx=document.getElementById('fx'), ctx=fx.getContext('2d'); let W=0,H=0,stars=[];
+  function resize(){W=fx.width=fx.clientWidth;H=fx.height=fx.clientHeight} window.addEventListener('resize',resize); resize();
+  function initStars(count= S.perf==='low'?30:90){stars=Array.from({length:count},()=>({x:Math.random()*W,y:Math.random()*H,r:Math.random()*1.4+0.3,v:Math.random()*0.4+0.2}))}
+  initStars(); (function loop(){ if(S.perf==='low'){ctx.clearRect(0,0,W,H);return requestAnimationFrame(loop)} ctx.clearRect(0,0,W,H); for(const s of stars){ctx.beginPath();ctx.arc(s.x,s.y,s.r,0,Math.PI*2);ctx.fillStyle='rgba(137,92,255,.9)';ctx.fill();s.y+=s.v; if(s.y>H){s.y=0;s.x=Math.random()*W}} requestAnimationFrame(loop) })();
+
+  function chipSync(){document.querySelectorAll('#modeRow .chip').forEach(ch=>ch.classList.toggle('active', ch.dataset.mode===S.mode)); S.modeTag.textContent = S.mode==='local'?'Local':S.mode==='cloud'?'Nuvem':'Neural'}
+  function setMode(m){S.mode=m; localStorage.setItem('dual.connector.mode',m); chipSync(); pushPulse('Sistema','Conector: '+m,'info')}
+  function saveEndpoints(){S.cloudUrl=document.getElementById('cloudUrl').value.trim();S.neuralUrl=document.getElementById('neuralUrl').value.trim();localStorage.setItem('dual.endpoints.cloud',S.cloudUrl);localStorage.setItem('dual.endpoints.neural',S.neuralUrl)}
+  function loadEndpointsUI(){document.getElementById('cloudUrl').value=S.cloudUrl;document.getElementById('neuralUrl').value=S.neuralUrl}
+
+  
+  function pushPulse(archetype, text, kind='card', audioUrl=null, meta={}){
+    const d = document.createElement('div');
+    d.className='card';
+    const time = new Date().toLocaleTimeString();
+    const hasSegments = meta && Array.isArray(meta.segments) && meta.segments.length>0;
+    d.innerHTML = `
+      <div class="meta">
+        <span class="badge">${archetype||'Dual'}</span>
+        <span>${time}</span>
+        <span class="badge" style="background:rgba(41,211,255,.22);border-color:rgba(41,211,255,.4)">${S.mode}</span>
+        ${meta.source? `<span class="badge" style="background:rgba(255,255,255,.1)">${meta.source}</span>`: ''}
+      </div>
+      <div class="text">${text?escapeHtml(text):''}</div>
+      ${audioUrl && !hasSegments ? `<div class="audio-row"><audio controls src="${audioUrl}"></audio></div>`:''}
+      ${audioUrl && hasSegments ? `<div class="player">
+         <div class="row"><audio id="a${Date.now()}" src="${audioUrl}"></audio>
+         <button class="btn pill" data-act="toggle">▶︎/⏸</button></div>
+         <div class="wave" data-act="wave"><canvas></canvas></div>
+         <div class="row" style="gap:12px">
+           <div class="bar" data-act="seek" style="flex:1">
+             <div class="buffer"></div>
+             <div class="progress"></div>
+             <div class="markers"></div>
+           </div>
+           <div class="time"><span data-act="cur">0:00</span> / <span data-act="dur">0:00</span></div>
+         </div>
+       </div>`:''}
+         ${audioUrl && hasSegments ? `<div class="labels" data-act="labels"></div><div class='chapters' data-act='chapters'></div>` : ``}
+    `;
+    S.feedEl.appendChild(d);
+    S.feedEl.scrollTo({top:S.feedEl.scrollHeight, behavior:'smooth'});
+    if(audioUrl && meta && Array.isArray(meta.segments) && meta.segments.length){
+      renderChapterPlayer(d.querySelector('.player'), audioUrl, meta.segments);
+    }
+  }
+
+
+  const panel=document.getElementById('panelConnect');
+  document.getElementById('btnConnect').onclick=()=>{ loadEndpointsUI(); panel.style.display = panel.style.display==='block'?'none':'block' };
+  document.getElementById('btnFeed').onclick=()=>{ document.getElementById('feed').scrollTo({top:0,behavior:'smooth'}) };
+  document.querySelectorAll('#modeRow .chip').forEach(ch=> ch.onclick=()=>setMode(ch.dataset.mode));
+  document.getElementById('testCloud').onclick=async()=>{ saveEndpoints(); if(!S.cloudUrl){pushPulse('Sistema','Informe URL do n8n.','warn');return} try{ const r=await fetch(S.cloudUrl,{method:'GET'}); pushPulse('Sistema', r.ok?'n8n OK':'n8n '+r.status, r.ok?'info':'warn')}catch(e){pushPulse('Sistema','n8n inacessível.','warn')} };
+  document.getElementById('testNeural').onclick=async()=>{ saveEndpoints(); if(!S.neuralUrl){pushPulse('Sistema','Informe URL do Servidor.','warn');return} try{ const r=await fetch(S.neuralUrl,{method:'GET'}); pushPulse('Sistema', r.ok?'Servidor OK':'Servidor '+r.status, r.ok?'info':'warn')}catch(e){pushPulse('Sistema','Servidor inacessível.','warn')} };
+  document.getElementById('btnLoadRemote').onclick=()=>{ const url=document.getElementById('remoteUrl').value.trim(); const frame=document.getElementById('sandbox'); if(!url){pushPulse('Sistema','Informe URL.','warn');return} frame.src=url; pushPulse('Sistema','Sandbox carregado.','info') };
+
+  document.getElementById('perfLow').onclick=()=>{S.perf='low';localStorage.setItem('dual.perf','low');initStars();pushPulse('Sistema','Low perf.','info')};
+  document.getElementById('perfHigh').onclick=()=>{S.perf='high';localStorage.setItem('dual.perf','high');initStars();pushPulse('Sistema','High perf.','info')};
+  document.getElementById('clearFeed').onclick=()=>{ S.feedEl.innerHTML=''; pushPulse('Sistema','Pulsos limpos.','info') };
+
+  const btnRitual=document.getElementById('btnRitual');
+  btnRitual.addEventListener('click', async ()=>{ const promptText = prompt("Fale sua intenção (ex.: 'TTS Nova: ...' ou 'Elysha RAG: ...')"); if(!promptText) return; const parsed = parseIntent(promptText); await routeIntent(parsed); });
+  document.getElementById('btnNova').onclick=()=>routeIntent(enrichTTS({type:'tts',archetype:'Nova',text:'Bem-vindo ao Estado 78K — fluidez e leveza.'}));
+  document.getElementById('btnElysha').onclick=()=>routeIntent({type:'rag',archetype:'Elysha',text:'Sintetize o conteúdo enviado em 3 tópicos e 1 citação.'});
+  document.getElementById('btnMission').onclick=()=>routeIntent({type:'mission',archetype:'Nova',text:'Missão 78K agora'});
+  document.getElementById('btnUpload').onclick=()=>document.getElementById('file').click();
+  document.getElementById('file').addEventListener('change', async (e)=>{ const file=e.target.files?.[0]; if(!file) return; pushPulse('Sistema','Arquivo: '+file.name,'info'); await routeIntent({type:'rag',archetype:'Elysha',text:'Analisar arquivo',file}); e.target.value='' });
+
+  function parseIntent(raw){ const s=(raw||'').trim(), low=s.toLowerCase();
+    if(low.startsWith('tts')){ const arch=(s.split(' ')[1]||'Nova').replace(':',''); const text=s.split(':').slice(1).join(':').trim()||'Bem-vindo ao Estado 78K.'; return enrichTTS({type:'tts',archetype:arch,text}) }
+    if(low.includes('rag')||low.includes('pdf')){ const arch='Elysha'; const text=s.split(':').slice(1).join(':').trim()||'Resuma o PDF em 3 tópicos e 1 citação.'; return {type:'rag',archetype:arch,text} }
+    if(low.includes('missão')||low.includes('mission')){ return {type:'mission',archetype:'Nova',text:'Missão 78K'} }
+    return enrichTTS({type:'tts',archetype:'Nova',text:s||'Bem-vindo ao Estado 78K.'});
+  }
+
+  chipSync();
+  pushPulse('Dual','Perfis de voz aplicados aos 12 arquétipos. Toque no ◉ e peça “TTS Nova…”.','info');
+  // --------- Voice Overrides (UI) ---------
+  function getOverrides(){
+    try{ return JSON.parse(localStorage.getItem('dual.voice.overrides')||'{}'); }catch(e){ return {}; }
+  }
+  function setOverrides(o){
+    localStorage.setItem('dual.voice.overrides', JSON.stringify(o));
+  }
+  function archetypeDefault(a){
+    return VOICE_PROFILES[a] || VOICE_PROFILES['Nova'];
+  }
+  function loadVoiceUI(){
+    const sel = document.getElementById('voiceArchetype');
+    const a = sel.value;
+    const ov = getOverrides();
+    const base = archetypeDefault(a);
+    const cur = ov[a] || base;
+    const sp = document.getElementById('voiceSpeed');
+    const pi = document.getElementById('voicePitch');
+    const st = document.getElementById('voiceStyle');
+    sp.value = cur.speed; pi.value = cur.pitch; st.value = cur.style || 'default';
+    document.getElementById('voiceSpeedVal').textContent = Number(sp.value).toFixed(2);
+    document.getElementById('voicePitchVal').textContent = Number(pi.value).toFixed(2);
+  }
+  function saveVoiceUI(){
+    const a = document.getElementById('voiceArchetype').value;
+    const sp = Number(document.getElementById('voiceSpeed').value);
+    const pi = Number(document.getElementById('voicePitch').value);
+    const st = document.getElementById('voiceStyle').value;
+    const ov = getOverrides();
+    ov[a] = { speed: sp, pitch: pi, style: st };
+    setOverrides(ov);
+    pushPulse('Sistema', 'Voz salva para '+a+': speed '+sp.toFixed(2)+', pitch '+pi.toFixed(2)+', style '+st, 'info');
+  }
+  function resetVoiceUI(){
+    const a = document.getElementById('voiceArchetype').value;
+    const ov = getOverrides();
+    delete ov[a];
+    setOverrides(ov);
+    loadVoiceUI();
+    pushPulse('Sistema', 'Perfil de voz resetado para '+a, 'info');
+  }
+  document.addEventListener('change', (e)=>{
+    if(e.target && (e.target.id==='voiceSpeed' || e.target.id==='voicePitch')){
+      document.getElementById('voiceSpeedVal').textContent = Number(document.getElementById('voiceSpeed').value).toFixed(2);
+      document.getElementById('voicePitchVal').textContent = Number(document.getElementById('voicePitch').value).toFixed(2);
+    }
+    if(e.target && e.target.id==='voiceArchetype'){ loadVoiceUI(); }
+  });
+  document.getElementById('saveVoice').onclick = saveVoiceUI;
+  document.getElementById('resetVoice').onclick = resetVoiceUI;
+  // On panel open, we call loadEndpointsUI(); also call loadVoiceUI()
+  const prevBtnConnect = document.getElementById('btnConnect').onclick;
+  document.getElementById('btnConnect').onclick = ()=>{
+    loadEndpointsUI();
+    loadVoiceUI();
+    panel.style.display = panel.style.display==='block' ? 'none' : 'block';
+  };
+  
+  // --------- Presets A/B per archetype ---------
+  function getOverrides(){ try{ return JSON.parse(localStorage.getItem('dual.voice.overrides')||'{}'); }catch(e){ return {}; } }
+  function setOverrides(o){ localStorage.setItem('dual.voice.overrides', JSON.stringify(o)); }
+  function currentPreset(){ return document.getElementById('voicePreset').value || 'A'; }
+
+  function loadVoiceUI(){
+    const a = document.getElementById('voiceArchetype').value;
+    const p = currentPreset();
+    const ov = getOverrides();
+    const key = a+'_'+p;
+    const base = archetypeDefault(a);
+    const cur = ov[key] || base;
+    document.getElementById('voiceSpeed').value = cur.speed;
+    document.getElementById('voicePitch').value = cur.pitch;
+    document.getElementById('voiceStyle').value = cur.style || 'default';
+    document.getElementById('voiceSpeedVal').textContent = Number(cur.speed).toFixed(2);
+    document.getElementById('voicePitchVal').textContent = Number(cur.pitch).toFixed(2);
+  }
+  function saveVoiceUI(){
+    const a = document.getElementById('voiceArchetype').value;
+    const p = currentPreset();
+    const sp = Number(document.getElementById('voiceSpeed').value);
+    const pi = Number(document.getElementById('voicePitch').value);
+    const st = document.getElementById('voiceStyle').value;
+    const ov = getOverrides();
+    ov[a+'_'+p] = { speed: sp, pitch: pi, style: st };
+    setOverrides(ov);
+    pushPulse('Sistema', `Voz salva (${p}) para ${a}: speed ${sp.toFixed(2)}, pitch ${pi.toFixed(2)}, style ${st}`, 'info');
+  }
+  function resetVoiceUI(){
+    const a = document.getElementById('voiceArchetype').value;
+    const p = currentPreset();
+    const ov = getOverrides();
+    delete ov[a+'_'+p];
+    setOverrides(ov);
+    loadVoiceUI();
+    pushPulse('Sistema', 'Perfil resetado ('+p+') para '+a, 'info');
+  }
+
+  // --------- Auto Preview (short/long) with cooldown ---------
+  let previewCooldown=false;
+  function autoPreview(){
+    if(previewCooldown) return;
+    previewCooldown=true;
+    setTimeout(()=>previewCooldown=false, 4000); // 4s cooldown
+    const a = document.getElementById('voiceArchetype').value;
+    const sp = Number(document.getElementById('voiceSpeed').value);
+    const pi = Number(document.getElementById('voicePitch').value);
+    const st = document.getElementById('voiceStyle').value;
+    const phraseShort = `Prévia curta ${a}, estilo ${st}.`;
+    const phraseLong = `Ativação ${a}: esta é uma fala longa de demonstração, onde você pode sentir a cadência, as pausas e o estilo ${st}.`;
+    try{
+      const u1 = new SpeechSynthesisUtterance(phraseShort);
+      u1.lang = 'pt-BR';
+      const u2 = new SpeechSynthesisUtterance(phraseLong);
+      u2.lang = 'pt-BR';
+      window.speechSynthesis.cancel();
+      window.speechSynthesis.speak(u1);
+      window.speechSynthesis.speak(u2);
+      pushPulse('Sistema','Auto-preview executado para '+a,'info');
+    }catch(e){
+      pushPulse('Sistema','Auto-preview falhou.','warn');
+    }
+  }
+
+  document.addEventListener('change', (e)=>{
+    if(e.target && (e.target.id==='voiceSpeed' || e.target.id==='voicePitch' || e.target.id==='voiceStyle')){
+      document.getElementById('voiceSpeedVal').textContent = Number(document.getElementById('voiceSpeed').value).toFixed(2);
+      document.getElementById('voicePitchVal').textContent = Number(document.getElementById('voicePitch').value).toFixed(2);
+      autoPreview();
+    }
+    if(e.target && e.target.id==='voiceArchetype'){ loadVoiceUI(); }
+    if(e.target && e.target.id==='voicePreset'){ loadVoiceUI(); }
+  });
+
+  // Override enrichTTS to honor A/B presets
+  const _enrichTTS = enrichTTS;
+  function enrichTTS(intent){
+    const enriched = _enrichTTS(intent);
+    if(enriched.type !== 'tts') return enriched;
+    const a = (enriched.archetype||'Nova');
+    const p = currentPreset();
+    const ov = getOverrides();
+    if(ov[a+'_'+p]){
+      enriched.speed = ov[a+'_'+p].speed;
+      enriched.pitch = ov[a+'_'+p].pitch;
+      enriched.style = ov[a+'_'+p].style;
+    }
+    return enriched;
+  }
+
+
+  // --------- Voice Preview (local TTS) ---------
+  document.getElementById('voicePreview').onclick = ()=>{
+    const a = document.getElementById('voiceArchetype').value;
+    const sp = Number(document.getElementById('voiceSpeed').value);
+    const pi = Number(document.getElementById('voicePitch').value);
+    const st = document.getElementById('voiceStyle').value;
+    const phrase = `Prévia ${a}: velocidade ${sp.toFixed(2)}, tom ${pi.toFixed(2)}, estilo ${st}.`;
+    try{
+      const u = new SpeechSynthesisUtterance(phrase);
+      u.lang = 'pt-BR';
+      window.speechSynthesis.cancel();
+      window.speechSynthesis.speak(u);
+      pushPulse('Sistema','Preview local executado.','info');
+    }catch(e){
+      pushPulse('Sistema','Preview falhou no TTS local.','warn');
+    }
+  };
+
+  // --------- Sync Overrides (optional server) ---------
+  function getSyncUrl(){ return (document.getElementById('syncUrl').value || '').trim(); }
+
+  document.getElementById('syncSave').onclick = async ()=>{
+    const url = getSyncUrl();
+    if(!url){ pushPulse('Sistema','Informe a URL do servidor para Sync.','warn'); return; }
+    const payload = { overrides: getOverrides(), ts: Date.now() };
+    try{
+      const r = await fetch(url.replace(/\/$/,'') + '/voice-overrides', {
+        method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload)
+      });
+
+      // chapter list
+      const listEl = rootEl.querySelector('[data-act="chapters"]');
+      if(listEl){
+        listEl.innerHTML='';
+        segments.forEach((seg,i)=>{
+          const b=document.createElement('button');
+          b.textContent=seg.label||('@'+fmt(seg.start||0));
+          b.onclick=()=>{ audio.currentTime=seg.start||0; };
+          listEl.appendChild(b);
+        });
+        // loop control: clicking active toggles loop
+        listEl.querySelectorAll('button').forEach((btn,i)=>{
+          btn.addEventListener('click',()=>{
+            listEl.querySelectorAll('button').forEach(bb=>bb.classList.remove('active'));
+            btn.classList.add('active');
+            let looping=true;
+            const seg=segments[i];
+            const onTime=()=>{
+              if(!looping){ audio.removeEventListener('timeupdate',onTime); return; }
+              if(audio.currentTime>=(seg.start+seg.duration)){ audio.currentTime=seg.start; audio.play(); }
+            };
+            audio.addEventListener('timeupdate',onTime);
+          });
+        });
+      }
+
+      if(!r.ok) throw new Error('HTTP '+r.status);
+      pushPulse('Sistema','Overrides enviados ao servidor.','info');
+    }catch(e){
+      pushPulse('Sistema','Falha no Sync: '+e.message,'warn');
+    }
+  };
+
+  document.getElementById('syncLoad').onclick = async ()=>{
+    const url = getSyncUrl();
+    if(!url){ pushPulse('Sistema','Informe a URL do servidor para Sync.','warn'); return; }
+    try{
+      const r = await fetch(url.replace(/\/$/,'') + '/voice-overrides', { method:'GET' });
+      if(!r.ok) throw new Error('HTTP '+r.status);
+      const data = await r.json();
+      if(data && data.overrides){
+        setOverrides(data.overrides);
+        loadVoiceUI();
+        pushPulse('Sistema','Overrides carregados do servidor.','info');
+      }else{
+        pushPulse('Sistema','Nenhum override encontrado no servidor.','warn');
+      }
+    }catch(e){
+      pushPulse('Sistema','Falha ao carregar Sync: '+e.message,'warn');
+    }
+  };
+
+  // --------- Auto-Preview ---------
+  function isAutoPreview(){ return localStorage.getItem('dual.voice.autoPreview') === '1'; }
+  function setAutoPreview(v){ localStorage.setItem('dual.voice.autoPreview', v ? '1' : '0'); }
+  function updateAutoBtn(){
+    const b = document.getElementById('autoPrevToggle');
+    const on = isAutoPreview();
+    b.textContent = 'Auto-Preview: ' + (on ? 'ON' : 'OFF');
+    b.className = 'btn ' + (on ? 'good' : 'accent');
+  }
+  document.getElementById('autoPrevToggle').onclick = ()=>{ setAutoPreview(!isAutoPreview()); updateAutoBtn(); };
+
+  let autoPrevTimer = null;
+  function scheduleAutoPreview(){
+    if(!isAutoPreview()) return;
+    clearTimeout(autoPrevTimer);
+    autoPrevTimer = setTimeout(()=>{
+      // Use current archetype + sliders to speak a short local phrase
+      const a = document.getElementById('voiceArchetype').value;
+      const sp = Number(document.getElementById('voiceSpeed').value);
+      const pi = Number(document.getElementById('voicePitch').value);
+      const st = document.getElementById('voiceStyle').value;
+      speakLocal(`Prévia ${a} (${st}).`, sp, pi);
+    }, 1200);
+  }
+
+  // Wire auto-preview on slider/style changes
+  ['voiceSpeed','voicePitch','voiceStyle'].forEach(id=>{
+    const el = document.getElementById(id);
+    el.addEventListener('input', scheduleAutoPreview);
+    el.addEventListener('change', scheduleAutoPreview);
+  });
+  document.getElementById('voiceArchetype').addEventListener('change', scheduleAutoPreview);
+  updateAutoBtn();
+
+  // --------- Local TTS with rate/pitch ---------
+  function clamp(v,min,max){ return Math.max(min, Math.min(max, v)); }
+  function synthAvailable(){ return 'speechSynthesis' in window; }
+  function speakLocal(text, speed=1.0, pitchRel=0.0){
+    if(!synthAvailable()) { pushPulse('Sistema','TTS local indisponível.','warn'); return; }
+    try{
+      const u = new SpeechSynthesisUtterance(text);
+      u.lang = 'pt-BR';
+      // Web Speech API rate: 0.1..10; we'll clamp 0.5..2.0
+      u.rate = clamp(speed, 0.5, 2.0);
+      // Web Speech API pitch: 0..2; our relative -1..+1 → map to 0.5..1.5
+      u.pitch = clamp(1 + (pitchRel*0.5), 0.1, 2.0);
+      window.speechSynthesis.cancel();
+      window.speechSynthesis.speak(u);
+    }catch(e){ pushPulse('Sistema','Falha no TTS local.','warn'); }
+  }
+
+  // --------- Long TTS (local: chunked; connector: intent long) ---------
+  function chunkText(t, maxLen){
+    const parts = [];
+    let s = (t||'').trim();
+    if(!s) return parts;
+    const regex = /(.{1,200}(?:[\\.!?]\\s|\\n|$))/g;
+    let m;
+    while((m = regex.exec(s)) !== null){
+      parts.push(m[1].trim());
+    }
+    return parts.length ? parts : [s];
+  }
+  async function speakChunksLocal(text, speed, pitchRel){
+    const chunks = chunkText(text, 200);
+    if(!chunks.length){ pushPulse('Sistema','Nada para falar.','warn'); return; }
+    for(const c of chunks){
+      await new Promise(res=>{
+        const u = new SpeechSynthesisUtterance(c);
+        u.lang='pt-BR';
+        u.rate = clamp(speed||1.0, 0.5, 2.0);
+        u.pitch = clamp(1 + ((pitchRel||0)*0.5), 0.1, 2.0);
+        u.onend = res;
+        try{
+          window.speechSynthesis.speak(u);
+        }catch(e){ res(); }
+      });
+
+      // chapter list
+      const listEl = rootEl.querySelector('[data-act="chapters"]');
+      if(listEl){
+        listEl.innerHTML='';
+        segments.forEach((seg,i)=>{
+          const b=document.createElement('button');
+          b.textContent=seg.label||('@'+fmt(seg.start||0));
+          b.onclick=()=>{ audio.currentTime=seg.start||0; };
+          listEl.appendChild(b);
+        });
+        // loop control: clicking active toggles loop
+        listEl.querySelectorAll('button').forEach((btn,i)=>{
+          btn.addEventListener('click',()=>{
+            listEl.querySelectorAll('button').forEach(bb=>bb.classList.remove('active'));
+            btn.classList.add('active');
+            let looping=true;
+            const seg=segments[i];
+            const onTime=()=>{
+              if(!looping){ audio.removeEventListener('timeupdate',onTime); return; }
+              if(audio.currentTime>=(seg.start+seg.duration)){ audio.currentTime=seg.start; audio.play(); }
+            };
+            audio.addEventListener('timeupdate',onTime);
+          });
+        });
+      }
+
+    }
+  }
+
+  document.getElementById('longPreview').onclick = async ()=>{
+    const a = document.getElementById('voiceArchetype').value;
+    const sp = Number(document.getElementById('voiceSpeed').value);
+    const pi = Number(document.getElementById('voicePitch').value);
+    const txt = (document.getElementById('longText').value||'').trim();
+    if(!txt){ pushPulse('Sistema','Escreva o texto da fala longa.','warn'); return; }
+    pushPulse(a, 'Preview longo (local) iniciado...', 'info', null, {source:'Local'});
+    await speakChunksLocal(txt, sp, pi);
+    pushPulse(a, 'Preview longo (local) concluído.', 'info', null, {source:'Local'});
+  };
+
+  document.getElementById('longSend').onclick = async ()=>{
+    const a = document.getElementById('voiceArchetype').value;
+    const sp = Number(document.getElementById('voiceSpeed').value);
+    const pi = Number(document.getElementById('voicePitch').value);
+    const st = document.getElementById('voiceStyle').value;
+    const txt = (document.getElementById('longText').value||'').trim();
+    if(!txt){ pushPulse('Sistema','Escreva o texto da fala longa.','warn'); return; }
+    // Envia como intent TTS com flag long=true (servidor/n8n faz chunk/stream)
+    await routeIntent({ type:'tts', archetype:a, text: txt, long: true, speed: sp, pitch: pi, style: st, format:'audio/mp3' });
+  };
+
+  // --------- Chaptered Player Renderer ---------
+  function fmt(t){ if(!isFinite(t)||t<0) t=0; const m=Math.floor(t/60), s=Math.floor(t%60); return m+':'+String(s).padStart(2,'0'); }
+  function renderChapterPlayer(rootEl, src, segments){
+    const audio = rootEl.querySelector('audio');
+    const btn = rootEl.querySelector('[data-act="toggle"]');
+    const bar = rootEl.querySelector('.bar');
+    const buf = bar.querySelector('.buffer');
+    const prog = bar.querySelector('.progress');
+    const marks = bar.querySelector('.markers');
+    const curEl = rootEl.querySelector('[data-act="cur"]');
+    const durEl = rootEl.querySelector('[data-act="dur"]');
+
+    audio.preload = 'auto';
+    audio.addEventListener('loadedmetadata', async ()=>{
+      durEl.textContent = fmt(audio.duration);
+      // place markers + labels
+      marks.innerHTML='';
+      segments.forEach(seg=>{
+        const start = Number(seg.start||0);
+        const pos = (start / audio.duration) * 100;
+        const m = document.createElement('div');
+        m.className='marker';
+        m.style.left = Math.min(99.5, Math.max(0,pos))+'%';
+        m.title = seg.label || ('@'+fmt(start));
+        m.style.pointerEvents='auto';
+        m.onclick = (e)=>{ audio.currentTime = start; };
+        marks.appendChild(m);
+      });
+
+      // chapter list
+      const listEl = rootEl.querySelector('[data-act="chapters"]');
+      if(listEl){
+        listEl.innerHTML='';
+        segments.forEach((seg,i)=>{
+          const b=document.createElement('button');
+          b.textContent=seg.label||('@'+fmt(seg.start||0));
+          b.onclick=()=>{ audio.currentTime=seg.start||0; };
+          listEl.appendChild(b);
+        });
+        // loop control: clicking active toggles loop
+        listEl.querySelectorAll('button').forEach((btn,i)=>{
+          btn.addEventListener('click',()=>{
+            listEl.querySelectorAll('button').forEach(bb=>bb.classList.remove('active'));
+            btn.classList.add('active');
+            let looping=true;
+            const seg=segments[i];
+            const onTime=()=>{
+              if(!looping){ audio.removeEventListener('timeupdate',onTime); return; }
+              if(audio.currentTime>=(seg.start+seg.duration)){ audio.currentTime=seg.start; audio.play(); }
+            };
+            audio.addEventListener('timeupdate',onTime);
+          });
+        });
+      }
+
+      // labels under the bar
+      const labelsEl = rootEl.querySelector('[data-act="labels"]');
+      if(labelsEl) placeLabels(labelsEl, segments, audio.duration);
+      // waveform
+      const waveBox = rootEl.querySelector('[data-act="wave"]');
+      if(waveBox){
+        const cv = waveBox.querySelector('canvas');
+        const dpr = dprSize(cv);
+        try{
+          const {ac,buf} = await fetchAndDecode(src);
+          const samples = downsampleBuffer(buf, Math.floor(cv.width/Math.max(1,dpr)));
+          drawWaveform(cv, samples);
+          ac.close();
+        }catch(e){
+          const samples = synthWaveFromSegments(segments, audio.duration, Math.floor(cv.width/Math.max(1,dpr)));
+          drawWaveform(cv, samples);
+        }
+        // redraw on resize
+        const ro = new ResizeObserver(()=>{
+          const dpr2 = dprSize(cv);
+          // simple redraw using synthetic (or we could cache samples)
+          const samples2 = synthWaveFromSegments(segments, audio.duration, Math.floor(cv.width/Math.max(1,dpr2)));
+          drawWaveform(cv, samples2);
+        });
+
+      // chapter list
+      const listEl = rootEl.querySelector('[data-act="chapters"]');
+      if(listEl){
+        listEl.innerHTML='';
+        segments.forEach((seg,i)=>{
+          const b=document.createElement('button');
+          b.textContent=seg.label||('@'+fmt(seg.start||0));
+          b.onclick=()=>{ audio.currentTime=seg.start||0; };
+          listEl.appendChild(b);
+        });
+        // loop control: clicking active toggles loop
+        listEl.querySelectorAll('button').forEach((btn,i)=>{
+          btn.addEventListener('click',()=>{
+            listEl.querySelectorAll('button').forEach(bb=>bb.classList.remove('active'));
+            btn.classList.add('active');
+            let looping=true;
+            const seg=segments[i];
+            const onTime=()=>{
+              if(!looping){ audio.removeEventListener('timeupdate',onTime); return; }
+              if(audio.currentTime>=(seg.start+seg.duration)){ audio.currentTime=seg.start; audio.play(); }
+            };
+            audio.addEventListener('timeupdate',onTime);
+          });
+        });
+      }
+
+        ro.observe(waveBox);
+      }
+    });
+
+      // chapter list
+      const listEl = rootEl.querySelector('[data-act="chapters"]');
+      if(listEl){
+        listEl.innerHTML='';
+        segments.forEach((seg,i)=>{
+          const b=document.createElement('button');
+          b.textContent=seg.label||('@'+fmt(seg.start||0));
+          b.onclick=()=>{ audio.currentTime=seg.start||0; };
+          listEl.appendChild(b);
+        });
+        // loop control: clicking active toggles loop
+        listEl.querySelectorAll('button').forEach((btn,i)=>{
+          btn.addEventListener('click',()=>{
+            listEl.querySelectorAll('button').forEach(bb=>bb.classList.remove('active'));
+            btn.classList.add('active');
+            let looping=true;
+            const seg=segments[i];
+            const onTime=()=>{
+              if(!looping){ audio.removeEventListener('timeupdate',onTime); return; }
+              if(audio.currentTime>=(seg.start+seg.duration)){ audio.currentTime=seg.start; audio.play(); }
+            };
+            audio.addEventListener('timeupdate',onTime);
+          });
+        });
+      }
+
+        const start = Number(seg.start||0);
+        const pos = (start / audio.duration) * 100;
+        const m = document.createElement('div');
+        m.className='marker';
+        m.style.left = Math.min(99.5, Math.max(0,pos))+'%';
+        m.title = seg.label || ('@'+fmt(start));
+        m.style.pointerEvents='auto';
+        m.onclick = (e)=>{ audio.currentTime = start; };
+        marks.appendChild(m);
+      });
+
+      // chapter list
+      const listEl = rootEl.querySelector('[data-act="chapters"]');
+      if(listEl){
+        listEl.innerHTML='';
+        segments.forEach((seg,i)=>{
+          const b=document.createElement('button');
+          b.textContent=seg.label||('@'+fmt(seg.start||0));
+          b.onclick=()=>{ audio.currentTime=seg.start||0; };
+          listEl.appendChild(b);
+        });
+        // loop control: clicking active toggles loop
+        listEl.querySelectorAll('button').forEach((btn,i)=>{
+          btn.addEventListener('click',()=>{
+            listEl.querySelectorAll('button').forEach(bb=>bb.classList.remove('active'));
+            btn.classList.add('active');
+            let looping=true;
+            const seg=segments[i];
+            const onTime=()=>{
+              if(!looping){ audio.removeEventListener('timeupdate',onTime); return; }
+              if(audio.currentTime>=(seg.start+seg.duration)){ audio.currentTime=seg.start; audio.play(); }
+            };
+            audio.addEventListener('timeupdate',onTime);
+          });
+        });
+      }
+
+    });
+
+      // chapter list
+      const listEl = rootEl.querySelector('[data-act="chapters"]');
+      if(listEl){
+        listEl.innerHTML='';
+        segments.forEach((seg,i)=>{
+          const b=document.createElement('button');
+          b.textContent=seg.label||('@'+fmt(seg.start||0));
+          b.onclick=()=>{ audio.currentTime=seg.start||0; };
+          listEl.appendChild(b);
+        });
+        // loop control: clicking active toggles loop
+        listEl.querySelectorAll('button').forEach((btn,i)=>{
+          btn.addEventListener('click',()=>{
+            listEl.querySelectorAll('button').forEach(bb=>bb.classList.remove('active'));
+            btn.classList.add('active');
+            let looping=true;
+            const seg=segments[i];
+            const onTime=()=>{
+              if(!looping){ audio.removeEventListener('timeupdate',onTime); return; }
+              if(audio.currentTime>=(seg.start+seg.duration)){ audio.currentTime=seg.start; audio.play(); }
+            };
+            audio.addEventListener('timeupdate',onTime);
+          });
+        });
+      }
+
+
+    function refreshBuffered(){
+      if(!audio.buffered || audio.buffered.length===0) { buf.style.width='0%'; return; }
+      // Assume we care about the last range end
+      const end = audio.buffered.end(audio.buffered.length-1);
+      buf.style.width = (Math.min(end, audio.duration) / audio.duration * 100) + '%';
+    }
+    function refreshProgress(){
+      prog.style.width = (audio.currentTime / audio.duration * 100) + '%';
+      curEl.textContent = fmt(audio.currentTime);
+      requestAnimationFrame(refreshProgress);
+    }
+    audio.addEventListener('progress', refreshBuffered);
+    audio.addEventListener('timeupdate', refreshBuffered);
+    requestAnimationFrame(refreshProgress);
+
+    btn.onclick = ()=>{
+      if(audio.paused) audio.play().catch(()=>{});
+      else audio.pause();
+    };
+    bar.addEventListener('click', (e)=>{
+      const rect = bar.getBoundingClientRect();
+      const x = (e.clientX - rect.left)/rect.width;
+      audio.currentTime = audio.duration * Math.max(0,Math.min(1,x));
+    });
+
+      // chapter list
+      const listEl = rootEl.querySelector('[data-act="chapters"]');
+      if(listEl){
+        listEl.innerHTML='';
+        segments.forEach((seg,i)=>{
+          const b=document.createElement('button');
+          b.textContent=seg.label||('@'+fmt(seg.start||0));
+          b.onclick=()=>{ audio.currentTime=seg.start||0; };
+          listEl.appendChild(b);
+        });
+        // loop control: clicking active toggles loop
+        listEl.querySelectorAll('button').forEach((btn,i)=>{
+          btn.addEventListener('click',()=>{
+            listEl.querySelectorAll('button').forEach(bb=>bb.classList.remove('active'));
+            btn.classList.add('active');
+            let looping=true;
+            const seg=segments[i];
+            const onTime=()=>{
+              if(!looping){ audio.removeEventListener('timeupdate',onTime); return; }
+              if(audio.currentTime>=(seg.start+seg.duration)){ audio.currentTime=seg.start; audio.play(); }
+            };
+            audio.addEventListener('timeupdate',onTime);
+          });
+        });
+      }
+
+  }
+
+  function dprSize(canvas){
+    const dpr = window.devicePixelRatio||1;
+    const rect = canvas.getBoundingClientRect();
+    canvas.width = Math.max(2, Math.floor(rect.width * dpr));
+    canvas.height = Math.max(2, Math.floor(rect.height * dpr));
+    return dpr;
+  }
+  function drawWaveform(canvas, samples){
+    const ctx = canvas.getContext('2d');
+    const w = canvas.width, h = canvas.height;
+    ctx.clearRect(0,0,w,h);
+    // background gradient fill
+    const g = ctx.createLinearGradient(0,0,0,h);
+    g.addColorStop(0,'rgba(137,92,255,0.35)');
+    g.addColorStop(1,'rgba(41,211,255,0.25)');
+    ctx.fillStyle = g;
+    const mid = h/2;
+    const n = samples.length;
+    for(let i=0;i<n;i++){
+      const x = i/n * w;
+      const amp = Math.max(0, Math.min(1, samples[i]));
+      const y = amp * (h*0.48);
+      ctx.fillRect(x, mid - y, Math.max(1, w/n), y*2);
+    }
+  }
+  function synthWaveFromSegments(segments, totalDur, count=400){
+    // deterministic pseudo-random based on segment index and label
+    const out = new Array(count).fill(0.15);
+    if(!Array.isArray(segments)||!segments.length||!isFinite(totalDur)||totalDur<=0) return out;
+    const segs = segments.map(s=>({start:+(s.start||0), dur:+(s.duration||0), label:(s.label||'')}));
+    for(let i=0;i<count;i++){
+      const t = (i/count)*totalDur;
+      const seg = segs.find(s => t>=s.start && t<=(s.start+s.dur)) || segs[segs.length-1];
+      const base = 0.25 + Math.min(0.6, (seg.dur/totalDur)*0.9);
+      // hash-ish
+      let h=0; for(const ch of seg.label) h=(h*31 + ch.charCodeAt(0))%997;
+      const noise = ((Math.sin(i*0.17 + h) + Math.sin(i*0.05 + h*0.01))*0.5+1)/2 * 0.25;
+      out[i] = Math.max(0.08, Math.min(0.95, base*0.6 + noise));
+    }
+    return out;
+  }
+  async function fetchAndDecode(src){
+    const ac = new (window.AudioContext||window.webkitAudioContext)();
+    const res = await fetch(src, {mode:'cors'});
+    const ab = await res.arrayBuffer();
+    return await new Promise((res,rej)=>{
+      ac.decodeAudioData(ab, buf=>res({ac,buf}), err=>rej(err));
+    });
+
+      // chapter list
+      const listEl = rootEl.querySelector('[data-act="chapters"]');
+      if(listEl){
+        listEl.innerHTML='';
+        segments.forEach((seg,i)=>{
+          const b=document.createElement('button');
+          b.textContent=seg.label||('@'+fmt(seg.start||0));
+          b.onclick=()=>{ audio.currentTime=seg.start||0; };
+          listEl.appendChild(b);
+        });
+        // loop control: clicking active toggles loop
+        listEl.querySelectorAll('button').forEach((btn,i)=>{
+          btn.addEventListener('click',()=>{
+            listEl.querySelectorAll('button').forEach(bb=>bb.classList.remove('active'));
+            btn.classList.add('active');
+            let looping=true;
+            const seg=segments[i];
+            const onTime=()=>{
+              if(!looping){ audio.removeEventListener('timeupdate',onTime); return; }
+              if(audio.currentTime>=(seg.start+seg.duration)){ audio.currentTime=seg.start; audio.play(); }
+            };
+            audio.addEventListener('timeupdate',onTime);
+          });
+        });
+      }
+
+  }
+  function downsampleBuffer(audioBuffer, count=400){
+    const ch0 = audioBuffer.getChannelData(0);
+    const ch1 = audioBuffer.numberOfChannels>1? audioBuffer.getChannelData(1) : null;
+    const block = Math.floor(ch0.length / count) || 1;
+    const out = [];
+    for(let i=0;i<count;i++){
+      const start=i*block, end=Math.min(ch0.length,(i+1)*block);
+      let sum=0, n=0;
+      for(let j=start;j<end;j++){ const v0=Math.abs(ch0[j]); const v1= ch1? Math.abs(ch1[j]):0; sum += (v0+v1)*0.5; n++; }
+      out.push(n? sum/n : 0);
+    }
+    // normalize
+    const max = Math.max(0.0001, ...out);
+    return out.map(v=>v/max);
+  }
+  function placeLabels(labelsEl, segments, totalDur){
+    labelsEl.innerHTML='';
+    if(!Array.isArray(segments)||!segments.length||!isFinite(totalDur)||totalDur<=0) return;
+    segments.forEach(seg=>{
+      const start = Number(seg.start||0);
+      const pos = Math.min(99.5, Math.max(0, (start/totalDur)*100));
+      const span = document.createElement('span');
+      span.className='lab';
+      span.style.left = pos+'%';
+      span.textContent = (seg.label || '@'+fmt(start));
+      labelsEl.appendChild(span);
+    });
+
+      // chapter list
+      const listEl = rootEl.querySelector('[data-act="chapters"]');
+      if(listEl){
+        listEl.innerHTML='';
+        segments.forEach((seg,i)=>{
+          const b=document.createElement('button');
+          b.textContent=seg.label||('@'+fmt(seg.start||0));
+          b.onclick=()=>{ audio.currentTime=seg.start||0; };
+          listEl.appendChild(b);
+        });
+        // loop control: clicking active toggles loop
+        listEl.querySelectorAll('button').forEach((btn,i)=>{
+          btn.addEventListener('click',()=>{
+            listEl.querySelectorAll('button').forEach(bb=>bb.classList.remove('active'));
+            btn.classList.add('active');
+            let looping=true;
+            const seg=segments[i];
+            const onTime=()=>{
+              if(!looping){ audio.removeEventListener('timeupdate',onTime); return; }
+              if(audio.currentTime>=(seg.start+seg.duration)){ audio.currentTime=seg.start; audio.play(); }
+            };
+            audio.addEventListener('timeupdate',onTime);
+          });
+        });
+      }
+
+  }
+
+  function downloadFile(name, content, type='application/json'){
+    const blob = new Blob([content], {type});
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = name;
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(()=>{ URL.revokeObjectURL(a.href); a.remove(); }, 500);
+  }
+  function toCSV(rows){
+    const esc = v => ('"'+String(v).replace(/"/g,'""')+'"');
+    const header = ['index','start','duration','label'];
+    const lines = [header.map(esc).join(',')];
+    rows.forEach((r,i)=>{
+      lines.push([i, r.start||0, r.duration||0, r.label||''].map(esc).join(','));
+    });
+    return lines.join('\n');
+  }
+
+  function getSyncUrl(){ const el=document.getElementById('syncUrl'); return el? (el.value||'').trim() : ''; }
+  async function fetchChapterSets(base){
+    const r = await fetch(base.replace(/\/$/,'') + '/chaptersets', {method:'GET'});
+    if(!r.ok) throw new Error('HTTP '+r.status);
+    return await r.json(); // expected array
+  }
+  async function postChapterSet(base, payload){
+    const r = await fetch(base.replace(/\/$/,'') + '/chaptersets', {
+      method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload)
+    });
+    if(!r.ok) throw new Error('HTTP '+r.status);
+    return await r.json();
+  }
+  function createModal(){
+    let modal = document.querySelector('.chapmodal');
+    if(!modal){
+      modal = document.createElement('div');
+      modal.className='chapmodal';
+      modal.innerHTML = `<div class="box"><h4>Banco de Capítulos</h4><div data-act="list"></div><div style="display:flex;gap:8px;justify-content:flex-end;margin-top:8px"><button class="btn" data-act="close">Fechar</button></div></div>`;
+      document.body.appendChild(modal);
+      modal.querySelector('[data-act="close"]').onclick = ()=> modal.style.display='none';
+      modal.addEventListener('click', (e)=>{ if(e.target===modal) modal.style.display='none'; });
+    }
+    return modal;
+  }
+  function openChapterList(sets, onPick){
+    const modal = createModal();
+    const list = modal.querySelector('[data-act="list"]');
+    list.innerHTML = '';
+    if(!Array.isArray(sets) || !sets.length){
+      list.innerHTML = '<div class="subtle">Nenhum set encontrado.</div>';
+    }else{
+      sets.forEach((s,i)=>{
+        const wrap = document.createElement('div');
+        wrap.className = 'chapset';
+        wrap.innerHTML = `<div style="flex:1">
+            <div style="font-weight:600">${(s.name||'sem-nome')}</div>
+            <div class="meta">${new Date(s.updatedAt||s.createdAt||Date.now()).toLocaleString()} • dur=${(s.duration||0).toFixed? (s.duration||0).toFixed(1) : s.duration} • segs=${(s.segments||[]).length}</div>
+          </div>
+          <button class="btn" data-idx="${i}">Carregar</button>`;
+        wrap.querySelector('button').onclick = ()=>{ modal.style.display='none'; onPick(s); };
+        list.appendChild(wrap);
+      });
+    }
+    modal.style.display='grid';
+  }
+
+  </script>
+</body>
+</html>
