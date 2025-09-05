@@ -1,0 +1,74 @@
+{
+  "Atlas": {
+    "speed": 0.96,
+    "pitch": -0.5,
+    "style": "focus",
+    "notes": "Firme, engenheiro, cadência precisa"
+  },
+  "Nova": {
+    "speed": 1.04,
+    "pitch": 0.5,
+    "style": "smooth",
+    "notes": "Doce, fluida, acolhedora"
+  },
+  "Vitalis": {
+    "speed": 1.06,
+    "pitch": 0.2,
+    "style": "bright",
+    "notes": "Energética, vital, saudações vivas"
+  },
+  "Pulse": {
+    "speed": 1.08,
+    "pitch": 0.4,
+    "style": "rhythmic",
+    "notes": "Rítmica, micro-pauses batidas"
+  },
+  "Artemis": {
+    "speed": 0.98,
+    "pitch": -0.2,
+    "style": "hunter",
+    "notes": "Foco, objetivo, cortes limpos"
+  },
+  "Serena": {
+    "speed": 0.94,
+    "pitch": -0.3,
+    "style": "calm",
+    "notes": "Serena, respirada, pausas longas"
+  },
+  "Kaos": {
+    "speed": 1.12,
+    "pitch": 0.6,
+    "style": "bold",
+    "notes": "Intensa, imprevisível, ênfases fortes"
+  },
+  "Genus": {
+    "speed": 1.0,
+    "pitch": 0.0,
+    "style": "analytical",
+    "notes": "Neutra, técnica, didática"
+  },
+  "Lumine": {
+    "speed": 1.02,
+    "pitch": 0.8,
+    "style": "luminous",
+    "notes": "Clara, cintilante, brilho nas vogais"
+  },
+  "Aion": {
+    "speed": 0.92,
+    "pitch": -0.6,
+    "style": "timeless",
+    "notes": "Grave leve, ritual, tempo elástico"
+  },
+  "Rhea": {
+    "speed": 0.97,
+    "pitch": -0.1,
+    "style": "warm",
+    "notes": "Acolhimento materno, abraço de voz"
+  },
+  "Horus": {
+    "speed": 0.99,
+    "pitch": -0.4,
+    "style": "oracle",
+    "notes": "Oracular, pausas significativas"
+  }
+}
