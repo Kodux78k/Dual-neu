@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover"/>
   <meta name="theme-color" content="#0b0b0f"/>
   <link rel="manifest" href="manifest.json"/>
-  <title>Dual.Infodose · Mobile UNO (Fusion v2 · Compact)</title>
+  <title>Dual.Infodose · Mobile UNO (Fusion v2 · Chat+OpenRouter)</title>
   <style>
     :root{
       --bg:#0b0b0f; --panel:#12121a; --ink:#eaeaf7; --ink-dim:#b7b7c9; --accent:#8a5cff; --accent-2:#29d3ff;
@@ -14,14 +14,22 @@
     }
     *{box-sizing:border-box}
     html,body{height:100%}
-    body{margin:0;background:radial-gradient(120% 110% at 50% 0%, #151522 0%, #0b0b0f 60%, #08080c 100%);
+    body{
+      margin:0;
+      background:radial-gradient(120% 110% at 50% 0%, #151522 0%, #0b0b0f 60%, #08080c 100%);
       color:var(--ink); font:14px/1.45 Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
-      overflow:hidden; -webkit-font-smoothing:antialiased; text-rendering:optimizeLegibility}
+      overflow:hidden; -webkit-font-smoothing:antialiased; text-rendering:optimizeLegibility
+    }
 
     /* Grid Mobile + safe areas */
-    #app{height:100%; display:grid; grid-template-rows:56px 1fr 84px; gap:8px; padding:8px; max-width:400px; margin:0 auto;
+    #app{
+      height:100%;
+      display:grid;
+      grid-template-rows:56px 1fr 64px 84px; /* header | stage | COMPOSER | footer */
+      gap:8px; padding:8px; max-width:400px; margin:0 auto;
       padding-left:max(8px, env(safe-area-inset-left)); padding-right:max(8px, env(safe-area-inset-right));
-      padding-top:max(8px, env(safe-area-inset-top)); padding-bottom:max(8px, env(safe-area-inset-bottom));}
+      padding-top:max(8px, env(safe-area-inset-top)); padding-bottom:max(8px, env(safe-area-inset-bottom));
+    }
 
     header{display:flex; align-items:center; justify-content:space-between; gap:8px;
       background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02));
@@ -41,6 +49,7 @@
     .btn.accent{background:linear-gradient(180deg, rgba(137,92,255,.26), rgba(41,211,255,.16)); border-color:rgba(137,92,255,.32)}
     .btn.good{background:linear-gradient(180deg, rgba(46,204,113,.26), rgba(46,204,113,.12)); border-color:rgba(46,204,113,.32)}
     .btn.bad{background:linear-gradient(180deg, rgba(231,76,60,.20), rgba(231,76,60,.10)); border-color:rgba(231,76,60,.28)}
+    .btn.icon{padding:8px; width:36px; height:36px; display:grid; place-items:center}
 
     /* Stage */
     .stage{position:relative; overflow:hidden; border-radius:var(--radius);
@@ -55,7 +64,7 @@
     .audio-row{display:flex; gap:6px; margin-top:6px; align-items:center}
     audio{width:100%}
 
-    /* Hub overlay (compact) */
+    /* Hub overlay (compact) — mantido */
     .hub{position:absolute; inset:0; display:grid; place-items:center; pointer-events:none; z-index:4}
     .hub-inner{position:relative; width:100%; height:100%; display:grid; place-items:center}
     .bg-ring{position:absolute; width:220px; height:220px; border-radius:50%;
@@ -80,7 +89,22 @@
     .item:nth-child(10){--ang:270deg} .item:nth-child(11){--ang:300deg} .item:nth-child(12){--ang:330deg}
     .hub[data-open="false"]{display:none}
 
-    /* Footer dock (compact) */
+    /* Composer (input de mensagem acima do footer) */
+    .composer{
+      display:grid; grid-template-columns:auto 1fr auto; gap:8px; align-items:center;
+      background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02));
+      border:1px solid rgba(255,255,255,.08); border-radius:calc(var(--radius) - 4px);
+      padding:8px 10px; box-shadow:var(--shadow); backdrop-filter:blur(8px)
+    }
+    .composer .prepend{display:flex; gap:6px}
+    .composer input[type="text"]{
+      width:100%; padding:10px 12px; border-radius:12px;
+      background:#0f1020; color:var(--ink); border:1px solid rgba(255,255,255,.12); font-size:13px
+    }
+    .composer .send{display:flex; gap:6px}
+    .hint{font-size:11px; color:var(--ink-dim); margin-top:-4px}
+
+    /* Footer dock (agora: controles de IA) */
     .dock{display:grid; grid-template-columns:1fr 72px 1fr; align-items:center; gap:8px}
     .dock .side{display:flex; gap:6px; align-items:center}
     .voice{position:relative; width:72px; height:72px; border-radius:999px; cursor:pointer; -webkit-tap-highlight-color:transparent;
@@ -93,13 +117,20 @@
     .voice::after{content:""; position:absolute; inset:-6px; border-radius:999px; box-shadow:0 0 0 0 rgba(124,92,255,0); transition:box-shadow .45s ease}
     .voice.tap::after{box-shadow:0 0 0 12px rgba(124,92,255,.12)}
 
-    /* Panels */
+    /* Seletor compacto */
+    select, .sk-wrap input{
+      padding:8px 10px; border-radius:10px; background:#0e0e14; border:1px solid rgba(255,255,255,.14); color:var(--ink); font-size:12px
+    }
+    .sk-wrap{display:flex; gap:6px; align-items:center}
+    .sk-wrap input{width:140px}
+    .sk-wrap .btn.icon{width:36px; height:36px}
+
+    /* Panels, Drawer, etc. (mantidos) */
     .panel{position:absolute; right:10px; top:10px; width:min(92vw, 340px); background:rgba(10,10,14,.9);
       border:1px solid rgba(255,255,255,.12); border-radius:14px; box-shadow:var(--shadow); backdrop-filter:blur(10px);
       padding:10px; display:none; max-height:66vh; overflow:auto; z-index:5}
     .panel h3{margin:0 0 6px 0; font-size:13px; letter-spacing:.3px}
     .row{display:flex; gap:8px; align-items:center; margin:6px 0}
-    .row input[type="text"], .row input[type="url"]{flex:1; padding:8px 10px; border-radius:10px; background:#0e0e14; border:1px solid rgba(255,255,255,.14); color:var(--ink); font-size:12px}
     .subtle{color:var(--ink-dim); font-size:11px}
     .radio-row{display:flex; gap:6px; flex-wrap:wrap}
     .chip{padding:6px 9px; border-radius:999px; border:1px solid rgba(255,255,255,.18); background:rgba(255,255,255,.07); font-weight:700; cursor:pointer; user-select:none; font-size:11px}
@@ -107,7 +138,6 @@
     input[type="file"]{display:none}
     .sandbox{border:1px dashed rgba(255,255,255,.2); border-radius:12px; overflow:hidden; height:110px}
 
-    /* Drawer (LocalStorage tools) */
     .drawer{position:fixed; inset:0; display:none; z-index:6}
     .drawer.open{display:block}
     .drawer .overlay{position:absolute; inset:0; background:rgba(0,0,0,.45); backdrop-filter:blur(2px); opacity:0; transition:opacity .25s}
@@ -122,34 +152,33 @@
     .list{max-height:150px; overflow:auto; font-size:12px; color:#aeb4c2}
     .badge-mini{display:inline-flex; gap:6px; align-items:center; padding:6px 10px; border-radius:999px; border:1px solid rgba(255,255,255,.12); background:rgba(255,255,255,.06)}
 
-    /* Extra compact for very short screens */
+    /* Extra compact */
     @media (max-height:700px){
-      #app{grid-template-rows:52px 1fr 76px}
+      #app{grid-template-rows:52px 1fr 56px 76px}
       .voice{width:66px; height:66px}
       .dock{grid-template-columns:1fr 66px 1fr}
-      .bg-ring{width:200px; height:200px}
-      .hub[data-open="true"] .item{--r:108px}
     }
-
     @media (min-width:420px){ body{font-size:15px} }
   </style>
 </head>
 <body>
   <div id="app">
+    <!-- HEADER -->
     <header>
-      <div class="brand"><div class="dot"></div>Dual.Infodose · <span id="modeTag">Nuvem</span></div>
+      <div class="brand"><div class="dot"></div>Dual.Infodose · <span id="modeTag"></span></div>
       <div class="toolrow">
-        <button class="btn pill" id="btnConnect">Conectores</button>
-        <button class="btn pill" id="btnFeed">Pulsos</button>
-        <button class="btn pill" id="btnMenu">Menu</button>
+        <button class="btn pill" id="btnConnect">⚡️</button>
+        <button class="btn pill" id="btnFeed">🧪</button>
+        <button class="btn pill" id="btnMenu">💊</button>
       </div>
     </header>
 
+    <!-- STAGE -->
     <main class="stage">
       <canvas id="fx"></canvas>
       <div class="feed" id="feed"></div>
 
-      <!-- Radial Hub overlay -->
+      <!-- Radial Hub overlay (mantido) -->
       <div class="hub" id="hub" data-open="false">
         <div class="hub-inner">
           <div class="bg-ring" id="bgRing" aria-hidden="true"></div>
@@ -170,10 +199,10 @@
         </div>
       </div>
 
-      <!-- Connectors Panel -->
+      <!-- Painel de conectores (mantido) -->
       <section class="panel" id="panelConnect">
         <h3>Conectores</h3>
-        <div class="subtle">Escolha o modo de execução • Local (WASM), Nuvem (n8n) ou Neural (Servidor Python)</div>
+        <div class="subtle">Escolha o modo de execução • Local (WASM), Nuvem (n8n), Neural (Servidor)</div>
         <div class="radio-row" id="modeRow">
           <div class="chip" data-mode="local">Local (WASM)</div>
           <div class="chip active" data-mode="cloud">Nuvem (n8n)</div>
@@ -196,12 +225,34 @@
       </section>
     </main>
 
-    <footer class="dock">
-      <div class="side">
-        <button class="btn pill" id="btnUpload">⧉ PDF</button>
-        <input id="file" type="file" accept=".pdf,.txt,.md"/>
-        <button class="btn pill" id="btnMission">Missão 78K</button>
+    <!-- COMPOSER – input de mensagem -->
+    <div class="composer">
+      <div class="prepend">
+        <button class="btn icon" id="btnHub" title="Ativar Hub">⭕</button>
       </div>
+      <input id="msg" type="text" placeholder="Escreva para a IA… (Enter para enviar)"/>
+      <div class="send">
+        <button class="btn accent" id="btnSend">Enviar</button>
+      </div>
+    </div>
+    <div class="hint" id="hintRow">Dica: defina o modelo e a chave no rodapé. Streaming ativo (Render Response).</div>
+
+    <!-- FOOTER – controles de IA (modelo/chave + botões rápidos) -->
+    <footer class="dock">
+      <div class="side" style="gap:6px;flex-wrap:wrap">
+        <select id="modelSel" title="Modelo OpenRouter">
+          <option value="meta-llama/llama-3.1-8b-instruct:free">Llama 3.1 8B (free)</option>
+          <option value="qwen/qwen-2.5-7b-instruct:free">Qwen2.5 7B (free)</option>
+          <option value="mistralai/mistral-7b-instruct:free">Mistral 7B (free)</option>
+          <option value="openai/gpt-4o-mini">GPT-4o mini</option>
+        </select>
+        <div class="sk-wrap">
+          <input id="sk" type="password" placeholder="sk-or-..." autocomplete="off"/>
+          <button class="btn icon" id="skToggle" title="Mostrar/ocultar">👁️</button>
+          <button class="btn icon" id="skSave" title="Salvar">💾</button>
+        </div>
+      </div>
+
       <button class="voice" id="voiceBtn" aria-label="Ativar voz">
         <svg viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
           <path d="M12 3a3 3 0 0 0-3 3v6a3 3 0 0 0 6 0V6a3 3 0 0 0-3-3z"/>
@@ -209,7 +260,10 @@
           <path d="M12 19v4"/>
         </svg>
       </button>
-      <div class="side" style="justify-content:flex-end">
+
+      <div class="side" style="justify-content:flex-end;gap:6px;flex-wrap:wrap">
+        <button class="btn pill" id="btnUpload">⧉ PDF</button><input id="file" type="file" accept=".pdf,.txt,.md"/>
+        <button class="btn pill" id="btnMission">Missão 78K</button>
         <button class="btn pill" id="btnNova">TTS Nova</button>
         <button class="btn pill" id="btnElysha">RAG Elysha</button>
       </div>
@@ -252,7 +306,7 @@
 
   <script src="https://unpkg.com/gsap@3/dist/gsap.min.js"></script>
   <script>
-  // --------- App State ---------
+  // ------------ Estado base (mantido + chat) ------------
   const S = {
     mode: localStorage.getItem('dual.connector.mode') || 'cloud',
     cloudUrl: localStorage.getItem('dual.endpoints.cloud') || '',
@@ -260,41 +314,38 @@
     perf: localStorage.getItem('dual.perf') || 'high',
     feedEl: document.getElementById('feed'),
     modeTag: document.getElementById('modeTag'),
-    firstAudioUnlocked: false
+    firstAudioUnlocked: false,
+    sk: localStorage.getItem('openrouter.sk') || '',
+    model: localStorage.getItem('openrouter.model') || 'meta-llama/llama-3.1-8b-instruct:free'
   };
 
-  // Service Worker
+  // SW
   if ('serviceWorker' in navigator) {
-    window.addEventListener('load', ()=>{
-      navigator.serviceWorker.register('./sw.js').catch(console.warn);
-    });
+    window.addEventListener('load', ()=>{ navigator.serviceWorker.register('./sw.js').catch(console.warn); });
   }
 
-  // Particles (slightly reduced for FPS)
-  const fx = document.getElementById('fx');
-  const ctx = fx.getContext('2d');
-  let W=0,H=0, stars=[];
+  // FX (estrelinhas – mantido, com sensibilidade por perf)
+  const fx = document.getElementById('fx'), ctx = fx.getContext('2d'); let W=0,H=0,stars=[];
   function resize(){ W=fx.width=fx.clientWidth; H=fx.height=fx.clientHeight; }
-  window.addEventListener('resize', resize, {passive:true});
-  resize();
+  addEventListener('resize', resize, {passive:true}); resize();
   function initStars(){
-    const base = (S.perf==='low') ? 20 : (Math.min(window.innerWidth, 420) < 380 ? 50 : 68);
+    const base = (S.perf==='low') ? 20 : (Math.min(innerWidth, 420) < 380 ? 50 : 68);
     stars = Array.from({length:base}, ()=>({x:Math.random()*W, y:Math.random()*H, r:Math.random()*1.2+0.25, v:Math.random()*0.35+0.18}));
   }
   initStars();
   (function loop(){
     if(S.perf==='low'){ ctx.clearRect(0,0,W,H); return requestAnimationFrame(loop); }
     ctx.clearRect(0,0,W,H);
-    for(const s of stars){ ctx.beginPath(); ctx.arc(s.x,s.y,s.r,0,Math.PI*2); ctx.fillStyle = 'rgba(137,92,255,.9)'; ctx.fill();
+    for(const s of stars){ ctx.beginPath(); ctx.arc(s.x,s.y,s.r,0,Math.PI*2); ctx.fillStyle='rgba(137,92,255,.9)'; ctx.fill();
       s.y += s.v; if(s.y>H){ s.y=0; s.x=Math.random()*W; } }
     requestAnimationFrame(loop);
   })();
 
   // Helpers
+  const escapeHtml = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
   function chipSync(){ document.querySelectorAll('#modeRow .chip').forEach(ch=> ch.classList.toggle('active', ch.dataset.mode===S.mode));
     S.modeTag.textContent = (S.mode==='local'?'Local': (S.mode==='cloud'?'Nuvem':'Neural')); }
-  function setMode(m){ S.mode = m; localStorage.setItem('dual.connector.mode', m); chipSync();
-    pushPulse('Sistema', 'Conector ativo: '+S.mode, 'info'); }
+  function setMode(m){ S.mode=m; localStorage.setItem('dual.connector.mode', m); chipSync(); pushPulse('Sistema', 'Conector ativo: '+S.mode, 'info'); }
   function saveEndpoints(){ S.cloudUrl = document.getElementById('cloudUrl').value.trim();
     S.neuralUrl = document.getElementById('neuralUrl').value.trim();
     localStorage.setItem('dual.endpoints.cloud', S.cloudUrl);
@@ -302,13 +353,12 @@
   function loadEndpointsUI(){ document.getElementById('cloudUrl').value = S.cloudUrl; document.getElementById('neuralUrl').value = S.neuralUrl; }
 
   // Pulsos
-  function pushPulse(archetype, text, kind='card', audioUrl=null, meta={}){
-    const d = document.createElement('div');
-    d.className='card';
+  function pushPulse(role, text, kind='card', audioUrl=null, meta={}){
+    const d = document.createElement('div'); d.className='card';
     const time = new Date().toLocaleTimeString();
     d.innerHTML = `
       <div class="meta">
-        <span class="badge">${archetype||'Dual'}</span>
+        <span class="badge">${role||'Dual'}</span>
         <span>${time}</span>
         <span class="badge" style="background:rgba(41,211,255,.22);border-color:rgba(41,211,255,.4)">${S.mode}</span>
         ${meta.source? `<span class="badge" style="background:rgba(255,255,255,.1)">${meta.source}</span>`: ''}
@@ -318,19 +368,79 @@
     `;
     S.feedEl.appendChild(d);
     S.feedEl.scrollTo({top:S.feedEl.scrollHeight, behavior:'smooth'});
+    return d.querySelector('.text'); // retorna o container p/ streaming
   }
-  const escapeHtml = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 
-  // Audio unlock iOS
-  function unlockAudioOnce(){ if(S.firstAudioUnlocked) return; try{ const a = new (window.AudioContext||window.webkitAudioContext)(); const b = a.createBuffer(1, 1, 22050); const src = a.createBufferSource(); src.buffer=b; src.connect(a.destination); src.start(0); S.firstAudioUnlocked = true; }catch(e){} }
+  // Audio unlock
+  function unlockAudioOnce(){ if(S.firstAudioUnlocked) return; try{ const a = new (AudioContext||webkitAudioContext)(); const b=a.createBuffer(1,1,22050); const s=a.createBufferSource(); s.buffer=b; s.connect(a.destination); s.start(0); S.firstAudioUnlocked=true; }catch(e){} }
+  function speakLocal(text, voiceHint){ try{ const u=new SpeechSynthesisUtterance(text); if(voiceHint) u.lang=/pt/i.test(voiceHint)?'pt-BR':'en-US'; speechSynthesis.cancel(); speechSynthesis.speak(u); }catch(e){} }
 
-  // TTS local
-  function speakLocal(text, voiceHint){ try{ const u = new SpeechSynthesisUtterance(text); if(voiceHint && typeof voiceHint==='string') u.lang = voiceHint.includes('pt')?'pt-BR':'en-US'; window.speechSynthesis.cancel(); window.speechSynthesis.speak(u); }catch(e){ console.warn('TTS local falhou', e); } }
+  // -------- Chat OpenRouter (Render Response) --------
+  const OR_ENDPOINT = 'https://openrouter.ai/api/v1/chat/completions';
 
-  // Router
+  async function callOpenRouterStream({message, system}){
+    const sk = S.sk || document.getElementById('sk').value.trim();
+    if(!sk){ pushPulse('Sistema', 'Defina sua chave do OpenRouter no rodapé.', 'warn'); return; }
+    const model = document.getElementById('modelSel').value;
+    localStorage.setItem('openrouter.model', model);
+
+    const userTextNode = pushPulse('Você', message, 'card', null, {source:'chat'});
+    const botNode = pushPulse('IA', '…', 'card', null, {source:model});
+
+    const resp = await fetch(OR_ENDPOINT, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${sk}`,
+        'Content-Type': 'application/json',
+        'HTTP-Referer': location.origin,
+        'X-Title': 'Dual.Infodose · Mobile UNO'
+      },
+      body: JSON.stringify({
+        model,
+        stream: true,
+        messages: [
+          ...(system ? [{role:'system', content: system}] : []),
+          {role:'user', content: message}
+        ]
+      })
+    }).catch(e => ({ok:false, statusText:String(e)}));
+
+    if(!resp || !resp.ok || !resp.body){
+      botNode.textContent = `Falha: ${resp && resp.statusText ? resp.statusText : 'sem resposta'}`;
+      return;
+    }
+
+    const reader = resp.body.getReader();
+    const decoder = new TextDecoder('utf-8');
+    let acc = '';
+
+    while(true){
+      const {done, value} = await reader.read();
+      if(done) break;
+      const chunk = decoder.decode(value, {stream:true});
+      // SSE: linhas "data: {json}"
+      const lines = (acc + chunk).split('\n');
+      acc = lines.pop() || '';
+      for(const ln of lines){
+        const line = ln.trim();
+        if(!line.startsWith('data:')) continue;
+        const data = line.slice(5).trim();
+        if(data === '[DONE]') continue;
+        try{
+          const j = JSON.parse(data);
+          const delta = j.choices?.[0]?.delta?.content || '';
+          if(delta){ botNode.textContent += delta; }
+        }catch(e){}
+      }
+      S.feedEl.scrollTo({top:S.feedEl.scrollHeight});
+    }
+  }
+
+  // ------------- Router antigo (TTS/RAG/Missão) -------------
   async function routeIntent(intent){
     saveEndpoints(); unlockAudioOnce();
     const { type, archetype, text, file } = intent;
+
     if(S.mode==='local'){
       const msg = simulateLocal(archetype, type, text);
       pushPulse(archetype||'Dual', msg, 'card', null, {source:'Local'});
@@ -340,47 +450,50 @@
     if(S.mode==='cloud'){
       if(!S.cloudUrl){ pushPulse('Sistema', 'Defina a URL do n8n em Conectores → Nuvem', 'warn'); return; }
       const r = await postTo(`${S.cloudUrl.replace(/\/$/,'')}/intent`, intent).catch(()=>null);
-      if(!r){ pushPulse('Sistema','Falha ao contatar Nuvem (n8n). Simulando.','warn'); const sim = simulateCloud(archetype, type, text); pushPulse(archetype||'Dual', sim.text, 'card', sim.audioUrl, {source:'Cloud-sim'}); return; }
+      if(!r){ pushPulse('Sistema','Falha ao contatar Nuvem (n8n). Simulando.','warn'); const sim=simulateCloud(archetype, type, text); pushPulse(archetype||'Dual', sim.text, 'card', sim.audioUrl, {source:'Cloud-sim'}); return; }
       pushPulse(archetype||'Dual', r.text || '(sem texto)', 'card', r.audioUrl||null, {source:'Cloud'}); return;
     }
     if(S.mode==='neural'){
       if(!S.neuralUrl){ pushPulse('Sistema', 'Defina a URL do Servidor Neural em Conectores', 'warn'); return; }
       const r = await postTo(`${S.neuralUrl.replace(/\/$/,'')}/intent`, intent).catch(()=>null);
-      if(!r){ pushPulse('Sistema','Falha no Servidor Neural. Simulando.','warn'); const sim = simulateNeural(archetype, type, text); pushPulse(archetype||'Dual', sim.text, 'card', sim.audioUrl, {source:'Neural-sim'}); return; }
+      if(!r){ pushPulse('Sistema','Falha no Servidor Neural. Simulando.','warn'); const sim=simulateNeural(archetype, type, text); pushPulse(archetype||'Dual', sim.text, 'card', sim.audioUrl, {source:'Neural-sim'}); return; }
       pushPulse(archetype||'Dual', r.text || '(sem texto)', 'card', r.audioUrl||null, {source:'Neural'}); return;
     }
   }
+
   async function postTo(url, payload){
     const isFile = payload && payload.file instanceof File; let body, headers={};
-    if(isFile){ const fd = new FormData(); Object.entries(payload).forEach(([k,v])=>{ if(k!=='file'){ fd.append(k, typeof v==='string'? v: JSON.stringify(v)); }}); fd.append('file', payload.file); body = fd; }
-    else{ headers['Content-Type']='application/json'; body = JSON.stringify(payload); }
-    const r = await fetch(url, {method:'POST', headers, body}); if(!r.ok) throw new Error('HTTP '+r.status); return await r.json();
+    if(isFile){
+      const fd = new FormData();
+      Object.entries(payload).forEach(([k,v])=>{ if(k!=='file'){ fd.append(k, typeof v==='string'? v: JSON.stringify(v)); }});
+      fd.append('file', payload.file); body = fd;
+    }else{ headers['Content-Type']='application/json'; body = JSON.stringify(payload); }
+    const r = await fetch(url, {method:'POST', headers, body}); if(!r.ok) throw new Error('HTTP '+r.status);
+    return await r.json();
   }
 
-  // Simulators
+  // Simuladores
   function simulateLocal(arch, type, text){ if(type==='tts') return `(${arch||'Nova'}·Local) ${text || 'Bem-vindo ao Estado 78K — modo local ativo.'}`; if(type==='rag') return `(${arch||'Elysha'}·Local) Resumo: • foco • ordem • leveza.\n“Você já veio do que está por vir.”`; if(type==='mission') return `Missão 78K: Grave 20s com sua intenção. Depois peça um conselho ao arquétipo ${arch||'Nova'}.`; return `(${arch||'Dual'}·Local) Intento: ${type}`; }
   const simulateCloud = (a,t,x)=>({text: simulateLocal(a,t,x), audioUrl:null});
   const simulateNeural = (a,t,x)=>({text:`(${a||'Nova'}·Neural) ${x || 'Resposta neural com timbre natural e pausas expressivas.'}`, audioUrl:null});
 
-  // Panel toggles
-  const panel = document.getElementById('panelConnect');
-  document.getElementById('btnConnect').onclick = ()=>{ loadEndpointsUI(); panel.style.display = panel.style.display==='block' ? 'none':'block'; };
+  // --------- UI bindings ---------
+  chipSync();
+
+  // Header buttons
+  document.getElementById('btnConnect').onclick = ()=>{ loadEndpointsUI(); const panel=document.getElementById('panelConnect'); panel.style.display = panel.style.display==='block' ? 'none':'block'; };
   document.getElementById('btnFeed').onclick = ()=>{ document.getElementById('feed').scrollTo({top:0, behavior:'smooth'}); };
   document.querySelectorAll('#modeRow .chip').forEach(ch=> ch.onclick = ()=> setMode(ch.dataset.mode));
-  document.getElementById('testCloud').onclick = async ()=>{ saveEndpoints(); if(!S.cloudUrl){ pushPulse('Sistema','Informe a URL do n8n para testar.','warn'); return; } try{ const r = await fetch(S.cloudUrl, {method:'GET'}); pushPulse('Sistema', r.ok? 'n8n OK' : 'n8n respondeu '+r.status, r.ok?'info':'warn'); } catch(e){ pushPulse('Sistema', 'n8n inacessível — verifique a URL.', 'warn'); } };
-  document.getElementById('testNeural').onclick = async ()=>{ saveEndpoints(); if(!S.neuralUrl){ pushPulse('Sistema','Informe a URL do Servidor Neural para testar.','warn'); return; } try{ const r = await fetch(S.neuralUrl, {method:'GET'}); pushPulse('Sistema', r.ok? 'Servidor Neural OK' : 'Servidor respondeu '+r.status, r.ok?'info':'warn'); } catch(e){ pushPulse('Sistema', 'Servidor Neural inacessível.', 'warn'); } };
-  document.getElementById('btnLoadRemote').onclick = ()=>{ const url = document.getElementById('remoteUrl').value.trim(); const frame = document.getElementById('sandbox'); if(!url){ pushPulse('Sistema','Informe uma URL para carregar no sandbox.','warn'); return; } frame.src = url; pushPulse('Sistema','Componente remoto carregado em sandbox.','info'); };
+  document.getElementById('testCloud').onclick = async ()=>{ saveEndpoints(); if(!S.cloudUrl){ pushPulse('Sistema','Informe a URL do n8n para testar.','warn'); return; }
+    try{ const r = await fetch(S.cloudUrl, {method:'GET'}); pushPulse('Sistema', r.ok? 'n8n OK' : 'n8n respondeu '+r.status, r.ok?'info':'warn'); } catch(e){ pushPulse('Sistema', 'n8n inacessível — verifique a URL.', 'warn'); } };
+  document.getElementById('testNeural').onclick = async ()=>{ saveEndpoints(); if(!S.neuralUrl){ pushPulse('Sistema','Informe a URL do Servidor Neural para testar.','warn'); return; }
+    try{ const r = await fetch(S.neuralUrl, {method:'GET'}); pushPulse('Sistema', r.ok? 'Servidor Neural OK' : 'Servidor respondeu '+r.status, r.ok?'info':'warn'); } catch(e){ pushPulse('Sistema', 'Servidor Neural inacessível.', 'warn'); } };
 
-  // Performance
-  document.getElementById('perfLow').onclick = ()=>{ S.perf='low'; localStorage.setItem('dual.perf','low'); initStars(); pushPulse('Sistema','Performance baixa (partículas reduzidas).','info'); };
-  document.getElementById('perfHigh').onclick = ()=>{ S.perf='high'; localStorage.setItem('dual.perf','high'); initStars(); pushPulse('Sistema','Performance alta (efeitos completos).','info'); };
-  document.getElementById('clearFeed').onclick = ()=>{ S.feedEl.innerHTML=''; pushPulse('Sistema','Pulsos limpos.','info'); };
+  document.getElementById('btnLoadRemote').onclick = ()=>{ const url = document.getElementById('remoteUrl').value.trim(); const frame=document.getElementById('sandbox'); if(!url){ pushPulse('Sistema','Informe uma URL para carregar no sandbox.','warn'); return; } frame.src=url; pushPulse('Sistema','Componente remoto carregado em sandbox.','info'); };
 
-  // Hub + Pretty Voice Button
-  const hub = document.getElementById('hub');
-  const menuList = document.getElementById('menuList');
-  const voiceBtn = document.getElementById('voiceBtn');
-  const bgRing = document.getElementById('bgRing');
+  // Hub e voice
+  const hub = document.getElementById('hub'); const bgRing=document.getElementById('bgRing');
+  const voiceBtn = document.getElementById('voiceBtn'); const menuList = document.getElementById('menuList');
   function openHub(){ hub.setAttribute('data-open','true'); hub.style.display='grid'; }
   function closeHub(){ hub.setAttribute('data-open','false'); hub.style.display='none'; }
   function toggleHub(){ (hub.getAttribute('data-open')==='true') ? closeHub() : openHub(); }
@@ -390,49 +503,44 @@
   voiceBtn.addEventListener('click', async ()=>{
     voiceBtn.classList.add('tap'); setTimeout(()=>voiceBtn.classList.remove('tap'), 420);
     pulse(); toggleHub();
-    const promptText = prompt("Fale sua intenção (ex.: 'TTS Nova: bem-vindo ao Estado 78K' ou 'Elysha RAG: resuma o PDF').");
-    if(!promptText) return;
-    const parsed = parseIntent(promptText);
-    await routeIntent(parsed);
   });
 
-  // Mapear 12 itens → TTS curto por arquétipo
-  const mapArch = el => el.getAttribute('data-arch') || 'Nova';
+  document.getElementById('btnHub').onclick = toggleHub;
+
+  // Mapeia clique nos 12 itens do hub → TTS curto local
   [...menuList.querySelectorAll('.item')].forEach(item=>{
     item.addEventListener('click', async ()=>{
-      const arch = mapArch(item);
-      await routeIntent({type:'tts', archetype: arch, text:`${arch}: pulso inicial alinhado.`});
+      const arch = item.getAttribute('data-arch') || 'Nova';
+      await routeIntent({type:'tts', archetype:arch, text:`${arch}: pulso inicial alinhado.`});
       closeHub();
     });
   });
 
-  // Drawer (LocalStorage tools)
+  // Drawer
   const drawer = document.getElementById('drawer');
   const overlay = document.getElementById('overlay');
-  const closeDrawer = document.getElementById('closeDrawer');
   document.getElementById('btnMenu').onclick = ()=> { drawer.classList.add('open'); drawer.setAttribute('aria-hidden','false'); };
   overlay.addEventListener('click', ()=>{ drawer.classList.remove('open'); drawer.setAttribute('aria-hidden','true'); });
-  closeDrawer.addEventListener('click', ()=>{ drawer.classList.remove('open'); drawer.setAttribute('aria-hidden','true'); });
+  document.getElementById('closeDrawer').addEventListener('click', ()=>{ drawer.classList.remove('open'); drawer.setAttribute('aria-hidden','true'); });
   document.getElementById('toggleHub').onclick = toggleHub;
   document.getElementById('pulseBtn').onclick = pulse;
 
-  // LocalStorage helpers
-  const el = id => document.getElementById(id);
-  const k = el('k'), v = el('v'), getKey = el('getKey'), lsOut = el('lsOut'), lsList = el('lsList');
+  // LocalStorage tools
+  const el=id=>document.getElementById(id);
+  const k=el('k'), v=el('v'), getKey=el('getKey'), lsOut=el('lsOut'), lsList=el('lsList');
   const refresh = () => {
     const keys = Object.keys(localStorage).sort();
     lsList.innerHTML = keys.length
       ? keys.map(key=>`<div>• <b>${key}</b>: <span style="color:#aeb4c2">${localStorage.getItem(key)}</span></div>`).join('')
       : '<em>Nenhuma chave salva.</em>';
   };
-  el('setBtn').addEventListener('click', ()=>{ try{ const val = v.value.trim(); localStorage.setItem(k.value.trim(), val); lsOut.value = 'OK: set ' + k.value; refresh(); } catch(e){ lsOut.value = 'Erro ao salvar: '+e.message; } });
-  el('getBtn').addEventListener('click', ()=>{ const key = getKey.value.trim(); const val = localStorage.getItem(key); lsOut.value = val!==null ? val : '(null)'; });
-  el('delBtn').addEventListener('click', ()=>{ const key = getKey.value.trim(); localStorage.removeItem(key); lsOut.value = 'Removido: ' + key; refresh(); });
-  el('clearBtn').addEventListener('click', ()=>{ localStorage.clear(); lsOut.value = 'LocalStorage limpo.'; refresh(); });
-  el('refreshBtn').addEventListener('click', refresh);
-  refresh();
+  el('setBtn').addEventListener('click', ()=>{ try{ const val=v.value.trim(); localStorage.setItem(k.value.trim(), val); lsOut.value='OK: set '+k.value; refresh(); } catch(e){ lsOut.value='Erro ao salvar: '+e.message; } });
+  el('getBtn').addEventListener('click', ()=>{ const key=getKey.value.trim(); const val=localStorage.getItem(key); lsOut.value = val!==null? val : '(null)'; });
+  el('delBtn').addEventListener('click', ()=>{ const key=getKey.value.trim(); localStorage.removeItem(key); lsOut.value='Removido: '+key; refresh(); });
+  el('clearBtn').addEventListener('click', ()=>{ localStorage.clear(); lsOut.value='LocalStorage limpo.'; refresh(); });
+  el('refreshBtn').addEventListener('click', refresh); refresh();
 
-  // Upload
+  // Upload → RAG Elysha via conector
   document.getElementById('btnUpload').onclick = ()=> document.getElementById('file').click();
   document.getElementById('file').addEventListener('change', async (e)=>{
     const file = e.target.files?.[0]; if(!file) return;
@@ -441,22 +549,35 @@
     e.target.value = '';
   });
 
-  // Quick buttons
-  document.getElementById('btnNova').onclick = ()=> routeIntent({type:'tts', archetype:'Nova', text:'Bem-vindo ao Estado 78K — fluidez e leveza.'});
-  document.getElementById('btnElysha').onclick = ()=> routeIntent({type:'rag', archetype:'Elysha', text:'Sintetize o conteúdo enviado em 3 tópicos e 1 citação.'});
-  document.getElementById('btnMission').onclick = ()=> routeIntent({type:'mission', archetype:'Nova', text:'Missão 78K agora'});
+  // Botões rápidos (mantidos)
+  document.getElementById('btnNova').onclick  = ()=> routeIntent({type:'tts', archetype:'Nova', text:'Bem-vindo ao Estado 78K — fluidez e leveza.'});
+  document.getElementById('btnElysha').onclick= ()=> routeIntent({type:'rag', archetype:'Elysha', text:'Sintetize o conteúdo enviado em 3 tópicos e 1 citação.'});
+  document.getElementById('btnMission').onclick=()=> routeIntent({type:'mission', archetype:'Nova', text:'Missão 78K agora'});
 
-  // Parser
-  function parseIntent(raw){
-    const s = (raw||'').trim(); const low = s.toLowerCase();
-    if(low.startsWith('tts')){ const arch = (s.split(' ')[1]||'Nova').replace(':',''); const text = s.split(':').slice(1).join(':').trim() || 'Bem-vindo ao Estado 78K.'; return {type:'tts', archetype: arch, text}; }
-    if(low.includes('rag') || low.includes('pdf')){ const arch = 'Elysha'; const text = s.split(':').slice(1).join(':').trim() || 'Resuma o PDF em 3 tópicos e 1 citação.'; return {type:'rag', archetype:arch, text}; }
-    if(low.includes('missão') || low.includes('mission')){ const arch = 'Nova'; return {type:'mission', archetype:arch, text:'Missão 78K'}; }
-    return {type:'tts', archetype:'Nova', text: s || 'Bem-vindo ao Estado 78K.'};
+  // ---------- Composer + OpenRouter ----------
+  const modelSel = document.getElementById('modelSel');
+  const skInput  = document.getElementById('sk');
+  const skToggle = document.getElementById('skToggle');
+  const skSave   = document.getElementById('skSave');
+  const msgInput = document.getElementById('msg');
+  const btnSend  = document.getElementById('btnSend');
+
+  // Carrega valores salvos
+  modelSel.value = S.model;
+  skInput.value  = S.sk;
+
+  skToggle.onclick = ()=>{ skInput.type = (skInput.type==='password'?'text':'password'); };
+  skSave.onclick = ()=>{ S.sk = skInput.value.trim(); localStorage.setItem('openrouter.sk', S.sk); pushPulse('Sistema','Chave OpenRouter salva no dispositivo.','info'); };
+
+  async function sendMessage(){
+    const m = msgInput.value.trim(); if(!m) return;
+    msgInput.value=''; await callOpenRouterStream({message:m, system: 'Você é a IA Dual.Infodose. Responda em pt-BR, curtas e claras, mantendo vibração elegante.'});
   }
+  btnSend.onclick = sendMessage;
+  msgInput.addEventListener('keydown', (e)=>{ if(e.key==='Enter'){ e.preventDefault(); sendMessage(); } });
 
-  chipSync();
-  pushPulse('Dual','Compact Fit: tudo reduzido e harmonizado para tela vertical.','info');
+  // Mensagem de boas-vindas
+  pushPulse('Dual','Chat habilitado: use o campo acima e selecione modelo/chave no rodapé. Streaming ativo.','info');
   </script>
 </body>
 </html>
