@@ -1,0 +1,86 @@
+[
+  {
+    "id": "apps",
+    "name": "Apps",
+    "url": "./launcher.html",
+    "iconKey": "hub_apps",
+    "defaultOpenMode": "embed"
+  },
+  {
+    "id": "bind",
+    "name": "Bind",
+    "url": "./bind.html",
+    "iconKey": "hub_bind",
+    "defaultOpenMode": "embed"
+  },
+  {
+    "id": "chat",
+    "name": "Chat",
+    "url": "./chat.html",
+    "iconKey": "hub_chat",
+    "defaultOpenMode": "embed"
+  },
+  {
+    "id": "cloud",
+    "name": "Cloud",
+    "url": "./cloud.html",
+    "iconKey": "hub_cloud",
+    "defaultOpenMode": "embed"
+  },
+  {
+    "id": "config",
+    "name": "Config",
+    "url": "./config.html",
+    "iconKey": "hub_config",
+    "defaultOpenMode": "embed"
+  },
+  {
+    "id": "download",
+    "name": "Downloads",
+    "url": "./downloads.html",
+    "iconKey": "hub_download",
+    "defaultOpenMode": "embed"
+  },
+  {
+    "id": "health",
+    "name": "Health",
+    "url": "./health.html",
+    "iconKey": "hub_health",
+    "defaultOpenMode": "embed"
+  },
+  {
+    "id": "lan_scanner",
+    "name": "LAN Scanner",
+    "url": "./lan.html",
+    "iconKey": "hub_lan_scanner",
+    "defaultOpenMode": "embed"
+  },
+  {
+    "id": "lightning",
+    "name": "Lightning",
+    "url": "./lightning.html",
+    "iconKey": "hub_lightning",
+    "defaultOpenMode": "embed"
+  },
+  {
+    "id": "memoria",
+    "name": "Memória",
+    "url": "./memoria.html",
+    "iconKey": "hub_memoria",
+    "defaultOpenMode": "embed"
+  },
+  {
+    "id": "perfil",
+    "name": "Perfil",
+    "url": "./perfil.html",
+    "iconKey": "hub_perfil",
+    "defaultOpenMode": "embed"
+  },
+  {
+    "id": "relatorio",
+    "name": "Relatório",
+    "url": "./relatorio.html",
+    "iconKey": "hub_relatorio",
+    "defaultOpenMode": "embed"
+  }
+]
