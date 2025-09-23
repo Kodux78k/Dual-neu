@@ -1,86 +1,52 @@
-<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,maximum-scale=1,user-scalable=no"><meta name="theme-color" content="#0b0f14">
-  <link rel="manifest" href="./manifest.json"><title>HUB 👥 UNO</title>
-<style>
-:root{--a:#ff52e5;--b:#00c5e5;--fg:#eaf0ff;--mut:#b8c0d9;--bd:#ffffff22;--glass:#0b112280;--r:14px;--tabs:64px;--hdr:56px}
-*{box-sizing:border-box}html,body{height:100%}body{margin:0;color:var(--fg);background:linear-gradient(42deg,var(--a),var(--b)) fixed;font:14px/1.45 Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial;overflow:hidden}
-header{position:fixed;inset:0 0 auto;display:flex;align-items:center;gap:8px;height:var(--hdr);padding:0 10px;background:linear-gradient(180deg,#0009,#0000);backdrop-filter:blur(10px);z-index:10}
-h1{margin:0;font:900 16px/1 Inter,system-ui;letter-spacing:.06em}small{color:var(--mut)}
-.ib{min-width:38px;height:38px;border:1px solid var(--bd);border-radius:12px;background:#0c1330aa;color:var(--fg);display:grid;place-items:center;cursor:pointer}
-main{position:relative;height:100%;padding:calc(var(--hdr) + env(safe-area-inset-top)) 10px calc(var(--tabs) + env(safe-area-inset-bottom)) ;overflow:auto}
-.view{display:none;max-width:900px;margin:0 auto} .view.active{display:block;animation:fade .15s ease}@keyframes fade{from{opacity:0;transform:translateY(6px)}}
-.card{background:#0b1122cc;border:1px solid var(--bd);border-radius:16px;padding:12px;box-shadow:0 12px 32px #0007}
-.grid{display:grid;gap:10px}
-.tabbar{position:fixed;left:0;right:0;bottom:env(safe-area-inset-bottom,0);height:var(--tabs);display:flex;justify-content:center;padding:8px;z-index:10}
-.tabbar .in{width:100%;max-width:900px;display:flex;justify-content:space-around;gap:8px;background:#0b1122cc;border:1px solid var(--bd);border-radius:18px;padding:8px}
-.tab{flex:1;border-radius:12px;padding:8px;display:flex;flex-direction:column;align-items:center;gap:4px;color:var(--mut);cursor:pointer}
-.tab.active{background:#ffffff14;color:var(--fg)}
-.btn{border:1px solid var(--bd);background:#0b1122; color:var(--fg);border-radius:12px;padding:.55rem .8rem;cursor:pointer}
-.input,select,textarea{width:100%;background:#0b1122;border:1px solid var(--bd);color:var(--fg);border-radius:12px;padding:8px}
-.mut{color:var(--mut);font-size:12px}
-#dock{position:fixed;left:10px;right:10px;bottom:calc(var(--tabs)+10px + env(safe-area-inset-bottom));display:flex;gap:8px;flex-wrap:wrap;z-index:9}
-.badge{border:1px solid var(--bd);border-radius:999px;background:#0b1122;padding:.35rem .6rem;font-weight:800}
-.arch{margin-top:6vh;display:grid;place-items:center;gap:10px}
-.circle{position:relative;width:min(80vw,480px);aspect-ratio:1/1;border-radius:50%;overflow:hidden;border:1px solid var(--bd);background:radial-gradient(60% 60% at 50% 50%,#0ff2,#fff0)}
-.circle iframe{position:absolute;inset:0;width:100%;height:100%;border:0;background:transparent}
-.msg{position:relative;margin-top:6px;background:#0b1122; border:1px solid var(--bd);border-radius:12px;padding:8px 10px;max-width:92%;text-align:center;opacity:.96}
-.switch{display:flex;gap:6px;align-items:center;background:#0b1122aa;border:1px solid var(--bd);border-radius:999px;padding:4px 8px}
-.switch button{width:30px;height:30px;border-radius:8px}
-#chatFeed{min-height:140px;max-height:50vh;overflow:auto;background:#0b1122cc;border:1px solid var(--bd);border-radius:14px;padding:10px;display:flex;flex-direction:column;gap:6px}
-#chatFeed .m{max-width:75%;padding:7px 10px;border-radius:14px}
-#chatFeed .u{align-self:flex-end;background:#ffffff14;border-radius:14px 14px 0 14px}
-#chatFeed .a{align-self:flex-start;background:#00ffaa22;border-radius:14px 14px 14px 0}
-.homeBtns{position:fixed;right:12px;bottom:calc(var(--tabs)+20px + env(safe-area-inset-bottom));display:flex;flex-direction:column;gap:8px;z-index:9}
-.hb{width:44px;height:44px;border-radius:22px;border:1px solid var(--bd);background:#0b1122;display:grid;place-items:center;font-size:18px}
-#preview{position:fixed;left:12px;right:12px;bottom:calc(var(--tabs)+20px + env(safe-area-inset-bottom));background:#ffb86b;color:#0b0f14;border-radius:14px;padding:8px 12px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;z-index:9;display:none}
-.apps{display:grid;gap:10px;grid-template-columns:repeat(auto-fill,minmax(220px,1fr))}
-.app{display:flex;gap:10px;align-items:center;background:#ffffff0e;border:1px solid var(--bd);border-radius:12px;padding:12px}
-.app .ico{width:40px;height:40px;border-radius:12px;display:grid;place-items:center;background:#0b1122;border:1px solid var(--bd)}
-.app .t{font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.session{background:#ffffff06;border:1px solid var(--bd);border-radius:14px;overflow:hidden}
-.session .h{display:flex;gap:8px;align-items:center;padding:8px 10px;background:#ffffff08;border-bottom:1px solid #ffffff16}
-.session iframe{display:block;width:100%;height:58vh;border:0;background:#000}
-.toast{position:fixed;right:12px;bottom:calc(var(--tabs)+14px);display:grid;gap:8px;z-index:20}
-.toast .t{background:#0f2a1e;border:1px solid #2f7a56;color:#c9ffe7;padding:.55rem .7rem;border-radius:10px}
-.theme-custom-bg{position:fixed;inset:0;z-index:-1;overflow:hidden;pointer-events:none}
-</style>
+<!doctype html><html lang="pt-BR"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,maximum-scale=1,user-scalable=no">
+<meta name="theme-color" content="#0b0f14"><link rel="manifest" href="manifest.webmanifest"><title>HUB UNO</title>
+<!-- CSS interno mínimo para boot; seu tema vem no hub-uno.css -->
+<style>:root{--a:#ff52e5;--b:#00c5e5;--fg:#eaf0ff;--mut:#b8c0d9;--bd:#ffffff22;--r:14px;--tabs:64px;--hdr:56px}*{box-sizing:border-box}html,body{height:100%}body{margin:0;color:var(--fg);background:linear-gradient(42deg,var(--a),var(--b)) fixed;font:14px/1.45 Inter,system-ui;-webkit-font-smoothing:antialiased;overflow:hidden}</style>
+<link rel="stylesheet" href="css/hub-uno.css?v=1">
 </head><body>
-<header>
-  <button class="ib" id="btnBack">⟵</button>
-  <div style="flex:1;text-align:center"><h1>HUB UNO</h1><small>Dual · Trinity</small></div>
-  <button class="ib" id="btnDownload" title="Baixar">⬇️</button>
-  <button class="ib" id="btnHelp" title="Ajuda">❔</button>
-  <button class="ib" id="btnLS" title="LocalStorage">LS</button>
+<header class="hub">
+  <button class="ib" id="btnBack" title="Voltar">
+    <img src="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6/svgs/solid/arrow-left.svg" alt="Voltar" width="18" height="18">
+  </button>
+  <div class="hub-title"><h1>HUB UNO</h1><small class="mut">Dual · Trinity</small></div>
+  <button class="ib" id="btnDownload" title="Baixar">
+    <img src="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6/svgs/solid/download.svg" alt="Baixar" width="18" height="18">
+  </button>
+  <button class="ib" id="btnHelp" title="Ajuda">
+    <img src="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6/svgs/solid/question-circle.svg" alt="Ajuda" width="18" height="18">
+  </button>
+  <button class="ib" id="btnLS" title="Local Storage">
+    <img src="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6/svgs/solid/database.svg" alt="LS" width="18" height="18">
+  </button>
 </header>
 
 <main>
-  <!-- HOME -->
   <section id="v-home" class="view active">
     <div class="grid">
       <div class="arch">
         <div class="switch">
-          <button class="btn" id="archPrev">‹</button>
+          <button class="btn" id="archPrev" title="Anterior"><img src="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6/svgs/solid/chevron-left.svg" width="16" height="16" alt=""></button>
           <select id="archSel" title="Arquétipo"></select>
-          <button class="btn" id="archNext">›</button>
-          <button class="btn" id="archAudio" title="Voz">🎙️</button>
+          <button class="btn" id="archNext" title="Próximo"><img src="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6/svgs/solid/chevron-right.svg" width="16" height="16" alt=""></button>
+          <button class="btn" id="archAudio" title="Voz"><img src="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6/svgs/solid/microphone-lines.svg" width="16" height="16" alt=""></button>
         </div>
         <div class="circle" id="archCircle"><iframe id="archFrame" title="Archetype" sandbox="allow-scripts allow-same-origin"></iframe></div>
         <div id="archMsg" class="msg" style="display:none"></div>
       </div>
-      <div id="iaFeed" class="card" style="display:none"></div>
     </div>
   </section>
 
-  <!-- APPS -->
   <section id="v-apps" class="view">
     <div class="grid">
       <div class="card">
         <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
           <label class="mut" style="display:inline-flex;gap:6px;align-items:center"><input id="openInside" type="checkbox"> abrir dentro</label>
-          <button id="toggleLocal" class="btn">Mostrar Locais</button>
+          <button id="toggleLocal" class="btn"><img src="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6/svgs/solid/folder-open.svg" width="16" height="16" alt="" style="margin-right:4px">Mostrar Locais</button>
           <input id="fileLocal" type="file" accept=".html,.htm,.txt,.json" multiple class="input" style="max-width:280px">
-          <button id="importLocal" class="btn">Adicionar</button>
-          <button id="exportLocal" class="btn">Exportar</button>
-          <button id="clearLocal" class="btn">Limpar</button>
+          <button id="importLocal" class="btn"><img src="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6/svgs/solid/plus-circle.svg" width="16" height="16" alt="" style="margin-right:4px">Adicionar</button>
+          <button id="exportLocal" class="btn"><img src="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6/svgs/solid/file-export.svg" width="16" height="16" alt="" style="margin-right:4px">Exportar</button>
+          <button id="clearLocal" class="btn"><img src="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6/svgs/solid/trash.svg" width="16" height="16" alt="" style="margin-right:4px">Limpar</button>
           <span id="appsCount" class="mut">—</span>
         </div>
       </div>
@@ -88,25 +54,23 @@ main{position:relative;height:100%;padding:calc(var(--hdr) + env(safe-area-inset
     </div>
   </section>
 
-  <!-- STACK -->
   <section id="v-stack" class="view">
     <div class="grid">
-      <div class="card" style="display:flex;align-items:center;gap:8px"><b>Sessões</b><button id="closeAll" class="btn">Fechar todas</button><span class="mut">Reabra pelo dock</span></div>
+      <div class="card" style="display:flex;align-items:center;gap:8px"><b>Sessões</b><button id="closeAll" class="btn"><img src="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6/svgs/solid/xmark.svg" width="14" height="14" alt="" style="margin-right:4px">Fechar todas</button><span class="mut">Reabra pelo dock</span></div>
       <div id="stackWrap" class="grid"></div>
     </div>
   </section>
 
-  <!-- BRAIN -->
   <section id="v-brain" class="view">
     <div class="grid">
       <div class="card"><b>Usuário</b>
-        <div style="display:flex;gap:8px;align-items:center;margin-top:6px"><input id="userName" class="input" placeholder="Seu nome" style="max-width:220px"><button id="saveName" class="btn">Salvar</button></div>
+        <div style="display:flex;gap:8px;align-items:center;margin-top:6px"><input id="userName" class="input" placeholder="Seu nome" style="max-width:220px"><button id="saveName" class="btn"><img src="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6/svgs/solid/floppy-disk.svg" width="14" height="14" style="margin-right:4px" alt="">Salvar</button></div>
       </div>
       <div class="card"><b>OpenRouter</b>
         <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:6px">
           <select id="model" class="input" style="max-width:280px"></select>
           <input id="sk" class="input" placeholder="sk-or-v1-…" style="max-width:260px">
-          <button id="saveSK" class="btn">Salvar</button>
+          <button id="saveSK" class="btn"><img src="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6/svgs/solid/floppy-disk.svg" width="14" height="14" style="margin-right:4px" alt="">Salvar</button>
         </div>
       </div>
       <div class="card"><b>Tema & Fundo</b>
@@ -120,45 +84,45 @@ main{position:relative;height:100%;padding:calc(var(--hdr) + env(safe-area-inset
       <div class="card"><b>CSS Personalizado</b>
         <textarea id="cssCustom" class="input" rows="4" placeholder="/* cole CSS aqui */"></textarea>
         <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:6px">
-          <button id="applyCSS" class="btn">Aplicar</button>
-          <button id="clearCSS" class="btn">Limpar</button>
-          <button id="downloadCSS" class="btn">Baixar</button>
+          <button id="applyCSS" class="btn"><img src="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6/svgs/solid/check.svg" width="14" height="14" style="margin-right:4px" alt="">Aplicar</button>
+          <button id="clearCSS" class="btn"><img src="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6/svgs/solid/eraser.svg" width="14" height="14" style="margin-right:4px" alt="">Limpar</button>
+          <button id="downloadCSS" class="btn"><img src="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6/svgs/solid/download.svg" width="14" height="14" style="margin-right:4px" alt="">Baixar</button>
         </div>
       </div>
+
       <div class="card"><b>LS • rápido</b>
         <div style="display:flex;gap:6px;flex-wrap:wrap">
           <input id="lsK" class="input" placeholder="chave (ex: infodose:userName)" style="flex:1 1 220px">
           <input id="lsV" class="input" placeholder="valor" style="flex:2 1 320px">
-          <button id="lsSave" class="btn">Salvar</button>
-          <button id="lsDel" class="btn">Apagar</button>
+          <button id="lsSave" class="btn"><img src="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6/svgs/solid/floppy-disk.svg" width="14" height="14" style="margin-right:4px" alt="">Salvar</button>
+          <button id="lsDel" class="btn"><img src="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6/svgs/solid/trash.svg" width="14" height="14" style="margin-right:4px" alt="">Apagar</button>
         </div>
         <div class="mut" id="lsStat" style="margin-top:6px">—</div>
       </div>
     </div>
   </section>
 
-  <!-- CHAT -->
   <section id="v-chat" class="view">
     <div class="grid">
       <div id="chatFeed"></div>
-      <form id="chatForm" style="display:flex;gap:8px"><input id="chatInput" class="input" placeholder="Escreva aqui…" autocomplete="off"><button class="btn" id="chatSend">Enviar</button></form>
+      <form id="chatForm" style="display:flex;gap:8px"><input id="chatInput" class="input" placeholder="Escreva aqui…" autocomplete="off"><button class="btn" id="chatSend"><img src="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6/svgs/solid/paper-plane.svg" width="14" height="14" style="margin-right:4px" alt="">Enviar</button></form>
     </div>
   </section>
 </main>
 
 <div id="dock"></div>
 <nav class="tabbar"><div class="in">
-  <button class="tab active" data-nav="home">🏠<span class="mut">Home</span></button>
-  <button class="tab" data-nav="apps">📁<span class="mut">Apps</span></button>
-  <button class="tab" data-nav="stack">🧱<span class="mut">Stack</span></button>
-  <button class="tab" data-nav="brain">🧠<span class="mut">Brain</span></button>
-  <button class="tab" data-nav="chat">💬<span class="mut">Chat</span></button>
+  <button class="tab active" data-nav="home"><img src="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6/svgs/solid/house.svg" width="18" height="18" alt=""><span class="mut">Home</span></button>
+  <button class="tab" data-nav="apps"><img src="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6/svgs/solid/folder-open.svg" width="18" height="18" alt=""><span class="mut">Apps</span></button>
+  <button class="tab" data-nav="stack"><img src="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6/svgs/solid/layer-group.svg" width="18" height="18" alt=""><span class="mut">Stack</span></button>
+  <button class="tab" data-nav="brain"><img src="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6/svgs/solid/brain.svg" width="18" height="18" alt=""><span class="mut">Brain</span></button>
+  <button class="tab" data-nav="chat"><img src="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6/svgs/solid/comments.svg" width="18" height="18" alt=""><span class="mut">Chat</span></button>
 </div></nav>
 
 <div id="preview"></div>
 <div class="homeBtns">
-  <button id="btnVoice" class="hb" title="Falar">🎤</button>
-  <button id="btnText" class="hb" title="Texto">✍️</button>
+  <button id="btnVoice" class="hb" title="Falar"><img src="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6/svgs/solid/microphone.svg" width="18" height="18" alt=""></button>
+  <button id="btnText" class="hb" title="Texto"><img src="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6/svgs/solid/pen-to-square.svg" width="18" height="18" alt=""></button>
 </div>
 <div id="toasts" class="toast"></div>
 <div id="customBG" class="theme-custom-bg"></div>
@@ -180,7 +144,6 @@ const toast=(m,t='ok')=>{const b=$("#toasts"),d=document.createElement('div');d.
 function nav(key){['home','apps','stack','brain','chat'].forEach(k=>{ $('#v-'+k).classList.toggle('active',k===key); document.querySelector('.tab[data-nav="'+k+'"]').classList.toggle('active',k===key)}); LS.set('uno:lastTab',key); if(key==='home') greeting(); $("#preview").style.display= key==='home' && $("#preview").textContent? 'block':'none'}
 $$('.tab').forEach(b=>b.onclick=()=>nav(b.dataset.nav));
 
-// GREETING
 function greeting(){const n=(localStorage.getItem('infodose:userName')||'').trim(); msgArch(n?`Bem-vindo, ${n}.`:'Salve! Defina seu nome no Brain.', n?'ok':'warn')}
 
 // THEME + BG
@@ -213,10 +176,10 @@ function normalize(L){return (L||[]).map(x=>({key:x.key||x.url||Math.random().to
 function locals(){let arr=[]; try{arr=JSON.parse(LS.raw('infodose:locals:v1')||'[]')}catch{} return arr.map(l=>({key:'local:'+l.id,title:l.name||'Local',desc:'HTML local',url:'local:'+l.id}))}
 function getLocal(id){let a=[]; try{a=JSON.parse(LS.raw('infodose:locals:v1')||'[]')}catch{} return a.find(x=>x.id===id)||null}
 function blobURL(loc){return URL.createObjectURL(new Blob([loc.html||''],{type:'text/html;charset=utf-8'}))}
-function card(a){const el=document.createElement('div'); el.className='app'; const ic=document.createElement('div'); ic.className='ico'; ic.textContent='📦'; const meta=document.createElement('div'); meta.style.flex='1'; const t=document.createElement('div'); t.className='t'; t.textContent=a.title; const d=document.createElement('div'); d.className='mut'; d.textContent=a.desc||a.url; const b=document.createElement('button'); b.className='btn'; b.textContent='Abrir'; b.onclick=()=>openApp(a); meta.append(t,d); el.append(ic,meta,b); return el}
+function card(a){const el=document.createElement('div'); el.className='app'; const ic=document.createElement('div'); ic.className='ico'; ic.innerHTML='<img src="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6/svgs/solid/cube.svg" width="18" height="18" alt="ico">'; const meta=document.createElement('div'); meta.style.flex='1'; const t=document.createElement('div'); t.className='t'; t.textContent=a.title; const d=document.createElement('div'); d.className='mut'; d.textContent=a.desc||a.url; const b=document.createElement('button'); b.className='btn'; b.innerHTML='<img src="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6/svgs/solid/arrow-up-right-from-square.svg" width="14" height="14" alt="" style="margin-right:4px">Abrir'; b.onclick=()=>openApp(a); meta.append(t,d); el.append(ic,meta,b); return el}
 function renderApps(){let L=normalize(RAW.apps).concat(locals()); if(onlyLocal) L=L.filter(x=>x.url.startsWith('local:')); appsWrap.innerHTML=''; L.forEach(a=>appsWrap.appendChild(card(a))); appsCount.textContent=L.length+' apps'}
 (function loadApps(){try{RAW.apps=JSON.parse($("#APPS_JSON").textContent||'{}').apps||[]}catch{RAW.apps=[]} renderApps()})();
-$("#toggleLocal").onclick=()=>{onlyLocal=!onlyLocal; $("#toggleLocal").textContent=onlyLocal?'Mostrar Todos':'Mostrar Locais'; renderApps()};
+$("#toggleLocal").onclick=()=>{onlyLocal=!onlyLocal; $("#toggleLocal").childNodes[1]&&( $("#toggleLocal").lastChild.nodeValue = onlyLocal?'Mostrar Todos':'Mostrar Locais'); renderApps()};
 $("#importLocal").onclick=async()=>{const fs=Array.from($("#fileLocal").files||[]); if(!fs.length)return; const tasks=fs.map(f=>new Promise(res=>{const r=new FileReader(); r.onload=()=>{const s=String(r.result||''); if(/\.json$/i.test(f.name)){try{const o=JSON.parse(s); RAW.apps=Array.isArray(o.apps)?o.apps:Array.isArray(o)?o:[]; renderApps(); toast('apps.json carregado'); res(null)}catch{toast('JSON inválido','err');res(null)}}else{res({id:'l_'+Math.random().toString(36).slice(2),name:f.name.replace(/\.(html?|txt)$/i,''),html:s,ts:Date.now()})}}; r.readAsText(f)})); const list=(await Promise.all(tasks)).filter(Boolean); const cur=JSON.parse(LS.raw('infodose:locals:v1')||'[]'); list.forEach(x=>cur.unshift(x)); localStorage.setItem('infodose:locals:v1',JSON.stringify(cur)); renderApps(); if(list.length) toast('HTMLs adicionados')};
 $("#exportLocal").onclick=()=>{const data={v:1,items:JSON.parse(LS.raw('infodose:locals:v1')||'[]')}; const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([JSON.stringify(data,null,2)],{type:'application/json'})); a.download='locals_pack.json'; a.click(); setTimeout(()=>URL.revokeObjectURL(a.href),400)};
 $("#clearLocal").onclick=()=>{if(confirm('Limpar HTMLs locais?')){localStorage.removeItem('infodose:locals:v1'); renderApps(); toast('Locais limpos','warn')}};
@@ -227,8 +190,12 @@ function badge(it){const b=document.createElement('button'); b.className='badge'
 function updDock(){dock.innerHTML=''; $$('.session').forEach(s=>{const meta=JSON.parse(s.dataset.meta||'{}'); dock.appendChild(badge({title:meta.title||'App',sid:s.dataset.sid}))})}
 function openApp(a){const sid='s_'+Math.random().toString(36).slice(2); const isLocal=a.url.startsWith('local:'); const lr=isLocal?getLocal(a.url.slice(6)):null; const url=lr?blobURL(lr):a.url||'about:blank';
 const card=document.createElement('div'); card.className='session'; card.dataset.sid=sid; card.dataset.meta=JSON.stringify({title:a.title||'App',url:a.url||''});
-card.innerHTML=`<div class="h"><b style="flex:1">${a.title||'App'}</b><button class="btn" data-act="min">–</button><button class="btn" data-act="ref">↻</button><button class="btn" data-act="x">✕</button></div><iframe src="${url}" allow="autoplay;clipboard-read;clipboard-write;picture-in-picture;fullscreen"></iframe>`;
-($("#openInside").checked? $("#v-home") : $("#v-stack")).querySelector ? $("#v-stack").prepend(card) : stackWrap.prepend(card);
+card.innerHTML=`<div class="h"><b style="flex:1">${a.title||'App'}</b>
+<button class="btn" data-act="min" title="Minimizar"><img src="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6/svgs/solid/minus.svg" width="14" height="14" alt=""></button>
+<button class="btn" data-act="ref" title="Recarregar"><img src="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6/svgs/solid/rotate-right.svg" width="14" height="14" alt=""></button>
+<button class="btn" data-act="x" title="Fechar"><img src="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6/svgs/solid/xmark.svg" width="14" height="14" alt=""></button></div>
+<iframe src="${url}" allow="autoplay;clipboard-read;clipboard-write;picture-in-picture;fullscreen"></iframe>`;
+( $('#openInside').checked ? $('#v-home') : $('#v-stack') ).querySelector ? $('#v-stack').prepend(card) : stackWrap.prepend(card);
 card.querySelector('[data-act=min]').onclick=()=>{card.classList.toggle('min'); card.querySelector('iframe').style.display=card.classList.contains('min')?'none':'block'; updDock()};
 card.querySelector('[data-act=ref]').onclick=()=>{const fr=card.querySelector('iframe'); try{fr.contentWindow.location.reload()}catch{fr.src=fr.src}};
 card.querySelector('[data-act=x]').onclick=()=>{card.remove(); updDock()}; nav('stack'); updDock(); toast('App aberto')}
@@ -240,7 +207,7 @@ const archSel=$("#archSel"), archFrame=$("#archFrame"), archMsg=$("#archMsg");
 function fillArch(){archSel.innerHTML=''; ARCH.forEach(n=>{const o=document.createElement('option');o.value=n;o.textContent=n.replace('.html',''); archSel.appendChild(o)}); setArch(0)}
 function setArch(i){const n=(i+ARCH.length)%ARCH.length; archSel.selectedIndex=n; const f=ARCH[n]; archFrame.src='./archetypes/'+f; speakArch(f.replace('.html',''))}
 function speakArch(name){try{const vs=speechSynthesis.getVoices(); const v=vs.find(v=>v.lang&&v.lang.startsWith('pt'))||vs[0]; const u=new SpeechSynthesisUtterance('Olá, eu sou '+name); if(v) u.voice=v; speechSynthesis.cancel(); speechSynthesis.speak(u)}catch{}}
-function msgArch(t,type){archMsg.textContent=t; archMsg.style.display='block'; archMsg.style.background= type==='ok'? '#39ffb6cc' : type==='warn'? '#ffb86bcc' : '#0b1122cc'; archMsg.style.color= type? '#0b0f14':'#eaf0ff'; clearTimeout(archMsg._tm); archMsg._tm=setTimeout(()=>archMsg.style.display='none',3500)}
+function msgArch(t,type){archMsg.textContent=t; archMsg.style.display='block'; archMsg.style.background= type==='ok'? '#39ffb6cc' : type==='warn'? '#ffb86bcc' : '#0b1122cc'; archMsg.style.color= type? '#0b0f14':'#eaf0ff'; clearTimeout(archMsg._tm); archMsg._tm=setTimeout(()=>archMsg.style.display='none',3200)}
 $("#archPrev").onclick=()=>setArch(archSel.selectedIndex-1);
 $("#archNext").onclick=()=>setArch(archSel.selectedIndex+1);
 archSel.onchange=()=>setArch(archSel.selectedIndex);
@@ -260,7 +227,7 @@ $("#btnVoice").onclick=()=>startVoice();
 $("#btnText").onclick=()=>{nav('chat'); $("#chatInput").focus()};
 $("#chatForm").onsubmit=e=>{e.preventDefault(); const t=$("#chatInput").value.trim(); if(!t) return; $("#chatInput").value=''; handleUserMessage(t)};
 
-// Buttons header
+// Header buttons
 $("#btnBack").onclick=()=>{try{history.length>1&&history.back()}catch{}};
 $("#btnDownload").onclick=()=>{const clone=document.documentElement.cloneNode(true); const html='<!doctype html>\n'+clone.outerHTML; const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([html],{type:'text/html;charset=utf-8'})); a.download='HUB-UNO.html'; a.click(); setTimeout(()=>URL.revokeObjectURL(a.href),400); toast('HTML exportado')};
 $("#btnHelp").onclick=()=>alert('Atalhos: g+h Home · g+a Apps · g+s Stack · g+b Brain · g+c Chat\nCtrl/Cmd+S: baixar HTML');
@@ -272,9 +239,7 @@ let g=false; window.addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&e.
 // Init
 (function init(){
   applyTheme(); applyCSS(); fillArch(); lsStats();
-  // restore last tab
   const last=LS.get('uno:lastTab','home'); nav(last);
-  // PWA SW (opcional)
   if(location.protocol==='https:' && 'serviceWorker' in navigator){addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}))}
 })();
 </script>
