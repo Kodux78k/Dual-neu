@@ -1,854 +1,246 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-<meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
-<link rel="manifest" href="./manifest.json"/>
-<title>Hub Dual — Nebula Pro (PERFECT)</title>
-<style>
-  /* ================= Nebula Pro — PERFECT ================= */
-  :root{
-    --grad-a:#ff52e5; --grad-b:#00c5e5;
-    --text:#f5f7ff; --muted:rgba(245,247,255,.7);
-    --surface:rgba(15,17,32,.45); --surface-strong:rgba(15,17,32,.88);
-    --border:1px solid rgba(255,255,255,.1);
-    --r:24px; --r-lg:28px; --shadow:0 10px 30px rgba(0,0,0,.35);
-  }
-  *{ box-sizing:border-box; min-width:0 }
-  html,body{ height:100%; margin:0 }
-  body{
-    font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
-    background:linear-gradient(42deg,var(--grad-a),var(--grad-b)) fixed;
-    color:var(--text);
-    overflow-x:hidden; overscroll-behavior-y:contain;
-    -webkit-text-size-adjust:100%;
-  }
-
-  /* ===== Masthead ===== */
-  .masthead{
-    position:fixed; inset:env(safe-area-inset-top,0) 0 auto 0; height:78px;
-    padding:0 16px; display:flex; align-items:center; gap:12px;
-    justify-content:space-between; backdrop-filter:blur(16px) saturate(120%);
-    z-index:100;
-  }
-  .title-block{ text-align:center; flex:1; line-height:1.1; min-width:0 }
-  .title-block h1{ margin:0; font-size:22px; font-weight:900; letter-spacing:.06em; white-space:nowrap; overflow:hidden; text-overflow:ellipsis }
-  .title-block small{ display:block; font-size:12px; letter-spacing:.08em; color:var(--muted) }
-  .icon-btn{
-    width:42px; height:42px; border-radius:50%; display:grid; place-items:center;
-    background:var(--surface); border:var(--border); box-shadow:var(--shadow);
-    color:var(--text); cursor:pointer; flex:0 0 auto; transition:background .15s ease;
-  }
-  .icon-btn:active{ transform:scale(.96) } .icon-btn:hover{ background:rgba(255,255,255,.08) }
-
-  /* ===== Brain menu ===== */
-  .brain-menu{
-    position:absolute; top:calc(100% + 6px); right:8px; width:min(92vw, 360px);
-    padding:12px; background:var(--surface-strong); border:var(--border);
-    border-radius:var(--r-lg); box-shadow:var(--shadow); display:none; z-index:99
-  }
-  .brain-menu.open{ display:block; animation:appear .18s ease-out forwards }
-  @keyframes appear{ from{ opacity:0; transform:translateY(-8px) } to{ opacity:1; transform:none } }
-  .brain-menu h3{ margin:4px 0 10px; font-size:16px; font-weight:800; letter-spacing:.05em }
-  .brain-list{ list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:8px }
-  .brain-item{ display:flex; align-items:center; gap:12px; padding:10px 12px; border-radius:18px; background:rgba(255,255,255,.05); border:var(--border); }
-  .brain-item svg{ width:22px; height:22px; flex-shrink:0 }
-  .brain-item span{ flex:1; font-weight:700; font-size:14px }
-  .brain-item small{ font-size:12px; color:var(--muted) }
-  .brain-item select, .brain-item input{
-    background:rgba(255,255,255,.06); color:var(--text); border:var(--border);
-    border-radius:10px; padding:6px 8px; font-weight:700;
-  }
-
-  /* ===== Main ===== */
-  main{
-    padding-top:calc(78px + env(safe-area-inset-top,0) + 12px);
-    padding-bottom:calc(80px + env(safe-area-inset-bottom,0) + 16px);
-    width:100%; max-width:520px; margin:0 auto; position:relative; min-height:100vh;
-  }
-  section{ display:none } section.active{ display:block }
-  .home-list{ display:flex; flex-direction:column; gap:14px; margin:0 16px }
-  .home-item{ display:flex; align-items:center; justify-content:space-between; padding:14px 18px; background:var(--surface); border:var(--border); border-radius:var(--r); box-shadow:var(--shadow); cursor:pointer }
-  .home-item .left{ display:flex; align-items:center; gap:14px }
-  .home-item .name{ font-weight:800; font-size:16px }
-  .home-item .right{ display:flex; align-items:center; gap:6px }
-  .bubble{ font-size:12px; background:#a66fff; color:#fff; border-radius:999px; padding:3px 8px; font-weight:800 }
-
-  /* ===== Apps Grid ===== */
-  .apps-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(90px,1fr)); gap:14px; padding:0 16px }
-  .app-icon{
-    display:flex; flex-direction:column; align-items:center; justify-content:center; gap:6px;
-    background:var(--surface); border:var(--border); border-radius:var(--r); box-shadow:var(--shadow);
-    height:100px; cursor:pointer; padding:8px; text-align:center;
-  }
-  .app-icon .icon{ width:32px; height:32px; display:grid; place-items:center }
-  .app-icon span{ font-size:12px; font-weight:700; color:var(--muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:100% }
-
-  /* ===== Stack ===== */
-  .stack-list{ display:flex; flex-direction:column; gap:16px; padding:0 16px }
-  .stack-card{ position:relative; background:var(--surface); border:var(--border); border-radius:var(--r); box-shadow:var(--shadow); padding:18px; min-height:118px }
-  .stack-card h2{ margin:0 0 4px; font-size:18px; font-weight:900; padding-right:120px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis }
-  .stack-card .tools{ position:absolute; top:14px; right:14px; display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end }
-  .stack-card .tools .icon-btn{ width:36px; height:36px; border-radius:12px; box-shadow:none }
-  .stack-card .badge{ position:absolute; right:14px; bottom:14px; font-size:12px; padding:4px 10px; border-radius:999px; background:rgba(166,111,255,.8); border:var(--border) }
-
-  .update-section{ margin:24px 16px; text-align:center }
-  .update-btn{ display:inline-block; padding:12px 32px; border-radius:var(--r); background:linear-gradient(90deg,#a66fff,#6db4ff); border:none; box-shadow:var(--shadow); color:#0a0d1f; font-weight:900; font-size:14px; cursor:pointer; transition:transform .1s ease }
-  .update-btn:active{ transform:scale(.97) }
-
-  /* ===== Viewer embutido ===== */
-  .viewer{ position:fixed; inset:78px 0 88px 0; z-index:90; display:none }
-  .viewer.open{ display:block }
-  .viewer .frame{ position:absolute; inset:12px 16px; border-radius:18px; border:var(--border); background:var(--surface-strong); box-shadow:var(--shadow); overflow:hidden }
-  .viewer .title{ position:absolute; top:18px; left:24px; right:140px; font-size:14px; font-weight:900; letter-spacing:.04em; white-space:nowrap; overflow:hidden; text-overflow:ellipsis }
-  .viewer .toolbar{ position:absolute; top:12px; right:12px; display:flex; gap:8px; flex-wrap:wrap }
-  .viewer iframe{ position:absolute; inset:54px 0 0 0; width:100%; height:calc(100% - 54px); border:0; background:#0a0d1f }
-  .toggle{ display:inline-flex; align-items:center; gap:8px; background:rgba(255,255,255,.06); border:var(--border); border-radius:999px; padding:6px 10px; font-size:12px; cursor:pointer }
-  .toggle input{ appearance:none; width:36px; height:20px; border-radius:999px; background:#444a; position:relative; outline:none; transition:all .15s }
-  .toggle input::after{ content:""; position:absolute; top:2px; left:2px; width:16px; height:16px; border-radius:50%; background:#fff; transition:left .15s }
-  .toggle input:checked{ background:#7fd } .toggle input:checked::after{ left:18px }
-
-  /* ===== Quick actions ===== */
-  .quick-actions{ position:fixed; bottom:calc(env(safe-area-inset-bottom,0) + 86px); right:16px; display:flex; gap:12px; z-index:95 }
-  .quick-actions .small-btn{
-    width:44px; height:44px; border-radius:50%; display:grid; place-items:center;
-    background:var(--surface); border:var(--border); box-shadow:var(--shadow);
-    cursor:pointer; transition:background .15s ease;
-  }
-  .quick-actions .small-btn:hover{ background:rgba(255,255,255,.08) }
-
-  /* ===== Tabbar ===== */
-  .tabbar{ position:fixed; inset:auto 0 env(safe-area-inset-bottom,0) 0; height:78px; padding:6px 14px; display:flex; align-items:center; justify-content:center; z-index:100 }
-  .tabbar .container{ width:100%; max-width:520px; background:var(--surface); border:var(--border); border-radius:var(--r-lg); box-shadow:var(--shadow); display:flex; justify-content:space-around; align-items:center; padding:10px 16px }
-  .tab{ flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px; color:var(--muted); font-size:11px; font-weight:800; cursor:pointer; padding:6px; border-radius:14px; transition:background .15s ease,color .15s ease }
-  .tab.active{ color:var(--text); background:rgba(255,255,255,.08); box-shadow:0 0 0 2px rgba(255,255,255,.08) }
-  .tab svg{ width:22px; height:22px }
-
-  /* iOS 100vh fix */
-  @supports (-webkit-touch-callout:none){
-    main, .viewer{ min-height:-webkit-fill-available }
-  }
-</style>
-
-<!-- iOS Splash Screens -->
-<link rel="apple-touch-startup-image" href="icons/splash/splash-1242x2688.png" media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 3)" />
-<link rel="apple-touch-startup-image" href="icons/splash/splash-2048x2732.png" media="(min-device-width: 768px) and (max-device-width: 1024px) and (-webkit-min-device-pixel-ratio: 2)" />
-<link rel="apple-touch-startup-image" href="icons/splash/splash-1280x720.png" media="(device-width: 1280px) and (device-height: 720px)" />
-
-
-  <!-- iOS PWA / Splash & Capabilities -->
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <link rel="apple-touch-icon" href="./icons/pwa/icon-192.png">
-  <!-- iOS startup images -->
-  <link rel="apple-touch-startup-image" href="./icons/splash/splash-1242x2688.png" media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)">
-  <link rel="apple-touch-startup-image" href="./icons/splash/splash-2048x2732.png" media="(device-width: 1024px) and (device-height: 1366px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)">
-  <link rel="apple-touch-startup-image" href="./icons/splash/splash-1280x720.png" media="(device-width: 360px) and (device-height: 640px) and (-webkit-device-pixel-ratio: 4) and (orientation: landscape)">
-
-</head>
-<body>
-<header class="masthead">
-  <button class="icon-btn" id="backBtn" aria-label="Voltar">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+<!doctype html><html lang="pt-BR"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,maximum-scale=1,user-scalable=no">
+<meta name="theme-color" content="#0b0f14"><link rel="manifest" href="manifest.webmanifest"><title>HUB UNO</title>
+<!-- CSS interno mínimo para boot; seu tema vem no hub-uno.css -->
+<style>:root{--a:#ff52e5;--b:#00c5e5;--fg:#eaf0ff;--mut:#b8c0d9;--bd:#ffffff22;--r:14px;--tabs:64px;--hdr:56px}*{box-sizing:border-box}html,body{height:100%}body{margin:0;color:var(--fg);background:linear-gradient(42deg,var(--a),var(--b)) fixed;font:14px/1.45 Inter,system-ui;-webkit-font-smoothing:antialiased;overflow:hidden}</style>
+<link rel="stylesheet" href="css/hub-uno.css?v=1">
+</head><body>
+<header class="hub">
+  <button class="ib" id="btnBack" title="Voltar">
+    <img src="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6/svgs/solid/arrow-left.svg" alt="Voltar" width="18" height="18">
   </button>
-  <div class="title-block">
-    <h1>HUB DUAL</h1>
-    <small>UNO • DUAL • TRINITY</small>
-  </div>
-  <button class="icon-btn" id="brainBtn" aria-haspopup="true" aria-expanded="false" aria-label="Dual Brain">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21a8 8 0 1 0-16 0"/><circle cx="12" cy="7" r="4"/></svg>
+  <div class="hub-title"><h1>HUB UNO</h1><small class="mut">Dual · Trinity</small></div>
+  <button class="ib" id="btnDownload" title="Baixar">
+    <img src="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6/svgs/solid/download.svg" alt="Baixar" width="18" height="18">
   </button>
-
-  <!-- Brain menu -->
-  <div class="brain-menu" id="brainMenu">
-    <h3>Brain</h3>
-    <ul class="brain-list">
-      <li class="brain-item" id="brainDownload">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-        <span>Download (backup)</span>
-      </li>
-      <li class="brain-item" id="brainSK">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 2l-2 2"/><path d="M7.5 13.5L2 19v3h3l5.5-5.5"/><circle cx="16" cy="8" r="5"/></svg>
-        <span>SK OpenRouter</span><small id="skHint"></small>
-      </li>
-      <li class="brain-item" style="cursor:default">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3h18v6H3z"/><path d="M3 15h18v6H3z"/></svg>
-        <span>Modelo</span>
-        <select id="modelSelect"></select>
-      </li>
-      <li class="brain-item" id="brainLogs">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3h18"/><path d="M3 8h18"/><path d="M3 13h18"/><path d="M3 18h18"/></svg>
-        <span>Limpar logs</span>
-      </li>
-    
-      <li class="brain-item" id="brainUpload">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M12 20v-8m0 0l-4 4m4-4l4 4"/>
-          <path d="M20 20H4V4h8l2 2h6z"/>
-        </svg>
-        <span>Upload Local (.html/.json)</span>
-      </li>
-
-    </ul>
-  </div>
+  <button class="ib" id="btnHelp" title="Ajuda">
+    <img src="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6/svgs/solid/question-circle.svg" alt="Ajuda" width="18" height="18">
+  </button>
+  <button class="ib" id="btnLS" title="Local Storage">
+    <img src="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6/svgs/solid/database.svg" alt="LS" width="18" height="18">
+  </button>
 </header>
 
-<!-- Ações rápidas -->
-<div class="quick-actions">
-  <button class="small-btn" onclick="toast('Atalho 1')">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14"/><path d="M5 12h14"/></svg>
-  </button>
-  <button class="small-btn" onclick="toast('Atalho 2')">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 3H7a4 4 0 0 0-4 4v10a4 4 0 0 0 4 4h10a4 4 0 0 0 4-4V7a4 4 0 0 0-4-4z"/><line x1="7" y1="7" x2="17" y2="17"/><line x1="17" y1="7" x2="7" y2="17"/></svg>
-  </button>
-</div>
-
 <main>
-  <section id="page-home" class="active">
-    <div class="home-list">
-      <div class="home-item" onclick="go('apps')">
-        <div class="left">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="2"/><rect x="14" y="3" width="7" height="7" rx="2"/><rect x="14" y="14" width="7" height="7" rx="2"/><rect x="3" y="14" width="7" height="7" rx="2"/></svg>
-          <span class="name">Apps</span>
+  <section id="v-home" class="view active">
+    <div class="grid">
+      <div class="arch">
+        <div class="switch">
+          <button class="btn" id="archPrev" title="Anterior"><img src="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6/svgs/solid/chevron-left.svg" width="16" height="16" alt=""></button>
+          <select id="archSel" title="Arquétipo"></select>
+          <button class="btn" id="archNext" title="Próximo"><img src="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6/svgs/solid/chevron-right.svg" width="16" height="16" alt=""></button>
+          <button class="btn" id="archAudio" title="Voz"><img src="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6/svgs/solid/microphone-lines.svg" width="16" height="16" alt=""></button>
         </div>
-        <div class="right">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
-        </div>
-      </div>
-      <div class="home-item" onclick="go('stack')">
-        <div class="left">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l9 4.5-9 4.5L3 6.5 12 2z"/><path d="M3 13l9 4.5 9-4.5"/></svg>
-          <span class="name">Stack</span>
-        </div>
-        <div class="right">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
-        </div>
-      </div>
-      <div class="home-item" onclick="go('stack')">
-        <div class="left">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h18"/></svg>
-          <span class="name">Minimized</span>
-        </div>
-        <div class="right">
-          <span class="bubble" id="miniCountHome">0</span>
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
-        </div>
+        <div class="circle" id="archCircle"><iframe id="archFrame" title="Archetype" sandbox="allow-scripts allow-same-origin"></iframe></div>
+        <div id="archMsg" class="msg" style="display:none"></div>
       </div>
     </div>
   </section>
 
-  <!-- Apps -->
-  <section id="page-apps">
-    <div class="apps-grid" id="appsGrid"></div>
+  <section id="v-apps" class="view">
+    <div class="grid">
+      <div class="card">
+        <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+          <label class="mut" style="display:inline-flex;gap:6px;align-items:center"><input id="openInside" type="checkbox"> abrir dentro</label>
+          <button id="toggleLocal" class="btn"><img src="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6/svgs/solid/folder-open.svg" width="16" height="16" alt="" style="margin-right:4px">Mostrar Locais</button>
+          <input id="fileLocal" type="file" accept=".html,.htm,.txt,.json" multiple class="input" style="max-width:280px">
+          <button id="importLocal" class="btn"><img src="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6/svgs/solid/plus-circle.svg" width="16" height="16" alt="" style="margin-right:4px">Adicionar</button>
+          <button id="exportLocal" class="btn"><img src="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6/svgs/solid/file-export.svg" width="16" height="16" alt="" style="margin-right:4px">Exportar</button>
+          <button id="clearLocal" class="btn"><img src="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6/svgs/solid/trash.svg" width="16" height="16" alt="" style="margin-right:4px">Limpar</button>
+          <span id="appsCount" class="mut">—</span>
+        </div>
+      </div>
+      <div id="appsWrap" class="apps"></div>
+    </div>
   </section>
 
-  <!-- Stack -->
-  <section id="page-stack">
-    <div class="stack-list" id="stackList"></div>
-    <div class="update-section">
-      <button class="update-btn" onclick="toast('Update')">Update</button>
+  <section id="v-stack" class="view">
+    <div class="grid">
+      <div class="card" style="display:flex;align-items:center;gap:8px"><b>Sessões</b><button id="closeAll" class="btn"><img src="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6/svgs/solid/xmark.svg" width="14" height="14" alt="" style="margin-right:4px">Fechar todas</button><span class="mut">Reabra pelo dock</span></div>
+      <div id="stackWrap" class="grid"></div>
+    </div>
+  </section>
+
+  <section id="v-brain" class="view">
+    <div class="grid">
+      <div class="card"><b>Usuário</b>
+        <div style="display:flex;gap:8px;align-items:center;margin-top:6px"><input id="userName" class="input" placeholder="Seu nome" style="max-width:220px"><button id="saveName" class="btn"><img src="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6/svgs/solid/floppy-disk.svg" width="14" height="14" style="margin-right:4px" alt="">Salvar</button></div>
+      </div>
+      <div class="card"><b>OpenRouter</b>
+        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:6px">
+          <select id="model" class="input" style="max-width:280px"></select>
+          <input id="sk" class="input" placeholder="sk-or-v1-…" style="max-width:260px">
+          <button id="saveSK" class="btn"><img src="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6/svgs/solid/floppy-disk.svg" width="14" height="14" style="margin-right:4px" alt="">Salvar</button>
+        </div>
+      </div>
+      <div class="card"><b>Tema & Fundo</b>
+        <div style="display:flex;gap:8px;align-items:center;margin-top:6px">
+          <select id="themeSel" class="input" style="max-width:200px">
+            <option value="default">Padrão</option><option value="medium">Cinza</option><option value="custom">Personalizado</option>
+          </select>
+          <input id="bgUpload" type="file" accept="image/*,video/*" class="input" style="max-width:260px">
+        </div>
+      </div>
+      <div class="card"><b>CSS Personalizado</b>
+        <textarea id="cssCustom" class="input" rows="4" placeholder="/* cole CSS aqui */"></textarea>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:6px">
+          <button id="applyCSS" class="btn"><img src="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6/svgs/solid/check.svg" width="14" height="14" style="margin-right:4px" alt="">Aplicar</button>
+          <button id="clearCSS" class="btn"><img src="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6/svgs/solid/eraser.svg" width="14" height="14" style="margin-right:4px" alt="">Limpar</button>
+          <button id="downloadCSS" class="btn"><img src="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6/svgs/solid/download.svg" width="14" height="14" style="margin-right:4px" alt="">Baixar</button>
+        </div>
+      </div>
+
+      <div class="card"><b>LS • rápido</b>
+        <div style="display:flex;gap:6px;flex-wrap:wrap">
+          <input id="lsK" class="input" placeholder="chave (ex: infodose:userName)" style="flex:1 1 220px">
+          <input id="lsV" class="input" placeholder="valor" style="flex:2 1 320px">
+          <button id="lsSave" class="btn"><img src="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6/svgs/solid/floppy-disk.svg" width="14" height="14" style="margin-right:4px" alt="">Salvar</button>
+          <button id="lsDel" class="btn"><img src="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6/svgs/solid/trash.svg" width="14" height="14" style="margin-right:4px" alt="">Apagar</button>
+        </div>
+        <div class="mut" id="lsStat" style="margin-top:6px">—</div>
+      </div>
+    </div>
+  </section>
+
+  <section id="v-chat" class="view">
+    <div class="grid">
+      <div id="chatFeed"></div>
+      <form id="chatForm" style="display:flex;gap:8px"><input id="chatInput" class="input" placeholder="Escreva aqui…" autocomplete="off"><button class="btn" id="chatSend"><img src="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6/svgs/solid/paper-plane.svg" width="14" height="14" style="margin-right:4px" alt="">Enviar</button></form>
     </div>
   </section>
 </main>
 
-<!-- Viewer embutido -->
-<div class="viewer" id="viewer">
-  <div class="frame">
-    <div class="title"><span id="viewerTitle">—</span></div>
-    <div class="toolbar">
-      <label class="toggle" title="Abrir em nova aba / dentro (por app)">
-        <input type="checkbox" id="openModeToggle"/>
-        <span id="openModeLabel">Dentro</span>
-      </label>
-      <button class="icon-btn" title="Minimizar" id="viewerMinBtn">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14"/></svg>
-      </button>
-      <button class="icon-btn" title="Recarregar" id="viewerReloadBtn">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.13-3.36L23 10M1 14l5.36 4.36A9 9 0 0 0 20.49 15"/></svg>
-      </button>
-      <button class="icon-btn" title="Fechar" id="viewerCloseBtn">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-      </button>
-    </div>
-    <iframe id="viewerFrame" src="about:blank" referrerpolicy="no-referrer"></iframe>
-  </div>
+<div id="dock"></div>
+<nav class="tabbar"><div class="in">
+  <button class="tab active" data-nav="home"><img src="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6/svgs/solid/house.svg" width="18" height="18" alt=""><span class="mut">Home</span></button>
+  <button class="tab" data-nav="apps"><img src="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6/svgs/solid/folder-open.svg" width="18" height="18" alt=""><span class="mut">Apps</span></button>
+  <button class="tab" data-nav="stack"><img src="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6/svgs/solid/layer-group.svg" width="18" height="18" alt=""><span class="mut">Stack</span></button>
+  <button class="tab" data-nav="brain"><img src="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6/svgs/solid/brain.svg" width="18" height="18" alt=""><span class="mut">Brain</span></button>
+  <button class="tab" data-nav="chat"><img src="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6/svgs/solid/comments.svg" width="18" height="18" alt=""><span class="mut">Chat</span></button>
+</div></nav>
+
+<div id="preview"></div>
+<div class="homeBtns">
+  <button id="btnVoice" class="hb" title="Falar"><img src="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6/svgs/solid/microphone.svg" width="18" height="18" alt=""></button>
+  <button id="btnText" class="hb" title="Texto"><img src="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6/svgs/solid/pen-to-square.svg" width="18" height="18" alt=""></button>
 </div>
+<div id="toasts" class="toast"></div>
+<div id="customBG" class="theme-custom-bg"></div>
 
-<footer class="tabbar">
-  <div class="container">
-    <div class="tab" id="tab-home" onclick="go('home')">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12l9-9 9 9"/><path d="M9 21V9h6v12"/></svg>
-      <span>Home</span>
-    </div>
-    <div class="tab" id="tab-apps" onclick="go('apps')">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="2"/><rect x="14" y="3" width="7" height="7" rx="2"/><rect x="14" y="14" width="7" height="7" rx="2"/><rect x="3" y="14" width="7" height="7" rx="2"/></svg>
-      <span>Apps</span>
-    </div>
-    <div class="tab" id="tab-stack" onclick="go('stack')">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l9 4.5-9 4.5L3 6.5 12 2z"/><path d="M3 13l9 4.5 9-4.5"/></svg>
-      <span>Stack</span>
-    </div>
-  </div>
-</footer>
+<script id="APPS_JSON" type="application/json">{"apps":[
+{"key":"atlas","title":"Atlas · Cartesius","desc":"Planejador","url":"about:blank","icon":""},
+{"key":"nova","title":"Nova · Inspira","desc":"Criativa","url":"about:blank","icon":""},
+{"key":"vitalis","title":"Vitalis · Momentum","desc":"Rotinas","url":"about:blank","icon":""},
+{"key":"pulse","title":"Pulse · Resona","desc":"Som","url":"about:blank","icon":""},
+{"key":"aion","title":"Aion · Evolutia","desc":"Evolução","url":"about:blank","icon":""}
+]}</script>
 
 <script>
-/* ================= Helpers ================= */
-const LS = {
-  get(k, d){ try{ const v = localStorage.getItem(k); return v ? JSON.parse(v) : d }catch(e){ return d } },
-  set(k, v){ try{ localStorage.setItem(k, JSON.stringify(v)) }catch(e){} },
-  raw(k){ return localStorage.getItem(k)||'' }
-};
-function toast(m){ console.log(m) }
-function exportBackup(){
-  const data = { when: Date.now(), storage: {...localStorage} };
-  const blob = new Blob([JSON.stringify(data,null,2)], {type:'application/json'});
-  const url = URL.createObjectURL(blob); const a = document.createElement('a');
-  a.href = url; a.download = 'dual.backup.json'; a.click(); URL.revokeObjectURL(url);
-  toast('Backup exportado');
-}
-function promptKey(){
-  const key = prompt('Cole sua SK do OpenRouter (salva localmente):', LS.raw('dual.keys.openrouter'));
-  if(key!=null){ localStorage.setItem('dual.keys.openrouter', key); document.getElementById('skHint').textContent = key ? '• OK' : '' ; toast('Chave armazenada') }
-}
-function clearLogs(){ console.clear(); toast('Logs limpos') }
+const $=(q,r=document)=>r.querySelector(q), $$=(q,r=document)=>Array.from(r.querySelectorAll(q));
+const LS={get:(k,d)=>{try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}},set:(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}},raw:k=>localStorage.getItem(k)||''};
+const toast=(m,t='ok')=>{const b=$("#toasts"),d=document.createElement('div');d.className='t';d.style.background=t==='err'?'#3c1212':(t==='warn'?'#3c2d12':'#0f2a1e');d.textContent=m;b.appendChild(d);setTimeout(()=>{d.style.opacity=.0;d.style.transform='translateY(6px)';setTimeout(()=>d.remove(),180)},1500)};
 
-/* ================= Navegação ================= */
-function go(target){
-  brainMenu.classList.remove('open'); brainBtn.setAttribute('aria-expanded','false');
-  ['home','apps','stack'].forEach(p=>{
-    const sec = document.getElementById('page-'+p); if(sec) sec.classList.remove('active');
-    const tab = document.getElementById('tab-'+p); if(tab) tab.classList.remove('active');
-  });
-  const newSec = document.getElementById('page-'+target); if(newSec) newSec.classList.add('active');
-  const newTab = document.getElementById('tab-'+target); if(newTab) newTab.classList.add('active');
-}
-const brainBtn = document.getElementById('brainBtn');
-const brainMenu = document.getElementById('brainMenu');
-brainBtn.addEventListener('click', (e)=>{
-  const isOpen = brainMenu.classList.toggle('open');
-  brainBtn.setAttribute('aria-expanded', String(isOpen)); e.stopPropagation();
-});
-document.addEventListener('click', (e)=>{
-  if(!brainMenu.contains(e.target) && e.target !== brainBtn){
-    brainMenu.classList.remove('open'); brainBtn.setAttribute('aria-expanded','false');
-  }
-});
-document.getElementById('backBtn').addEventListener('click', ()=>history.back());
+// NAV
+function nav(key){['home','apps','stack','brain','chat'].forEach(k=>{ $('#v-'+k).classList.toggle('active',k===key); document.querySelector('.tab[data-nav="'+k+'"]').classList.toggle('active',k===key)}); LS.set('uno:lastTab',key); if(key==='home') greeting(); $("#preview").style.display= key==='home' && $("#preview").textContent? 'block':'none'}
+$$('.tab').forEach(b=>b.onclick=()=>nav(b.dataset.nav));
 
-/* ================= Modelo (OpenRouter) ================= */
-const DEFAULT_MODELS = [
-  "openrouter/auto",
-  "anthropic/claude-3.5-sonnet",
-  "openai/gpt-4.1-mini",
-  "google/gemini-1.5-pro",
-  "meta/llama-3.1-405b-instruct",
-  "mistral/mistral-large-latest"
-];
-const modelSelect = document.getElementById('modelSelect');
-function initModelSelect(){
-  const saved = LS.get('dual.openrouter.model', DEFAULT_MODELS[0]);
-  modelSelect.innerHTML = "";
-  DEFAULT_MODELS.forEach(m=>{
-    const opt = document.createElement('option'); opt.value = m; opt.textContent = m; if(m===saved) opt.selected = true;
-    modelSelect.appendChild(opt);
-  });
-  modelSelect.addEventListener('change', ()=>{ LS.set('dual.openrouter.model', modelSelect.value); toast('Modelo: '+modelSelect.value) });
-}
+function greeting(){const n=(localStorage.getItem('infodose:userName')||'').trim(); msgArch(n?`Bem-vindo, ${n}.`:'Salve! Defina seu nome no Brain.', n?'ok':'warn')}
 
-/* ================= Ícones dinâmicos ================= */
-const iconCache = new Map();
-function normKey(s){
-  return (s||'').toLowerCase().normalize('NFD').replace(/[\\u0300-\\u036f]/g,'').replace(/[^a-z0-9_-]+/g,'_').replace(/_+/g,'_').replace(/^_|_$/g,'');
-}
-async function getIconNode(app){
-  // Priority: explicit bitmap/icon path -> iconKey svg -> computed key svg -> fallback
-  if(app.icon && /\\.(png|jpg|jpeg|gif|webp|svg)$/i.test(app.icon)){
-    const d = document.createElement('div'); d.className='icon';
-    const img = new Image(); img.src = app.icon; img.alt = app.name||app.title||app.id||'app';
-    img.style.width = '26px'; img.style.height = '26px';
-    d.appendChild(img); return d;
-  }
-  const key = normKey(app.iconKey || app.key || app.id || app.title || app.name || 'app');
-  const path = `./icons/others/${key}.svg`;
-  try{
-    const cacheKey = 'svg:'+path;
-    if(iconCache.has(cacheKey)){ const d=document.createElement('div'); d.className='icon'; d.innerHTML = iconCache.get(cacheKey); return d; }
-    const res = await fetch(path, {cache:'force-cache'});
-    if(res.ok){
-      const svg = await res.text(); iconCache.set(cacheKey, svg);
-      const d=document.createElement('div'); d.className='icon'; d.innerHTML=svg; return d;
-    }
-  }catch(e){}
-  const d=document.createElement('div'); d.className='icon';
-  d.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="16" height="16" rx="4"/></svg>';
-  return d;
-}
+// THEME + BG
+function applyTheme(){const t=LS.get('uno:theme','medium'); if(t==='default') delete document.body.dataset.theme; else document.body.dataset.theme=t;
+const bg=$("#customBG"); bg.innerHTML=''; if(t!=='custom') return; const data=LS.get('uno:bg',''); if(!data) return; const v=/^data:video\//.test(data); const el=document.createElement(v?'video':'img'); el.src=data; if(v){el.autoplay=el.loop=el.muted=true; el.playsInline=true} Object.assign(el.style,{width:'100%',height:'100%',objectFit:'cover'}); bg.appendChild(el)}
+$("#themeSel")&&($("#themeSel").value=LS.get('uno:theme','medium'), $("#themeSel").onchange=()=>{LS.set('uno:theme',$("#themeSel").value);applyTheme();toast('Tema atualizado')});
+$("#bgUpload")&&($("#bgUpload").onchange=e=>{const f=e.target.files&&e.target.files[0]; if(!f)return; const r=new FileReader(); r.onload=()=>{LS.set('uno:bg',r.result);LS.set('uno:theme','custom');$("#themeSel").value='custom';applyTheme();toast('Fundo salvo')}; r.readAsDataURL(f)});
 
-/* ================= Apps ================= */
-const appsGrid = document.getElementById('appsGrid');
-async function readApps(){
-  // Supports two formats:
-  // 1) Array of apps: [ {id,name,url,iconKey,defaultOpenMode} ]
-  // 2) { groups: { "Group Name": [ {key,title,url,iconKey,...}, ... ] } }
-  try{
-    const res = await fetch('./apps/apps.json', {cache:'no-cache'});
-    if(!res.ok) throw new Error('missing apps.json');
-    const data = await res.json();
-    if(Array.isArray(data)) return data.map(x => ({
-      id: x.id || x.key || normKey(x.title||x.name),
-      name: x.name || x.title || x.key,
-      url: x.url,
-      iconKey: x.iconKey,
-      icon: x.icon,
-      defaultOpenMode: x.defaultOpenMode || 'embed'
-    }));
-    if(data && data.groups){
-      const out=[];
-      for(const g of Object.keys(data.groups)){
-        for(const app of (data.groups[g]||[])){
-          out.push({
-            id: app.key || app.id || normKey(app.title||app.name),
-            name: app.title || app.name || app.key,
-            url: app.url,
-            iconKey: app.iconKey || app.key,
-            icon: app.icon,
-            defaultOpenMode: app.defaultOpenMode || 'embed'
-          });
-        }
-      }
-      return out;
-    }
-    return [];
-  }catch(e){
-    // Fallback demonstrativo
-    return [
-      { id:'chat', name:'Chat', url:'chat.html', iconKey:'hub_chat', defaultOpenMode:'embed' },
-      { id:'editor', name:'Editor', url:'editor.html', iconKey:'hub_config', defaultOpenMode:'embed' },
-      { id:'books', name:'Books', url:'books.html', iconKey:'hub_relatorio', defaultOpenMode:'embed' },
-      { id:'koblox', name:'KOBLOX', url:'player.html', iconKey:'hub_health', defaultOpenMode:'embed' }
-    ];
-  }
-}
+// CSS custom
+function applyCSS(){let st=$("#customStyle"); if(!st){st=document.createElement('style');st.id='customStyle';document.head.appendChild(st)} st.textContent=localStorage.getItem('infodose:cssCustom')||''}
+$("#applyCSS")&&($("#applyCSS").onclick=()=>{localStorage.setItem('infodose:cssCustom',($("#cssCustom").value||''));applyCSS();toast('CSS aplicado')});
+$("#clearCSS")&&($("#clearCSS").onclick=()=>{localStorage.removeItem('infodose:cssCustom');$("#cssCustom").value='';applyCSS();toast('CSS limpo','warn')});
+$("#downloadCSS")&&($("#downloadCSS").onclick=()=>{const css=localStorage.getItem('infodose:cssCustom')||''; const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([css],{type:'text/css'})); a.download='custom.css'; a.click(); setTimeout(()=>URL.revokeObjectURL(a.href),400)});
 
-/* per-app openMode */
-function getOpenMode(appId, def){ return LS.get('dual.app.openMode.'+appId, def||'embed') }
-function setOpenMode(appId, mode){ LS.set('dual.app.openMode.'+appId, mode) }
+// Brain
+const MODELS=['openrouter/auto','anthropic/claude-3.5-sonnet','openai/gpt-4.1-mini','google/gemini-1.5-pro','meta/llama-3.1-405b-instruct'];
+(function initBrain(){const sel=$("#model"); sel.innerHTML=''; MODELS.forEach(m=>{const o=document.createElement('option');o.value=o.textContent=m; sel.appendChild(o)}); sel.value=LS.get('dual.openrouter.model',MODELS[0]); $("#sk").value=LS.raw('dual.keys.openrouter')||'';
+$("#saveSK").onclick=()=>{LS.set('dual.openrouter.model',sel.value); localStorage.setItem('dual.keys.openrouter',$("#sk").value||''); toast('Config salvo')};
+$("#saveName").onclick=()=>{localStorage.setItem('infodose:userName',($("#userName").value||'').trim());toast('Nome salvo'); greeting()};
+})();
 
-/* ================= Viewer + Stack ================= */
-const viewer = document.getElementById('viewer');
-const viewerFrame = document.getElementById('viewerFrame');
-const viewerTitle = document.getElementById('viewerTitle');
-const openModeToggle = document.getElementById('openModeToggle');
-const openModeLabel = document.getElementById('openModeLabel');
-const viewerMinBtn = document.getElementById('viewerMinBtn');
-const viewerReloadBtn = document.getElementById('viewerReloadBtn');
-const viewerCloseBtn = document.getElementById('viewerCloseBtn');
-let currentAppId = null;
+// LS mini
+function lsStats(){let bytes=0; try{for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i),v=localStorage.getItem(k)||''; bytes+=k.length+v.length}}catch{} const fmt=n=>n<1024? n+'B': n<1048576? (n/1024).toFixed(1)+'KB' : (n/1048576).toFixed(2)+'MB'; $("#lsStat").textContent=`chaves:${localStorage.length} · ${fmt(bytes)}`}
+$("#lsSave")&&($("#lsSave").onclick=()=>{const k=$("#lsK").value.trim(); if(!k)return; localStorage.setItem(k,$("#lsV").value||''); lsStats(); toast('LS salvo')});
+$("#lsDel")&&($("#lsDel").onclick=()=>{const k=$("#lsK").value.trim(); if(!k)return; localStorage.removeItem(k); lsStats(); toast('LS apagado','warn')});
 
-function readStack(){ return LS.get('dual.stack', []) }
-function writeStack(v){ LS.set('dual.stack', v) }
-function addToStack(app, opts={}){
-  const st = readStack();
-  const i = st.findIndex(s=>s.id===app.id);
-  const item = { id:app.id, title:app.name, url:app.url, minimized:!!opts.minimized, mode:opts.mode||'embed', t:Date.now() };
-  if(i>=0){ st[i] = item } else { st.unshift(item) }
-  writeStack(st); renderStack();
-}
-function removeFromStack(id){ writeStack(readStack().filter(s=>s.id!==id)); renderStack() }
-function setMinimized(id,val){
-  const st = readStack(); const i = st.findIndex(s=>s.id===id);
-  if(i>=0){ st[i].minimized = !!val; writeStack(st); renderStack() }
-}
-function setStackMode(id, mode){
-  const st = readStack(); const i = st.findIndex(s=>s.id===id);
-  if(i>=0){ st[i].mode = mode; writeStack(st); renderStack() }
-}
+// Apps
+const RAW={apps:[]}; let onlyLocal=false; const appsWrap=$("#appsWrap"), appsCount=$("#appsCount");
+function normalize(L){return (L||[]).map(x=>({key:x.key||x.url||Math.random().toString(36).slice(2),title:x.title||'App',desc:x.desc||'',url:String(x.url||''),icon:x.icon||''}))}
+function locals(){let arr=[]; try{arr=JSON.parse(LS.raw('infodose:locals:v1')||'[]')}catch{} return arr.map(l=>({key:'local:'+l.id,title:l.name||'Local',desc:'HTML local',url:'local:'+l.id}))}
+function getLocal(id){let a=[]; try{a=JSON.parse(LS.raw('infodose:locals:v1')||'[]')}catch{} return a.find(x=>x.id===id)||null}
+function blobURL(loc){return URL.createObjectURL(new Blob([loc.html||''],{type:'text/html;charset=utf-8'}))}
+function card(a){const el=document.createElement('div'); el.className='app'; const ic=document.createElement('div'); ic.className='ico'; ic.innerHTML='<img src="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6/svgs/solid/cube.svg" width="18" height="18" alt="ico">'; const meta=document.createElement('div'); meta.style.flex='1'; const t=document.createElement('div'); t.className='t'; t.textContent=a.title; const d=document.createElement('div'); d.className='mut'; d.textContent=a.desc||a.url; const b=document.createElement('button'); b.className='btn'; b.innerHTML='<img src="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6/svgs/solid/arrow-up-right-from-square.svg" width="14" height="14" alt="" style="margin-right:4px">Abrir'; b.onclick=()=>openApp(a); meta.append(t,d); el.append(ic,meta,b); return el}
+function renderApps(){let L=normalize(RAW.apps).concat(locals()); if(onlyLocal) L=L.filter(x=>x.url.startsWith('local:')); appsWrap.innerHTML=''; L.forEach(a=>appsWrap.appendChild(card(a))); appsCount.textContent=L.length+' apps'}
+(function loadApps(){try{RAW.apps=JSON.parse($("#APPS_JSON").textContent||'{}').apps||[]}catch{RAW.apps=[]} renderApps()})();
+$("#toggleLocal").onclick=()=>{onlyLocal=!onlyLocal; $("#toggleLocal").childNodes[1]&&( $("#toggleLocal").lastChild.nodeValue = onlyLocal?'Mostrar Todos':'Mostrar Locais'); renderApps()};
+$("#importLocal").onclick=async()=>{const fs=Array.from($("#fileLocal").files||[]); if(!fs.length)return; const tasks=fs.map(f=>new Promise(res=>{const r=new FileReader(); r.onload=()=>{const s=String(r.result||''); if(/\.json$/i.test(f.name)){try{const o=JSON.parse(s); RAW.apps=Array.isArray(o.apps)?o.apps:Array.isArray(o)?o:[]; renderApps(); toast('apps.json carregado'); res(null)}catch{toast('JSON inválido','err');res(null)}}else{res({id:'l_'+Math.random().toString(36).slice(2),name:f.name.replace(/\.(html?|txt)$/i,''),html:s,ts:Date.now()})}}; r.readAsText(f)})); const list=(await Promise.all(tasks)).filter(Boolean); const cur=JSON.parse(LS.raw('infodose:locals:v1')||'[]'); list.forEach(x=>cur.unshift(x)); localStorage.setItem('infodose:locals:v1',JSON.stringify(cur)); renderApps(); if(list.length) toast('HTMLs adicionados')};
+$("#exportLocal").onclick=()=>{const data={v:1,items:JSON.parse(LS.raw('infodose:locals:v1')||'[]')}; const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([JSON.stringify(data,null,2)],{type:'application/json'})); a.download='locals_pack.json'; a.click(); setTimeout(()=>URL.revokeObjectURL(a.href),400)};
+$("#clearLocal").onclick=()=>{if(confirm('Limpar HTMLs locais?')){localStorage.removeItem('infodose:locals:v1'); renderApps(); toast('Locais limpos','warn')}};
 
-const stackList = document.getElementById('stackList');
-function renderStack(){
-  const st = readStack();
-  const miniCount = st.filter(s=>s.minimized).length;
-  document.getElementById('miniCountHome').textContent = miniCount;
-  stackList.innerHTML = '';
-  st.forEach(s=>{
-    const card = document.createElement('div'); card.className='stack-card';
-    const h2 = document.createElement('h2'); h2.textContent = s.title; card.appendChild(h2);
+// Stack + Dock
+const stackWrap=$("#stackWrap"), dock=$("#dock");
+function badge(it){const b=document.createElement('button'); b.className='badge'; b.textContent=it.title; b.onclick=()=>{const s=document.querySelector('[data-sid="'+it.sid+'"]'); if(s){s.scrollIntoView({behavior:'smooth'}); s.classList.remove('min')}}; return b}
+function updDock(){dock.innerHTML=''; $$('.session').forEach(s=>{const meta=JSON.parse(s.dataset.meta||'{}'); dock.appendChild(badge({title:meta.title||'App',sid:s.dataset.sid}))})}
+function openApp(a){const sid='s_'+Math.random().toString(36).slice(2); const isLocal=a.url.startsWith('local:'); const lr=isLocal?getLocal(a.url.slice(6)):null; const url=lr?blobURL(lr):a.url||'about:blank';
+const card=document.createElement('div'); card.className='session'; card.dataset.sid=sid; card.dataset.meta=JSON.stringify({title:a.title||'App',url:a.url||''});
+card.innerHTML=`<div class="h"><b style="flex:1">${a.title||'App'}</b>
+<button class="btn" data-act="min" title="Minimizar"><img src="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6/svgs/solid/minus.svg" width="14" height="14" alt=""></button>
+<button class="btn" data-act="ref" title="Recarregar"><img src="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6/svgs/solid/rotate-right.svg" width="14" height="14" alt=""></button>
+<button class="btn" data-act="x" title="Fechar"><img src="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6/svgs/solid/xmark.svg" width="14" height="14" alt=""></button></div>
+<iframe src="${url}" allow="autoplay;clipboard-read;clipboard-write;picture-in-picture;fullscreen"></iframe>`;
+( $('#openInside').checked ? $('#v-home') : $('#v-stack') ).querySelector ? $('#v-stack').prepend(card) : stackWrap.prepend(card);
+card.querySelector('[data-act=min]').onclick=()=>{card.classList.toggle('min'); card.querySelector('iframe').style.display=card.classList.contains('min')?'none':'block'; updDock()};
+card.querySelector('[data-act=ref]').onclick=()=>{const fr=card.querySelector('iframe'); try{fr.contentWindow.location.reload()}catch{fr.src=fr.src}};
+card.querySelector('[data-act=x]').onclick=()=>{card.remove(); updDock()}; nav('stack'); updDock(); toast('App aberto')}
+$("#closeAll").onclick=()=>{if(!confirm('Fechar todas as sessões?'))return; $$('.session').forEach(s=>s.remove()); updDock(); toast('Sessões fechadas','warn')};
 
-    const tools = document.createElement('div'); tools.className='tools';
-    // toggle open mode (também no stack)
-    const toggleWrap = document.createElement('label'); toggleWrap.className='toggle'; toggleWrap.title='Abrir em nova aba / dentro';
-    const chk = document.createElement('input'); chk.type='checkbox'; chk.checked = (getOpenMode(s.id, 'embed')==='tab');
-    const span = document.createElement('span'); span.textContent = chk.checked ? 'Nova aba' : 'Dentro';
-    chk.addEventListener('change', ()=>{ const m = chk.checked?'tab':'embed'; setOpenMode(s.id,m); setStackMode(s.id,m); span.textContent = chk.checked?'Nova aba':'Dentro' });
-    toggleWrap.appendChild(chk); toggleWrap.appendChild(span);
-    tools.appendChild(toggleWrap);
+// Archetypes
+const ARCH=['luxara.html','rhea.html','aion.html','atlas.html','nova.html','genus.html','horus.html'];
+const archSel=$("#archSel"), archFrame=$("#archFrame"), archMsg=$("#archMsg");
+function fillArch(){archSel.innerHTML=''; ARCH.forEach(n=>{const o=document.createElement('option');o.value=n;o.textContent=n.replace('.html',''); archSel.appendChild(o)}); setArch(0)}
+function setArch(i){const n=(i+ARCH.length)%ARCH.length; archSel.selectedIndex=n; const f=ARCH[n]; archFrame.src='./archetypes/'+f; speakArch(f.replace('.html',''))}
+function speakArch(name){try{const vs=speechSynthesis.getVoices(); const v=vs.find(v=>v.lang&&v.lang.startsWith('pt'))||vs[0]; const u=new SpeechSynthesisUtterance('Olá, eu sou '+name); if(v) u.voice=v; speechSynthesis.cancel(); speechSynthesis.speak(u)}catch{}}
+function msgArch(t,type){archMsg.textContent=t; archMsg.style.display='block'; archMsg.style.background= type==='ok'? '#39ffb6cc' : type==='warn'? '#ffb86bcc' : '#0b1122cc'; archMsg.style.color= type? '#0b0f14':'#eaf0ff'; clearTimeout(archMsg._tm); archMsg._tm=setTimeout(()=>archMsg.style.display='none',3200)}
+$("#archPrev").onclick=()=>setArch(archSel.selectedIndex-1);
+$("#archNext").onclick=()=>setArch(archSel.selectedIndex+1);
+archSel.onchange=()=>setArch(archSel.selectedIndex);
+$("#archCircle").onclick=()=>startDual();
+$("#archAudio").onclick=()=>startVoice();
 
-    const btnMin = document.createElement('button'); btnMin.className='icon-btn'; btnMin.title='Minimizar';
-    btnMin.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14"/></svg>`;
-    btnMin.onclick = ()=>setMinimized(s.id,true);
+// Chat + OpenRouter
+const feed=$("#chatFeed");
+function push(type,text){const d=document.createElement('div'); d.className='m '+(type==='user'?'u':type==='ai'?'a':''); d.textContent=text; feed.appendChild(d); feed.scrollTop=feed.scrollHeight; if(type==='ai'){const p=$("#preview"); p.textContent=text; if($('#v-home').classList.contains('active')) p.style.display='block'}}
+async function sendAI(content,sk,model){const payload={model, messages:[{role:'system',content:'Você é o assistente Dual em pt-BR.'},{role:'user',content:String(content)}],max_tokens:220,temperature:.7}; const r=await fetch('https://openrouter.ai/api/v1/chat/completions',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+sk},body:JSON.stringify(payload)}); if(!r.ok) throw new Error('API '+r.status); const j=await r.json(); return j?.choices?.[0]?.message?.content||''}
+async function handleUserMessage(text){const name=(localStorage.getItem('infodose:userName')||'').trim(); const sk=(localStorage.getItem('dual.keys.openrouter')||'').trim(); const model=LS.get('dual.openrouter.model','openrouter/auto'); if(!sk){msgArch('Configure a chave no Brain.','warn'); return}
+push('user','Você: '+text); try{const reply=await sendAI((name?name+': ':'')+text,sk,model); const arch=archSel.options[archSel.selectedIndex]?.textContent||'Dual'; push('ai',arch+': '+reply); speak(reply)}catch(e){push('ai','Desculpe, não consegui responder agora.'); toast('Falha na API','err')}}
+function speak(t){try{const vs=speechSynthesis.getVoices(); const v=vs.find(v=>v.lang&&v.lang.startsWith('pt'))||vs[0]; const u=new SpeechSynthesisUtterance(String(t)); if(v) u.voice=v; speechSynthesis.cancel(); speechSynthesis.speak(u)}catch{}}
+function startDual(){msgArch('Oi Dual','ok'); speak('Oi Dual'); setTimeout(()=>startVoice(),500)}
+function startVoice(){const SR=window.SpeechRecognition||window.webkitSpeechRecognition; if(!SR){msgArch('Navegador sem reconhecimento de fala.','warn'); return} const r=new SR(); r.lang='pt-BR'; r.interimResults=false; r.onstart=()=>{push('','🎙️ Ouvindo…')}; r.onresult=e=>{const t=e.results[0][0].transcript.trim(); if(t) handleUserMessage(t)}; r.onerror=()=>msgArch('Erro no microfone','warn'); r.start()}
+$("#btnVoice").onclick=()=>startVoice();
+$("#btnText").onclick=()=>{nav('chat'); $("#chatInput").focus()};
+$("#chatForm").onsubmit=e=>{e.preventDefault(); const t=$("#chatInput").value.trim(); if(!t) return; $("#chatInput").value=''; handleUserMessage(t)};
 
-    const btnOpen = document.createElement('button'); btnOpen.className='icon-btn'; btnOpen.title='Abrir';
-    btnOpen.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>`;
-    btnOpen.onclick = ()=>{
-      if(getOpenMode(s.id,'embed')==='tab'){ window.open(s.url,'_blank','noopener,noreferrer') }
-      else { viewerTitle.textContent = s.title; viewerFrame.src = s.url; viewer.classList.add('open'); setMinimized(s.id,false) }
-    };
+// Header buttons
+$("#btnBack").onclick=()=>{try{history.length>1&&history.back()}catch{}};
+$("#btnDownload").onclick=()=>{const clone=document.documentElement.cloneNode(true); const html='<!doctype html>\n'+clone.outerHTML; const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([html],{type:'text/html;charset=utf-8'})); a.download='HUB-UNO.html'; a.click(); setTimeout(()=>URL.revokeObjectURL(a.href),400); toast('HTML exportado')};
+$("#btnHelp").onclick=()=>alert('Atalhos: g+h Home · g+a Apps · g+s Stack · g+b Brain · g+c Chat\nCtrl/Cmd+S: baixar HTML');
+$("#btnLS").onclick=()=>{nav('brain'); document.getElementById('lsK').focus()};
 
-    const btnReload = document.createElement('button'); btnReload.className='icon-btn'; btnReload.title='Recarregar';
-    btnReload.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.13-3.36L23 10M1 14l5.36 4.36A9 9 0 0 0 20.49 15"/></svg>`;
-    btnReload.onclick = ()=>{ try{ viewerFrame.contentWindow.location.reload() }catch(e){ viewerFrame.src = viewerFrame.src } };
+// Keybinds
+let g=false; window.addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='s'){e.preventDefault();$("#btnDownload").click()} if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='k'){e.preventDefault();$("#chatInput")?.focus()} if(e.key==='g'){g=true;setTimeout(()=>g=false,600)} if(g){const k=e.key.toLowerCase(); if(k==='h')nav('home'); if(k==='a')nav('apps'); if(k==='s')nav('stack'); if(k==='b')nav('brain'); if(k==='c')nav('chat'); g=false}});
 
-    const btnClose = document.createElement('button'); btnClose.className='icon-btn'; btnClose.title='Fechar';
-    btnClose.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>`;
-    btnClose.onclick = ()=>removeFromStack(s.id);
-
-    tools.appendChild(btnMin); tools.appendChild(btnOpen); tools.appendChild(btnReload); tools.appendChild(btnClose);
-    card.appendChild(tools);
-
-    if(s.minimized){ const b=document.createElement('div'); b.className='badge'; b.textContent='Minimized'; card.appendChild(b) }
-    stackList.appendChild(card);
-  });
-}
-
-/* ================= Render Apps ================= */
-async function renderApps(){
-  const apps = await readApps();
-  appsGrid.innerHTML = '';
-  for(const app of apps){
-    const tile = document.createElement('div'); tile.className='app-icon';
-    const iconNode = await getIconNode(app); iconNode.classList.add('icon');
-    const label = document.createElement('span'); label.textContent = app.name;
-    tile.appendChild(iconNode); tile.appendChild(label);
-    tile.onclick = ()=>openApp(app);
-    appsGrid.appendChild(tile);
-    if(LS.get('dual.app.openMode.'+app.id, null)===null){ setOpenMode(app.id, app.defaultOpenMode||'embed') }
-  }
-}
-
-/* ================= Open App ================= */
-function openApp(app){
-  const mode = getOpenMode(app.id, app.defaultOpenMode||'embed');
-  if(mode==='tab'){
-    window.open(app.url,'_blank','noopener,noreferrer');
-    addToStack(app,{ minimized:false, mode:'tab' });
-    return;
-  }
-  viewerTitle.textContent = app.name;
-  viewer.classList.add('open');
-  viewerFrame.src = app.url;
-  currentAppId = app.id;
-  openModeToggle.checked = (mode==='tab');
-  openModeLabel.textContent = openModeToggle.checked ? 'Nova aba' : 'Dentro';
-  addToStack(app,{ minimized:false, mode:'embed' });
-}
-openModeToggle.addEventListener('change', ()=>{
-  if(!currentAppId) return;
-  const m = openModeToggle.checked ? 'tab' : 'embed';
-  setOpenMode(currentAppId, m);
-  setStackMode(currentAppId, m);
-  openModeLabel.textContent = openModeToggle.checked ? 'Nova aba' : 'Dentro';
-});
-viewerMinBtn.addEventListener('click', ()=>{ viewer.classList.remove('open'); if(currentAppId){ setMinimized(currentAppId,true) } });
-viewerReloadBtn.addEventListener('click', ()=>{ try{ viewerFrame.contentWindow.location.reload() }catch(e){ viewerFrame.src = viewerFrame.src } });
-viewerCloseBtn.addEventListener('click', ()=>{ viewer.classList.remove('open'); viewerFrame.src='about:blank'; if(currentAppId){ removeFromStack(currentAppId); currentAppId=null } });
-
-
-/* ================= Local Uploads & Apps Override ================= */
-function lsListLocalApps(){ return LS.get('dual.localapps', []) }
-function lsSaveLocalApps(list){ LS.set('dual.localapps', list) }
-function addLocalAppEntry(id, name){
-  const list = lsListLocalApps();
-  const i = list.findIndex(a=>a.id===id);
-  const entry = { id, name: name || id, url: 'local:'+id, iconKey: 'hub_apps', defaultOpenMode: 'embed' };
-  if(i>=0){ list[i] = entry } else { list.unshift(entry) }
-  lsSaveLocalApps(list);
-}
-function getLocalAppContent(id){ return LS.raw('dual.localapp.'+id) || '' }
-function setLocalAppContent(id, html){ try{ localStorage.setItem('dual.localapp.'+id, html) }catch(e){} }
-
-async function handleLocalUpload(files){
-  if(!files || !files.length) return;
-  dualShowLoaderAfter(600); // feedback rápido
-  try{
-    const tasks = Array.from(files).map(async f=>{
-      const name = f.name || 'upload';
-      if(/\.json$/i.test(name)){
-        const txt = await f.text();
-        try{
-          const parsed = JSON.parse(txt);
-          if(Array.isArray(parsed) || (parsed && typeof parsed==='object' && parsed.groups)){
-            localStorage.setItem('dual.apps.override', txt);
-            toast('Override de apps.json ativado ('+ name +')');
-          }else{
-            toast('JSON não reconhecido como apps.json válido: '+name);
-          }
-        }catch(e){ toast('Falha ao ler JSON: '+name) }
-      } else if(/\.(html|htm)$/i.test(name)){
-        const id = (name.toLowerCase().replace(/[^a-z0-9_-]+/g,'_').replace(/_+/g,'_').replace(/^_|_$/g,'')) || ('local_'+Date.now());
-        const txt = await f.text();
-        setLocalAppContent(id, txt);
-        addLocalAppEntry(id, name.replace(/\.(html|htm)$/i,''));
-        toast('App local adicionado: '+name);
-      } else {
-        toast('Tipo não suportado: '+name);
-      }
-    });
-    await Promise.all(tasks);
-  } finally {
-    dualHideLoader();
-    renderApps(); // atualiza grid
-  }
-}
-
-function clearAppsOverride(){
-  localStorage.removeItem('dual.apps.override');
-  toast('Override removido');
-}
-
-/* Override-aware readApps */
-const __readApps_fetch = readApps;
-readApps = async function(){
-  // 1) local override (apps.json via upload) tem prioridade
-  const override = LS.raw('dual.apps.override');
-  if(override){
-    try{
-      const data = JSON.parse(override);
-      const norm = Array.isArray(data) ? data.map(x => ({
-        id: x.id || x.key || normKey(x.title||x.name),
-        name: x.name || x.title || x.key,
-        url: x.url, iconKey: x.iconKey, icon: x.icon, defaultOpenMode: x.defaultOpenMode || 'embed'
-      })) : (data && data.groups ? Object.keys(data.groups).flatMap(g => (data.groups[g]||[]).map(app => ({
-        id: app.key || app.id || normKey(app.title||app.name),
-        name: app.title || app.name || app.key,
-        url: app.url, iconKey: app.iconKey || app.key, icon: app.icon, defaultOpenMode: app.defaultOpenMode || 'embed'
-      }))) : []);
-      // + local uploads
-      const locals = lsListLocalApps();
-      return [...locals, ...norm];
-    }catch(e){ /* cai para fetch */ }
-  }
-  // 2) fetch padrão + append dos locais
-  const list = await __readApps_fetch();
-  const locals = lsListLocalApps();
-  return [...locals, ...list];
-};
-
-/* Open local:* apps */
-const __openApp_base = openApp;
-openApp = function(app){
-  if(app && typeof app.url==='string' && app.url.startsWith('local:')){
-    const id = app.url.slice(6);
-    const html = getLocalAppContent(id);
-    const blob = new Blob([html || '<!doctype html><title>Local App</title><meta charset=\"utf-8\"><style>body{background:#0b0f1a;color:#fff;font-family:Inter,sans-serif;padding:20px}</style><h1>Local App vazio</h1>'], {type:'text/html'});
-    const u = URL.createObjectURL(blob);
-    const mode = getOpenMode(app.id||id, app.defaultOpenMode||'embed');
-    if(mode==='tab'){ window.open(u, '_blank', 'noopener,noreferrer'); }
-    else {
-      viewerTitle.textContent = app.name || id;
-      viewer.classList.add('open');
-      dualShowLoaderAfter(500);
-      viewerFrame.src = u;
-    }
-    addToStack({ id: app.id||id, name: app.name||id, url: app.url, iconKey: app.iconKey, defaultOpenMode: app.defaultOpenMode }, { minimized:false, mode: (mode==='tab'?'tab':'embed') });
-    return;
-  }
-  return __openApp_base(app);
-};
-
-/* ================= Boot ================= */
-function boot(){
-  document.getElementById('skHint').textContent = LS.raw('dual.keys.openrouter') ? '• OK' : '';
-  document.getElementById('brainDownload').onclick = exportBackup;
-  document.getElementById('brainSK').onclick = promptKey;
-  document.getElementById('brainLogs').onclick = clearLogs;
-  initModelSelect();
-  renderApps();
-  renderStack();
-  if('serviceWorker' in navigator){ try{ navigator.serviceWorker.register('./service-worker.js') }catch(e){} }
-}
-boot();
-</script>
-
-<style>
-/* === Dual Loader Overlay === */
-#dualLoader{ position:fixed; inset:0; display:none; place-items:center; z-index:9999;
-  background:rgba(10,13,31,.66); backdrop-filter:blur(6px); -webkit-backdrop-filter:blur(6px) }
-#dualLoader.show{ display:grid }
-#dualLoader .di-loader{ --di-size:54px; --di-gold:#F2C75C; --di-stroke:2px; position:relative; width:var(--di-size); height:var(--di-size) }
-#dualLoader .di-ring{ position:absolute; inset:0; border:var(--di-stroke) solid var(--di-gold); border-radius:50%; animation:di-spin 6s linear infinite }
-#dualLoader .di-stroke{ position:absolute; left:50%; top:50%; width:62%; height:var(--di-stroke); background:var(--di-gold);
-  transform:translate(-50%,-50%); border-radius:999px; animation:di-breathe 2.4s ease-in-out infinite }
-#dualLoader .di-dots{ position:absolute; inset:0; transform:rotate(-90deg); animation:di-orbit 4.2s linear infinite }
-#dualLoader .di-dots i{ --i:0; position:absolute; left:50%; top:50%; width:4px; height:4px; border-radius:50%; background:var(--di-gold); opacity:.55;
-  transform: rotate(calc(var(--i)*51deg)) translate(calc(7px + var(--i)*2.2px)) rotate(calc(var(--i)*-51deg));
-  animation:di-pulse 4.2s linear infinite; animation-delay:calc(var(--i) * .6s) }
-@keyframes di-orbit{ to{ transform:rotate(270deg) } }@keyframes di-spin{ to{ transform:rotate(360deg) } }
-@keyframes di-breathe{ 0%,100%{ opacity:.9 } 50%{ opacity:1 } }
-@keyframes di-pulse{ 0%,70%{ opacity:.45; transform:scale(.92) } 76%,84%{ opacity:1; transform:scale(1.18) } 100%{ opacity:.6; transform:scale(.96) } }
-@media (prefers-reduced-motion:reduce){ #dualLoader .di-ring,#dualLoader .di-stroke,#dualLoader .di-dots,#dualLoader .di-dots i{ animation:none } }
-</style>
-<div id="dualLoader" aria-hidden="true">
-  <span class="di-loader">
-    <span class="di-ring"></span>
-    <span class="di-stroke"></span>
-    <span class="di-dots">
-      <i style="--i:0"></i><i style="--i:1"></i><i style="--i:2"></i>
-      <i style="--i:3"></i><i style="--i:4"></i><i style="--i:5"></i><i style="--i:6"></i>
-    </span>
-  </span>
-</div>
-
-
-<script>
-// === Dual Loader control (show after 3s threshold) ===
-const __dualLoader = document.getElementById('dualLoader');
-let __dualTimer = null, __dualVisible = false;
-function dualShowLoaderAfter(thresholdMs){
-  dualHideLoader();
-  __dualTimer = setTimeout(()=>{ __dualVisible = true; __dualLoader.classList.add('show') }, thresholdMs);
-}
-function dualHideLoader(){
-  if(__dualTimer){ clearTimeout(__dualTimer); __dualTimer=null }
-  if(__dualVisible){ __dualLoader.classList.remove('show'); __dualVisible=false }
-}
-
-// Patch readApps fetch to use loader
-const __readApps_orig = readApps;
-readApps = async function(){
-  dualShowLoaderAfter(3000);
-  try{
-    const out = await __readApps_orig();
-    return out;
-  } finally { dualHideLoader() }
-}
-
-// Hook viewer iframe loads
-if (typeof viewerFrame !== 'undefined'){
-  viewerFrame.addEventListener('load', ()=> dualHideLoader());
-}
-
-// When opening embedded app, show loader if slow
-const __openApp_orig = openApp;
-openApp = function(app){
-  const mode = getOpenMode(app.id, app.defaultOpenMode||'embed');
-  if (mode !== 'tab'){
-    dualShowLoaderAfter(3000);
-  }
-  return __openApp_orig(app);
-}
-</script>
-
-
-<script>
-// === Global fetch hook with loader threshold ===
-(function(){
-  const origFetch = window.fetch;
-  window.fetch = function(){
-    let shown = false;
-    const t = setTimeout(()=>{
-      dualShowLoaderAfter(0); // immediate show after 3s wait below
-      shown = true;
-    }, 3000);
-    return origFetch.apply(this, arguments).finally(()=>{
-      clearTimeout(t);
-      if(shown) dualHideLoader();
-    });
-  };
+// Init
+(function init(){
+  applyTheme(); applyCSS(); fillArch(); lsStats();
+  const last=LS.get('uno:lastTab','home'); nav(last);
+  if(location.protocol==='https:' && 'serviceWorker' in navigator){addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}))}
 })();
 </script>
-
-
-<script>
-// === Global fetch loader hook (slow fetches) ===
-(function(){
-  const EXCEPTIONS = [
-    /\.(png|jpg|jpeg|gif|webp|svg|ico|mp3|mp4|webm|woff2?|ttf|otf|css)$/i,
-    /service-worker\.js$/i,
-    /manifest\.json$/i
-  ];
-  const OPT_OUT_HEADER = 'x-dual-loader';
-  const SLOW_MS = 3000; // threshold
-
-  const _origFetch = window.fetch.bind(window);
-  window.fetch = function(input, init){
-    try {
-      const req = new Request(input, init);
-      const method = (req.method || 'GET').toUpperCase();
-      // opt-out via header
-      if (req.headers && req.headers.get(OPT_OUT_HEADER) === 'off') {
-        return _origFetch(input, init);
-      }
-      // skip non-GET/POST/PUT/PATCH requests
-      if (!['GET','POST','PUT','PATCH'].includes(method)) {
-        return _origFetch(input, init);
-      }
-      // exceptions by URL pattern
-      const url = req.url || String(input||'');
-      if (EXCEPTIONS.some(rx => rx.test(url))) {
-        return _origFetch(input, init);
-      }
-      // start slow timer
-      dualShowLoaderAfter(SLOW_MS);
-      return _origFetch(input, init)
-        .finally(() => { try{ dualHideLoader() }catch(e){} });
-    } catch (e){
-      return _origFetch(input, init);
-    }
-  };
-})();
-</script>
-
-<input type="file" id="fileInputUpload" style="display:none" accept=".html,.json">
-
-<script>
-// === Upload Local App/JSON ===
-const fileInputUpload = document.getElementById('fileInputUpload');
-document.getElementById('brainUpload').onclick = () => fileInputUpload.click();
-
-fileInputUpload.addEventListener('change', (e) => {
-  const f = e.target.files[0];
-  if(!f) return;
-  const reader = new FileReader();
-  reader.onload = function(ev){
-    const content = ev.target.result;
-    if(f.name.endsWith('.json')){
-      try{
-        const parsed = JSON.parse(content);
-        localStorage.setItem('dual.local.apps.json', JSON.stringify(parsed));
-        toast('JSON carregado em dual.local.apps.json');
-        renderApps();
-      }catch(err){
-        alert('JSON inválido: '+err.message);
-      }
-    }else if(f.name.endsWith('.html')){
-      const key = 'dual.local.app.'+Date.now();
-      localStorage.setItem(key, content);
-      const apps = LS.get('dual.local.apps', []);
-      apps.push({ id:key, name:f.name, url:'data:text/html;base64,'+btoa(unescape(encodeURIComponent(content))), iconKey:'hub_config', defaultOpenMode:'embed' });
-      LS.set('dual.local.apps', apps);
-      toast('App local '+f.name+' salvo e adicionado');
-      renderApps();
-    }
-  };
-  reader.readAsText(f);
-});
-
-// Patch readApps to merge local uploads
-const __readApps_base = readApps;
-readApps = async function(){
-  const base = await __readApps_base();
-  let extra = [];
-  try{
-    const j = localStorage.getItem('dual.local.apps.json');
-    if(j) extra = extra.concat(JSON.parse(j));
-  }catch(e){}
-  try{
-    const apps = LS.get('dual.local.apps', []);
-    if(Array.isArray(apps)) extra = extra.concat(apps);
-  }catch(e){}
-  return base.concat(extra);
-}
-</script>
-
-</body>
-</html>
+</body></html>
