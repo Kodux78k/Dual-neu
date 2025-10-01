@@ -1,15 +1,25 @@
-Hub Dual — Nebula Pro (PERFECT) — Pack
 
-Files:
-- Hub_Dual_perfect.html ................ Main unified build (design refinado)
-- Hub_Dual_perfect_ultracompact.html ... Variante Ultra-Compact (densidade máxima)
-- Hub_Dual_perfect_mediumdark.html ..... Variante Medium-Dark (tema um pouco mais claro)
+UNO_HORUS_ACTIVATED_v6 — Patch pack (Horus • Bloom/Toon presets)
+-----------------------------------------------------------------
+• Index (Blue‑1 + HORUS dual):            HUB-UNO-Revo.HORUS.BLUE1.html
+• Index (No overlay tint):                HUB-UNO-Revo.HORUS.NoOverlay.html
+• Index (Cinematic Soft bloom):           HUB-UNO-Revo.HORUS.CineSoft.html
+• Index (Strong bloom):                   HUB-UNO-Revo.HORUS.Strong.html
+• Chat‑only page (Blue‑1 + HORUS dual):   HUB-UNO-Revo.HORUS.ChatOnly.html
+• Overlay patch w/ bloom & voice icon:    UNO_patch_arch3d_particles.bloomtoon*.js
+• Archetypes upgraded (toon+photographic bloom): archetypes/*.html (+ arch3d_embed.js)
 
-Notas rápidas:
-- Ícones: coloca seus SVGs em icons/others/ com keys normalizadas (ex: hub_chat.svg).
-- Apps: cria apps/apps.json (lista simples ou groups). As chaves 'id'/'key' viram persistência e ícone.
-- Open mode: cada app salva 'Dentro/Nova aba' em localStorage (dual.app.openMode.{id}).
-- Stack: estado de minimizado/aberto persiste em 'dual.stack'.
-- Brain: SK em 'dual.keys.openrouter' e modelo em 'dual.openrouter.model'.
+How to use
+----------
+1) Coloque a pasta "archetypes/" ao lado dos HTMLs acima.
+2) Abra uma das variantes do HUB conforme o preset desejado (BLUE1, CineSoft, Strong, NoOverlay).
+3) (Opcional) Ajuste o bloom/tonemapping nos scripts:
+   - UNO_patch_arch3d_particles.bloomtoon*.js  → overlay da bolinha no HUB
+   - archetypes/arch3d_embed.js                → sólido dentro de cada HTML arquétipo
+4) O ícone do botão de voz no HUB replica o sólido ativo automaticamente.
 
-Bom uso!
+Presets (valores principais)
+----------------------------
+Cinematic Soft → strength: 0.45, radius: 0.38, threshold: 0.82
+Strong         → strength: 1.25, radius: 0.88, threshold: 0.22
+Blue‑1 (base)  → strength: 0.85, radius: 0.62, threshold: 0.25
