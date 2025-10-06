@@ -2,7 +2,7 @@
 <html lang="pt-BR" style="--arch-overlay: rgba(64, 158, 255, 0.22);"><head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1, user-scalable=no">
-  <title>HUB UNO — CineSoft</title>
+  <title>HUB UNO — PROD (safe)</title>
   <meta name="theme-color" content="#0b0f14">
   <style>
     :root {
@@ -1171,20 +1171,76 @@ body[data-theme="blue1"] #chatFeed .msg.ai { background: rgba(77, 148, 255, 0.14
 body[data-theme="blue1"] #chatFeed .msg.user { background: rgba(232,240,255,0.10); }
 
 </style>
-<link rel="stylesheet" href="blue-1.css">
+
+<style id="overlay-defaults">
+:root{
+  --arch-color: #8a2be2;
+  --arch-overlay-strength: 12%; /* −1 default */
+  --arch-overlay: color-mix(in srgb, var(--arch-color) var(--arch-overlay-strength), transparent);
+}
+body::after{content:'';position:fixed;inset:0;background:var(--arch-overlay, transparent)!important;pointer-events:none;z-index:0}
+#arch-fadeCover{background:var(--arch-overlay, transparent);z-index:2}
+</style>
+
+
+<style id="ls-panel-css">
+#lsModal.ls-modal{position:fixed;inset:0;display:none;align-items:center;justify-content:center;z-index:1200;background:rgba(0,0,0,.55);backdrop-filter:blur(8px)}
+#lsModal.ls-modal.open{display:flex}
+#lsModal .ls-panel{width:min(1040px,95vw);max-height:86vh;overflow:auto;background:rgba(15,17,32,.92);border:1px solid rgba(255,255,255,.12);border-radius:18px;box-shadow:0 12px 34px rgba(0,0,0,.4);padding:14px;color:#f5f7ff;font:14px/1.45 Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial}
+#lsModal .ls-hdr{display:flex;gap:10px;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(255,255,255,.12);padding-bottom:10px;margin-bottom:10px}
+#lsModal .ls-ttl{font-weight:900;letter-spacing:.06em}
+#lsModal .ls-actions{display:flex;gap:8px;flex-wrap:wrap}
+#lsModal button{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);color:#fff;padding:8px 12px;border-radius:10px;cursor:pointer}
+#lsModal button:hover{background:rgba(255,255,255,.18)}
+#lsModal .meta{color:#cfd8dc;font-size:12px;margin:8px 0 10px}
+#lsModal .presets{border:1px solid rgba(255,255,255,.12);border-radius:14px;padding:8px;background:rgba(255,255,255,.04);margin:10px 0}
+#lsModal .presets-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:10px;margin-top:8px}
+#lsModal .preset{border:1px solid rgba(255,255,255,.12);border-radius:12px;background:rgba(255,255,255,.04);padding:10px;display:grid;gap:6px}
+#lsModal .row{display:flex;align-items:center;justify-content:space-between;gap:10px}
+#lsModal .val{font:12px/1.4 ui-monospace,monospace;background:#0b0f1a;border:1px solid rgba(255,255,255,.12);border-radius:10px;padding:8px;max-height:140px;overflow:auto;word-break:break-word}
+#lsModal .list{display:grid;gap:10px}
+#lsModal .item{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);border-radius:12px;padding:10px;display:grid;gap:8px}
+#lsModal .item .head{display:flex;align-items:center;justify-content:space-between;gap:8px}
+#lsModal .key{font-weight:800;max-width:56vw;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#lsModal .type{font-size:11px;color:#cfd8dc}
+#lsModal .switch{inline-size:46px;block-size:28px;border-radius:999px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.15);position:relative;cursor:pointer}
+#lsModal .switch::after{content:"";position:absolute;inset:4px auto 4px 4px;width:20px;border-radius:999px;background:#fff;transition:all .18s}
+#lsModal .switch.on{background:rgba(25,226,123,.28)}
+#lsModal .switch.on::after{left:22px}
+#lsModal .img-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px}
+#lsModal .img-card{border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.04);border-radius:10px;padding:8px}
+#lsModal .img-card img{width:100%;height:auto;display:block;border-radius:8px}
+#lsModal .sk-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media (max-width:720px){#lsModal .sk-grid{grid-template-columns:1fr}#lsModal .key{max-width:46vw}}
+#lsModal .sk-item{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);border-radius:12px;padding:10px;display:grid;gap:8px}
+#lsModal .sk-item .top{display:flex;align-items:center;justify-content:space-between;gap:8px}
+#lsModal .sk-item .name{font-weight:800}
+#lsModal .sk-item .key{font:12px/1.4 ui-monospace,monospace;opacity:.85;word-break:break-all}
+#lsModal .sk-item button{font-size:.75rem;padding:4px 8px;border-radius:8px}
+#lsModal .sk-item button:first-child{background:rgba(57,255,182,.18)}
+#lsModal .sk-item button:last-child{background:rgba(255,92,138,.18)}
+/* inside LS overlay ctl */
+#lsModal .seg{display:inline-grid;grid-auto-flow:column;gap:6px}
+#lsModal .ls-ov{min-width:40px;padding:6px 8px;border-radius:10px;border:1px solid rgba(255,255,255,.16);background:rgba(255,255,255,.08);color:#fff;cursor:pointer;font-weight:700}
+#lsModal .ls-ov.on{background:rgba(57,255,182,.20);border-color:rgba(57,255,182,.45)}
+</style>
+
+
+<style id="show-app-title-css">.app-title{display:inline-flex;align-items:center;gap:6px}</style>
+<!-- Manifestado 00 · orbs simples (inline) -->
+<style id="manifest00-inline">
+:root{ --grad-a:#9d7bff; --grad-b:#00c5e5; }
+.manifest-orbs{ display:flex; gap:14px; align-items:center; justify-content:center; padding:16px 0; }
+.manifest-orbs .orb{ width:120px; height:120px; border-radius:50%;
+  background: radial-gradient(circle at 35% 35%, var(--grad-a), var(--grad-b));
+  box-shadow: 0 0 40px rgba(0,197,229,.18), inset 0 0 40px rgba(255,82,229,.18);
+  animation: m00-pulse 2s ease-in-out infinite; cursor:pointer; position:relative; }
+@keyframes m00-pulse { 0%,100%{ transform:scale(1)} 50%{ transform:scale(1.05)} }
+.manifest-orbs .label{ position:absolute; bottom:-26px; left:50%; transform:translateX(-50%); font-weight:800; font-size:12px; opacity:.8 }
+@media (min-width:700px){ .manifest-orbs .orb{ width:160px; height:160px; } }
+</style>
 </head>
 <body>
-<script>
-(function(){
-  try{
-    if (localStorage.getItem('arch:visualPreset')===null) localStorage.setItem('arch:visualPreset', JSON.stringify('blue1'));
-    if (localStorage.getItem('arch:overlayOn')===null) localStorage.setItem('arch:overlayOn', JSON.stringify(false));
-    if (localStorage.getItem('arch:bloomOn')===null) localStorage.setItem('arch:bloomOn', JSON.stringify(false));
-    if (localStorage.getItem('arch:glowStrength')===null) localStorage.setItem('arch:glowStrength', JSON.stringify(0.8));
-  }catch(e){}
-})();
-</script>
-
   <!-- Splash screen displayed on initial load -->
   
   <!-- Som do splash: coloque seu arquivo de áudio na pasta especificada e ajuste o caminho abaixo.
@@ -1232,7 +1288,7 @@ body[data-theme="blue1"] #chatFeed .msg.user { background: rgba(232,240,255,0.10
   <!-- ===== Views ===== -->
   <main>
     <!-- HOME -->
-    <section id="v-home" class="view">
+    <section id="v-home" class="view active">
       <div class="grid">
           <!-- Saudação / chamada para cadastro. Visível quando o usuário precisa ativar a Dual Infodose ou quando já houver nome salvo -->
           <div id="greetingCard" class="card fx-trans fx-lift" style="display:none">
@@ -1415,7 +1471,7 @@ body[data-theme="blue1"] #chatFeed .msg.user { background: rgba(232,240,255,0.10
     </section>
 
     <!-- BRAIN -->
-    <section id="v-brain" class="view active">
+    <section id="v-brain" class="view">
       <div class="grid">
         <div class="card fx-trans fx-lift" style="display:block">
           <div style="font-weight:800">Usuário</div>
@@ -2891,7 +2947,7 @@ body[data-theme="blue1"] #chatFeed .msg.user { background: rgba(232,240,255,0.10
       dock.innerHTML = '';
       $$('.session').forEach(s => {
         const meta = JSON.parse(s.dataset.meta || '{}');
-        dock.appendChild(badge({ title: meta.title, sid: s.dataset.sid }))
+        dock.appendChild(badge({ title: "", sid: s.dataset.sid }))
       });
       // Atualize o status de sessões na home
       try { updateHomeStatus(); } catch {}
@@ -3285,334 +3341,8 @@ body[data-theme="blue1"] #chatFeed .msg.user { background: rgba(232,240,255,0.10
     $$('button').forEach(addRipple);
   </script><div style="position: fixed; right: 14px; bottom: calc(var(--tabsH) + 16px); display: grid; gap: 8px; z-index: 120;"></div><div style="position: fixed; right: 14px; bottom: calc(var(--tabsH) + 16px); display: grid; gap: 8px; z-index: 120;"></div>
 <!-- Local Storage Modal (safe-placed near end of body) -->
-<div id="modalLS" class="modal" aria-hidden="true">
-  <div class="panel">
-    <div style="display:flex;align-items:center;gap:10px;justify-content:space-between">
-      <h3 style="margin:0">Local Storage</h3>
-      <button id="lsClose" class="btn fx-trans fx-press ring">Fechar<span class="ripple"></span></button>
-    </div>
-    <div class="mut" id="lsStats" style="margin-top:8px;font-size:12px">–</div>
-    <!-- Informações rápidas do usuário, assistente e arquétipo ativo -->
-    <div id="lsInfo" style="margin-top:8px;font-size:12px;line-height:1.4">
-      <div><strong>Usuário:</strong> <span id="lsUserDisplay">–</span></div>
-      <div><strong>Assistente:</strong> <span id="lsAssistantDisplay">–</span></div>
-      <div><strong>Arquétipo ativo:</strong> <span id="lsArchDisplay">–</span></div>
-    </div>
-    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px">
-      <button id="lsExport" class="btn fx-trans fx-press ring">Exportar<span class="ripple"></span></button>
-      <button id="lsImport" class="btn fx-trans fx-press ring">Importar<span class="ripple"></span></button>
-      <button id="lsClear" class="btn fx-trans fx-press ring">Limpar LS<span class="ripple"></span></button>
-      <button id="lsClearIDB" class="btn fx-trans fx-press ring">Limpar IndexDB<span class="ripple"></span></button>
-      <button id="lsReloadPage" class="btn fx-trans fx-press ring">Atualizar página<span class="ripple"></span></button>
-    </div>
-    <!-- Lista dinâmica de itens armazenados no LocalStorage -->
-    <div id="lsList" style="margin-top:12px; max-height:200px; overflow:auto; font-size:12px; color:var(--fg);"></div>
-    <!-- Botão para adicionar novo item ao LocalStorage -->
-    <div style="margin-top:10px; display:flex; gap:6px;">
-      <button id="lsAdd" class="btn fx-trans fx-press ring">Adicionar item<span class="ripple"></span></button>
-    </div>
-    <div class="mut" style="margin-top:10px;font-size:11px">Dica: exporte antes de limpar. O tamanho é aproximado (UTF-16).</div>
-  </div>
-</div>
-<script>
-// === Fala por voz usando Web Speech API ===
-// Estas funções utilizam a API de síntese de fala do navegador para
-// pronunciar mensagens. A voz padrão é configurada para o português do Brasil.
-// Fala uma mensagem opcionalmente selecionando uma voz preferida.
-function pickVoice(pref) {
-  try {
-    const voices = speechSynthesis.getVoices();
-    if (!voices || !voices.length) return null;
-    // Se houver uma preferência, tente encontrá-la pelo nome
-    if (pref) {
-      const found = voices.find(v => v.name && v.name.toLowerCase().includes(pref.toLowerCase()));
-      if (found) return found;
-    }
-    // Caso contrário, escolha uma voz em português ou a primeira disponível
-    const ptVoice = voices.find(v => v.lang && v.lang.toLowerCase().startsWith('pt'));
-    return ptVoice || voices[0];
-  } catch (err) {
-    return null;
-  }
-}
-function speakMsg(msg, voicePref) {
-  try {
-    const utter = new SpeechSynthesisUtterance(msg);
-    utter.lang = 'pt-BR';
-    const voice = pickVoice(voicePref);
-    if (voice) utter.voice = voice;
-    speechSynthesis.speak(utter);
-  } catch (e) {
-    console.warn('Speech synthesis not supported', e);
-  }
-}
-function speakSplash() {
-  // Recupera o nome do usuário salvo no localStorage para personalizar a mensagem
-  const name = (localStorage.getItem('infodose:userName') || '').trim();
-  // Se houver nome de usuário, use-o; caso contrário utilize "Dual" como padrão
-  const msg = name ? `${name}, pulso ativo.` : 'Oi Dual, pulso ativo.';
-  // Use a voz selecionada pelo usuário no Brain, ou "Joana" como fallback
-  const prefVoice = (localStorage.getItem('infodose:speechVoice') || '').trim() || 'Joana';
-  speakMsg(msg, prefVoice);
-}
-function speakHomeGreeting() {
-  // Esta função pode ser chamada manualmente para saudar o usuário na home.
-  // Não é chamada automaticamente para evitar saudações inesperadas.
-  const assistant = (localStorage.getItem('dual.assistantName') || localStorage.getItem('infodose:assistantName') || 'Dual').trim();
-  // Determine arquétipo selecionado a partir do select (remove .html)
-  let archName = '';
-  const sel = document.getElementById('arch-select');
-  if (sel && sel.options.length > 0) {
-    const opt = sel.options[sel.selectedIndex];
-    if (opt) archName = opt.textContent.replace(/\.html$/i, '');
-  }
-  let msg = '';
-  // Determine o nome de saudação ou utilize "Dual" como padrão
-  const userName = (localStorage.getItem('infodose:userName') || '').trim();
-  const greet = userName || 'Dual';
-  if (assistant && archName) {
-    msg = `Oi ${greet}, eu sou ${assistant}. Ativo o impulso com o arquétipo ${archName}.`;
-  } else if (assistant) {
-    msg = `Oi ${greet}, eu sou ${assistant}.`;
-  } else {
-    msg = `Oi ${greet}, ative seu impulso configurando um arquétipo.`;
-  }
-  // Use a voz salva pelo usuário ou o nome do arquétipo; se ambos vazios, use Joana
-  const prefVoice = (localStorage.getItem('infodose:speechVoice') || '').trim();
-  speakMsg(msg, archName || prefVoice || 'Joana');
-}
-// ===== LS Control (isolated; safe append) =====
-(function(){
-  function toast(msg, type){ try{ window.toast(msg, type || 'ok') }catch{ console.log(msg) } }
-  const modal = document.getElementById('modalLS');
-  const stats = document.getElementById('lsStats');
-  const btn = document.getElementById('btnLS');
-  const btnClose = document.getElementById('lsClose');
-  const btnExport = document.getElementById('lsExport');
-  const btnImport = document.getElementById('lsImport');
-  const btnClear = document.getElementById('lsClear');
-  const btnClearIDB = document.getElementById('lsClearIDB');
-  // Elementos adicionais para exibir e editar LocalStorage
-  const lsList = document.getElementById('lsList');
-  const btnAdd  = document.getElementById('lsAdd');
 
-  function approxSize(){
-    let bytes = 0;
-    for (let i=0; i<localStorage.length; i++){
-      const k = localStorage.key(i) || '';
-      const v = localStorage.getItem(k) || '';
-      bytes += 2 * (k.length + v.length);
-    }
-    const KB = 1024, MB = KB*1024;
-    const human = bytes > MB ? (bytes/MB).toFixed(2)+' MB' : (bytes>KB ? (bytes/KB).toFixed(1)+' KB' : bytes+' B');
-    return { bytes, human, keys: localStorage.length };
-  }
-  function updateStats(){ if (!stats) return; const s = approxSize(); stats.textContent = 'Chaves: ' + s.keys + ' · Tamanho aprox: ' + s.human; }
-  // Renderiza a lista de itens no LocalStorage dentro do modal.  Cada item possui campos
-  // editáveis para chave e valor, além de botões para salvar ou excluir.
-  function renderLS(){
-    if (!lsList) return;
-    lsList.innerHTML = '';
-    const keys = [];
-    for (let i=0; i<localStorage.length; i++){
-      const k = localStorage.key(i);
-      if (k != null) keys.push(k);
-    }
-    // Ordene as chaves para exibir de forma consistente
-    keys.sort();
-    keys.forEach((key) => {
-      const value = localStorage.getItem(key) ?? '';
-      const row = document.createElement('div');
-      row.style.display = 'flex';
-      row.style.alignItems = 'center';
-      row.style.gap = '6px';
-      row.style.marginTop = '6px';
-      // Campo de chave
-      const keyInput = document.createElement('input');
-      keyInput.value = key;
-      keyInput.placeholder = 'chave';
-      keyInput.style.flex = '1 1 30%';
-      keyInput.style.padding = '4px';
-      keyInput.style.borderRadius = '6px';
-      keyInput.style.border = '1px solid rgba(255,255,255,0.15)';
-      keyInput.style.background = 'rgba(255,255,255,0.05)';
-      keyInput.style.color = 'inherit';
-      // Campo de valor
-      const valInput = document.createElement('input');
-      valInput.value = value;
-      valInput.placeholder = 'valor';
-      valInput.style.flex = '1 1 50%';
-      valInput.style.padding = '4px';
-      valInput.style.borderRadius = '6px';
-      valInput.style.border = '1px solid rgba(255,255,255,0.15)';
-      valInput.style.background = 'rgba(255,255,255,0.05)';
-      valInput.style.color = 'inherit';
-      // Botão salvar
-      const btnSave = document.createElement('button');
-      btnSave.textContent = 'Salvar';
-      btnSave.className = 'btn fx-trans fx-press ring';
-      btnSave.style.fontSize = '11px';
-      // Botão excluir
-      const btnDel = document.createElement('button');
-      btnDel.textContent = 'Del';
-      btnDel.className = 'btn fx-trans fx-press ring';
-      btnDel.style.fontSize = '11px';
-      // Ações
-      btnSave.addEventListener('click', () => {
-        const newKey = keyInput.value.trim();
-        const newVal = valInput.value;
-        if (!newKey) { toast('Chave vazia', 'warn'); return; }
-        if (newKey !== key) localStorage.removeItem(key);
-        try { localStorage.setItem(newKey, newVal); toast('Item salvo', 'ok'); } catch(e){ toast('Erro ao salvar', 'err'); }
-        renderLS(); updateStats();
-      });
-      btnDel.addEventListener('click', () => {
-        if (!confirm('Excluir a chave "'+keyInput.value+'"?')) return;
-        localStorage.removeItem(keyInput.value);
-        renderLS(); updateStats(); toast('Item removido', 'warn');
-      });
-      row.appendChild(keyInput);
-      row.appendChild(valInput);
-      row.appendChild(btnSave);
-      row.appendChild(btnDel);
-      lsList.appendChild(row);
-    });
-  }
-  function openModal(){ if (!modal) return; updateStats(); modal.classList.add('open'); modal.setAttribute('aria-hidden','false'); }
-  function closeModal(){ if (!modal) return; modal.classList.remove('open'); modal.setAttribute('aria-hidden','true'); }
 
-  // Ao abrir o modal, também carregue a lista de itens atuais
-  const _openModalRef = openModal;
-  function openModalLS(){
-    _openModalRef();
-    renderLS();
-    // Preencha informações do usuário, assistente e arquétipo ativo
-    try {
-      const uDisplay = document.getElementById('lsUserDisplay');
-      const aDisplay = document.getElementById('lsAssistantDisplay');
-      const archDisplay = document.getElementById('lsArchDisplay');
-      // Tente recuperar o nome do usuário das chaves salvas
-      const userName = (localStorage.getItem('dual.name') || localStorage.getItem('infodose:userName') || '').trim();
-      const assistantName = (localStorage.getItem('dual.assistantName') || localStorage.getItem('infodose:assistantName') || 'Dual').trim();
-      // Obtenha o arquétipo ativo a partir do seletor
-      let arch = '';
-      const archSel = document.getElementById('arch-select');
-      if (archSel && archSel.value) arch = archSel.value.replace(/\.html$/i, '');
-      if (uDisplay) uDisplay.textContent = userName || '–';
-      if (aDisplay) aDisplay.textContent = assistantName || '–';
-      if (archDisplay) archDisplay.textContent = arch || '–';
-    } catch {}
-    // Botão para recarregar a página
-    const btnReload = document.getElementById('lsReloadPage');
-    if (btnReload) {
-      btnReload.onclick = () => { location.reload(); };
-    }
-  }
-  // Redefina o evento para usar a nova função
-  if (btn) btn.addEventListener('click', openModalLS);
-
-  // O botão LS já foi associado à função openModalLS acima.
-  if (btnClose) btnClose.addEventListener('click', closeModal);
-  if (modal) modal.addEventListener('click', (e)=>{ if (e.target === modal) closeModal(); });
-
-  // Botão para adicionar novo item
-  if (btnAdd) btnAdd.addEventListener('click', () => {
-    if (!lsList) return;
-    // Insira uma nova linha em branco no início para o usuário digitar
-    const row = document.createElement('div');
-    row.style.display = 'flex';
-    row.style.alignItems = 'center';
-    row.style.gap = '6px';
-    row.style.marginTop = '6px';
-    const keyInput = document.createElement('input');
-    keyInput.placeholder = 'nova chave';
-    keyInput.style.flex = '1 1 30%';
-    keyInput.style.padding = '4px';
-    keyInput.style.borderRadius = '6px';
-    keyInput.style.border = '1px solid rgba(255,255,255,0.15)';
-    keyInput.style.background = 'rgba(255,255,255,0.05)';
-    keyInput.style.color = 'inherit';
-    const valInput = document.createElement('input');
-    valInput.placeholder = 'novo valor';
-    valInput.style.flex = '1 1 50%';
-    valInput.style.padding = '4px';
-    valInput.style.borderRadius = '6px';
-    valInput.style.border = '1px solid rgba(255,255,255,0.15)';
-    valInput.style.background = 'rgba(255,255,255,0.05)';
-    valInput.style.color = 'inherit';
-    const btnSave = document.createElement('button');
-    btnSave.textContent = 'Salvar';
-    btnSave.className = 'btn fx-trans fx-press ring';
-    btnSave.style.fontSize = '11px';
-    const btnCancel = document.createElement('button');
-    btnCancel.textContent = 'Cancelar';
-    btnCancel.className = 'btn fx-trans fx-press ring';
-    btnCancel.style.fontSize = '11px';
-    btnSave.addEventListener('click', () => {
-      const newKey = keyInput.value.trim();
-      const newVal = valInput.value;
-      if (!newKey) { toast('Chave vazia', 'warn'); return; }
-      try {
-        localStorage.setItem(newKey, newVal);
-        toast('Item adicionado', 'ok');
-      } catch(e) { toast('Erro ao adicionar', 'err'); }
-      renderLS(); updateStats();
-    });
-    btnCancel.addEventListener('click', () => {
-      row.remove();
-    });
-    row.appendChild(keyInput);
-    row.appendChild(valInput);
-    row.appendChild(btnSave);
-    row.appendChild(btnCancel);
-    lsList.prepend(row);
-  });
-
-  if (btnExport) btnExport.addEventListener('click', () => {
-    const dump = {};
-    for (let i=0; i<localStorage.length; i++){ const k = localStorage.key(i); if (!k) continue; dump[k] = localStorage.getItem(k); }
-    const blob = new Blob([JSON.stringify({ when: Date.now(), dump }, null, 2)], { type: 'application/json' });
-    const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'localStorage_backup.json'; a.click();
-    setTimeout(()=>URL.revokeObjectURL(a.href), 400);
-    toast('LS exportado', 'ok');
-  });
-
-  if (btnImport) btnImport.addEventListener('click', () => {
-    const inp = document.createElement('input'); inp.type = 'file'; inp.accept = '.json,application/json';
-    inp.onchange = (ev) => {
-      const f = ev.target.files && ev.target.files[0]; if (!f) return;
-      const r = new FileReader();
-      r.onload = () => {
-        try {
-          const obj = JSON.parse(String(r.result||'') || '{}'); const data = obj.dump || obj || {};
-          Object.keys(data).forEach(k => { try { localStorage.setItem(k, String(data[k])) } catch{} });
-          updateStats(); toast('LS importado', 'ok');
-        } catch { toast('Erro no JSON', 'err'); }
-      };
-      r.readAsText(f);
-    };
-    inp.click();
-  });
-
-  if (btnClear) btnClear.addEventListener('click', () => {
-    if (!confirm('Limpar TODO o Local Storage?')) return;
-    try { localStorage.clear(); updateStats(); toast('LS limpo', 'warn'); } catch(e){ alert(e.message) }
-  });
-
-  if (btnClearIDB) btnClearIDB.addEventListener('click', async () => {
-    if (!confirm('Apagar bancos do IndexDB?')) return;
-    try {
-      if ('databases' in indexedDB) {
-        const dbs = await indexedDB.databases();
-        for (const db of dbs) { if (db && db.name) indexedDB.deleteDatabase(db.name); }
-      } else {
-        ['infodose','dual','uno'].forEach(name => { try { indexedDB.deleteDatabase(name) } catch{} });
-      }
-      toast('IndexDB limpo', 'warn');
-    } catch(e){ alert('Falha no IndexDB: ' + e.message) }
-  });
-})();
-</script>
 
 <!-- Script para ocultar o splash screen após o carregamento completo da página -->
 <!-- Script adicional para o Stacks estendido: upload de HTML e criação de grupos -->
@@ -4899,9 +4629,429 @@ main .row > * + * { margin-top: .5rem; }
 </script>
 
 
-<script src="dual_multiagent_v12_locked_fixed.js" defer></script>
-<script src="UNO_patch_arch3d_particles.bloomtoon.soft.js"></script>
 
-<script src="uno_audio_breath.js" defer></script>
-<script src="blue-1.js" defer></script>
+<div id="lsModal" class="ls-modal" aria-hidden="true">
+  <div class="ls-panel" id="lsPanel">
+    <div class="ls-hdr">
+      <div class="ls-ttl">LocalStorage • Presets, Chaves & Carteira SK</div>
+      <div class="ls-actions">
+        <button id="lsRescan">Re-scan</button>
+        <button id="lsExport">Exportar</button>
+        <label for="lsImportFile" style="display:inline-block"><button type="button">Importar</button></label>
+        <input id="lsImportFile" type="file" accept="application/json" hidden>
+        <button id="lsClearDisabled">Limpar desativados</button>
+        <button id="lsClose">Fechar</button>
+      </div>
+    </div>
+
+    <details class="presets" open>
+      <summary><strong>Presets (ON/OFF global)</strong></summary>
+      <div class="presets-grid" id="presetsGrid"></div>
+    </details>
+
+    <details class="presets" open>
+      <summary><strong>Carteira de Chaves OpenRouter</strong></summary>
+      <div class="grid" style="gap:8px">
+        <div class="row" style="border:0;padding:0;gap:8px">
+          <input id="skName" placeholder="Nome curto (ex.: Prod, Dev, Teste)" style="flex:1">
+          <input id="skValue" placeholder="sk-..." style="flex:2">
+          <button id="skAdd">Adicionar</button>
+        </div>
+        <div class="sk-grid" id="skGrid"></div>
+      </div>
+      <div class="meta">A chave <code>dual.keys.openrouter</code> recebe a chave marcada como <b>Ativa</b>. Desativar retira a chave ativa do uso (sem apagar a carteira).</div>
+    </details>
+
+    <details class="presets" open>
+      <summary><strong>Overlay do Arquétipo</strong> <span class="type" style="opacity:.75">força</span></summary>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+        <div>Força:</div>
+        <div class="seg">
+          <button type="button" class="ls-ov" data-level="0">0</button>
+          <button type="button" class="ls-ov" data-level="-1">−1</button>
+          <button type="button" class="ls-ov" data-level="-2">−2</button>
+        </div>
+        <div class="meta">Salvo em <code>infodose:arch.overlay.level</code> • Default: −1 (12%).</div>
+      </div>
+    </details>
+
+    <div class="meta"><span id="lsCount">—</span> • <span id="lsSize">—</span></div>
+    <div class="list" id="lsList"></div>
+
+    <details class="presets" style="margin-top:10px" open>
+      <summary><strong>Pré-visualização de Imagens</strong></summary>
+      <div class="img-grid" id="imgGrid"></div>
+    </details>
+  </div>
+
+</div>
+
+
+<script id="ls-panel-js">
+(() => {
+  const $ = (s, r=document)=> r.querySelector(s);
+  const $$ = (s, r=document)=> Array.from(r.querySelectorAll(s));
+  const prettyBytes = (n)=>{ if(!Number.isFinite(n)||n<=0) return '0 B'; const u=['B','KB','MB','GB']; let i=0; while(n>=1024&&i<u.length-1){n/=1024;i++} return n.toFixed(2)+' '+u[i] };
+  const isJson = (v)=>{ try{ JSON.parse(v); return true; }catch{ return false; } };
+  const inferType = (v)=>{
+    if(v==null||v==='') return 'empty';
+    if(isJson(v)){const p=JSON.parse(v); if(Array.isArray(p)) return 'json[array]'; if(p&&typeof p==='object') return 'json[object]'; return 'json['+(typeof p)+']';}
+    if(/^data:image\//i.test(v)||/\.(png|jpe?g|gif|webp|svg)(\?|$)/i.test(v)) return 'image';
+    if(/^(true|false|1|0)$/i.test(v)) return 'boolean-like';
+    if(/^https?:\/\//i.test(v)) return 'url';
+    if(/^data:/i.test(v)) return 'data-url';
+    return 'string';
+  };
+
+  const DISABLED_KEY = 'infodose:presets.disabled';
+  const PRESETS = [
+    { key:'infodose:userName', label:'Usuário' },
+    { key:'infodose:assistantName', label:'Assistente' },
+    { key:'dual.keys.openrouter', label:'Chave OpenRouter (ativa)' },
+    { key:'dual.openrouter.model', label:'Modelo OpenRouter' },
+    { key:'uno:theme', label:'Tema' },
+    { key:'uno:bg', label:'Fundo Custom' },
+    { key:'infodose:cssCustom', label:'CSS Custom' },
+    { key:'infodose:voices', label:'Vozes Arquetípicas' }
+  ];
+
+  const disabledSet = ()=> { try{ return new Set(JSON.parse(localStorage.getItem(DISABLED_KEY)||'[]')); }catch{ return new Set(); } };
+  const saveDisabled = (set)=> localStorage.setItem(DISABLED_KEY, JSON.stringify(Array.from(set)));
+  const isEnabled = (k)=> !disabledSet().has(k);
+  const toggleDisabled = (k)=> { const s=disabledSet(); s.has(k)?s.delete(k):s.add(k); saveDisabled(s); renderAll(); window.dispatchEvent(new CustomEvent('ls:disabled-changed',{detail:{key:k,disabled:s.has(k)}})); };
+
+  // Carteira SK
+  const WALLET_KEY = 'dual.keys.wallet';
+  const getWallet = ()=>{ try{ return JSON.parse(localStorage.getItem(WALLET_KEY)||'[]'); }catch{return []} };
+  const setWallet = (arr)=> localStorage.setItem(WALLET_KEY, JSON.stringify(arr));
+  const addWalletItem = (name, key)=>{
+    const list=getWallet();
+    const genId = (crypto?.randomUUID ? crypto.randomUUID() : Math.random().toString(36).slice(2));
+    list.push({ id: genId, name, key, active:false });
+    setWallet(list); renderWallet();
+  };
+  const removeWalletItem = (id)=>{ const list=getWallet().filter(x=>x.id!==id); setWallet(list); ensureActiveConsistency(); renderWallet(); };
+  const activateWalletItem = (id)=>{
+    const list=getWallet().map(x=>({...x, active: x.id===id})); setWallet(list);
+    if(isEnabled('dual.keys.openrouter')){
+      const chosen=list.find(x=>x.active); localStorage.setItem('dual.keys.openrouter', chosen? chosen.key: '');
+    }
+    renderAll();
+  };
+  const ensureActiveConsistency = ()=>{ const list=getWallet(); const anyActive=list.some(x=>x.active); if(!anyActive){ localStorage.setItem('dual.keys.openrouter',''); } };
+  const renderWallet = ()=>{
+    const grid=$('#skGrid'); if(!grid) return; grid.innerHTML='';
+    const list=getWallet(); if(!list.length){ grid.innerHTML='<div class="meta">Nenhuma chave na carteira ainda.</div>'; return; }
+    list.forEach(item=>{
+      const div=document.createElement('div'); div.className='sk-item';
+      const top=document.createElement('div'); top.className='top';
+      const name=document.createElement('div'); name.className='name'; name.textContent=item.name+(item.active?' • ATIVA':'');
+      const act=document.createElement('div');
+      const bUse=document.createElement('button'); bUse.textContent=item.active?'Desativar':'Ativar';
+      bUse.onclick=()=>{ if(item.active){
+          const list2=getWallet().map(x=>({...x, active: x.id===item.id? false: x.active })); setWallet(list2); ensureActiveConsistency(); renderWallet(); renderAll();
+        } else { activateWalletItem(item.id); } };
+      const bDel=document.createElement('button'); bDel.textContent='Apagar'; bDel.onclick=()=>{ if(confirm('Apagar entrada da carteira?')) removeWalletItem(item.id) };
+      act.append(bUse,bDel); top.append(name,act);
+      const key=document.createElement('div'); key.className='key'; key.textContent=item.key;
+      div.append(top,key); grid.append(div);
+    });
+  };
+
+  // LS
+  const lsEntries = ()=>{ const out=[]; for(let i=0;i<localStorage.length;i++){ const k=localStorage.key(i); const v=localStorage.getItem(k)||''; out.push({key:k,val:v}); } return out.sort((a,b)=>a.key.localeCompare(b.key)); };
+  const lsSizeBytes = ()=>{ let sum=0; for(let i=0;i<localStorage.length;i++){ const k=localStorage.key(i); const v=localStorage.getItem(k)||''; sum += k.length + v.length; } return sum; };
+
+  const renderPresets = ()=>{
+    const grid=$('#presetsGrid'); if(!grid) return; grid.innerHTML='';
+    const dis=disabledSet();
+    PRESETS.forEach(p=>{
+      const val=localStorage.getItem(p.key); const on=!dis.has(p.key);
+      const wrap=document.createElement('div'); wrap.className='preset';
+      const head=document.createElement('div'); head.className='row';
+      const name=document.createElement('div'); name.innerHTML = `<strong>${p.label}</strong><div class="type">${p.key}</div>`;
+      const sw=document.createElement('div'); sw.className='switch'+(on?' on':''); sw.title=on?'Desativar (não apaga)':'Ativar'; sw.onclick=()=>toggleDisabled(p.key);
+      head.append(name,sw);
+      const meta=document.createElement('div'); meta.className='val';
+      meta.textContent = val ? (inferType(val).startsWith('json')? JSON.stringify(JSON.parse(val),null,2): val) : '—';
+      wrap.append(head,meta); grid.append(wrap);
+    });
+  };
+
+  const addImagePreview = (key,src)=>{ const g=$('#imgGrid'); if(!g) return; const card=document.createElement('div'); card.className='img-card'; const cap=document.createElement('div'); cap.className='meta'; cap.textContent=key; const im=new Image(); im.src=src; im.loading='lazy'; card.append(cap,im); g.append(card); };
+
+  const renderLS = ()=>{
+    const list=$('#lsList'); if(!list) return; list.innerHTML=''; const imgGrid=$('#imgGrid'); if(imgGrid) imgGrid.innerHTML='';
+    const entries=lsEntries(); const count=$('#lsCount'); if(count) count.textContent = entries.length+' chave(s)';
+    const size=$('#lsSize'); if(size) size.textContent = prettyBytes(lsSizeBytes());
+    const dis=disabledSet();
+    entries.forEach(({key,val})=>{
+      if(key===DISABLED_KEY) return;
+      const it=document.createElement('div'); it.className='item';
+      const head=document.createElement('div'); head.className='head';
+      const left=document.createElement('div');
+      left.innerHTML=`<div class="key">${key}${dis.has(key)?' <span class="type">(desativado)</span>':''}</div><div class="type">${inferType(val)} • ${prettyBytes((val||'').length)}</div>`;
+      const ctr=document.createElement('div'); ctr.style.display='flex'; ctr.style.gap='8px'; ctr.style.flexWrap='wrap';
+      const sw=document.createElement('div'); sw.className='switch'+(!dis.has(key)?' on':''); sw.title = (!dis.has(key)?'Desativar':'Ativar'); sw.onclick=()=>toggleDisabled(key);
+      const bEdit=document.createElement('button'); bEdit.textContent='Editar'; bEdit.onclick=()=>{ const next=prompt('Editar valor de\n'+key, val ?? ''); if(next==null) return; localStorage.setItem(key,String(next)); renderAll(); };
+      const bDel=document.createElement('button'); bDel.textContent='Apagar'; bDel.onclick=()=>{ if(confirm('Apagar '+key+'?')){ localStorage.removeItem(key); renderAll(); } };
+      if(inferType(val)==='image'){ const bImg=document.createElement('button'); bImg.textContent='Ver imagem'; bImg.onclick=()=>addImagePreview(key,val); ctr.append(bImg); }
+      ctr.append(sw,bEdit,bDel); head.append(left,ctr);
+      const v=document.createElement('div'); v.className='val'; v.textContent = inferType(val).startsWith('json')? JSON.stringify(JSON.parse(val),null,2): (val??'—');
+      it.append(head,v); list.append(it);
+    });
+  };
+
+  const exportLS = ()=>{ const dump={}; for(let i=0;i<localStorage.length;i++){ const k=localStorage.key(i); if(k===DISABLED_KEY) continue; dump[k]=localStorage.getItem(k); } const blob=new Blob([JSON.stringify(dump,null,2)],{type:'application/json'}); const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download='localstorage_export.json'; a.click(); setTimeout(()=>URL.revokeObjectURL(url), 2000); };
+  const importLS = (file)=>{ const r=new FileReader(); r.onload=()=>{ try{ const data=JSON.parse(r.result||'{}'); Object.entries(data).forEach(([k,v])=>localStorage.setItem(k,String(v))); alert('Importado com sucesso.'); renderAll(); }catch(e){ alert('JSON inválido.'); } }; r.readAsText(file); };
+
+  const openLS = ()=>{ const m=$('#lsModal'); if(!m) return; m.classList.add('open'); m.setAttribute('aria-hidden','false'); renderAll(); renderWallet(); };
+  const closeLS = ()=>{ const m=$('#lsModal'); if(!m) return; m.classList.remove('open'); m.setAttribute('aria-hidden','true'); };
+  const renderAll = ()=>{ renderPresets(); renderLS(); };
+
+  const ready = () => {
+    // Unify LS button (clone -> only our modal)
+    const btn = document.getElementById('btnLS');
+    if(btn && !btn.dataset._lsUnified){
+      const c=btn.cloneNode(true);
+      c.removeAttribute('onclick'); c.removeAttribute('href');
+      c.dataset._lsUnified='1';
+      c.addEventListener('click', (ev)=>{
+        ev.preventDefault(); ev.stopPropagation();
+        try{
+          document.querySelectorAll('.modal,[role="dialog"],[class*="modal"]').forEach(el=>{ if(el.id!=='lsModal'){ el.style.display='none'; el.classList.remove('open','show','visible'); el.setAttribute('aria-hidden','true'); } });
+        }catch(e){}
+        openLS();
+      }, {passive:false});
+      btn.parentNode.replaceChild(c, btn);
+    }
+
+    const c = $('#lsClose'); if(c) c.onclick = closeLS;
+    const r = $('#lsRescan'); if(r) r.onclick = renderAll;
+    const e = $('#lsExport'); if(e) e.onclick = exportLS;
+    const imp = $('#lsImportFile'); if(imp) imp.addEventListener('change', ev=>{ const f=ev.target.files?.[0]; if(f) importLS(f); ev.target.value=''; });
+    const clr = $('#lsClearDisabled'); if(clr) clr.onclick = ()=>{ localStorage.setItem(DISABLED_KEY,'[]'); renderAll(); };
+
+    const modal = $('#lsModal'); if(modal) modal.addEventListener('click', (evt)=>{ if(evt.target===modal) closeLS(); });
+    const skAdd = $('#skAdd'); if(skAdd) skAdd.onclick = ()=>{ const name=$('#skName').value.trim(); const key=$('#skValue').value.trim(); if(!name||!key) return alert('Informe nome e chave.'); addWalletItem(name,key); $('#skName').value=''; $('#skValue').value=''; };
+
+    // Overlay control in LS
+    const KEY='infodose:arch.overlay.level';
+    const LEVELS={"0":"16%","-1":"12%","-2":"8%"};
+    const apply=(lvl)=>{
+      const force=LEVELS[String(lvl)]||LEVELS["-1"];
+      document.documentElement.style.setProperty('--arch-overlay-strength', force);
+      if(window.ArchTint&&typeof ArchTint.set==='function'){ try{ ArchTint.set(null, String(lvl)); }catch(e){} }
+      document.querySelectorAll('.ls-ov[data-level]').forEach(b=>b.classList.toggle('on', b.dataset.level===String(lvl)));
+    };
+    const saved=localStorage.getItem(KEY)||"-1";
+    apply(saved);
+    $$('.ls-ov[data-level]').forEach(b=> b.addEventListener('click',()=>{ const lvl=b.dataset.level; localStorage.setItem(KEY, String(lvl)); apply(lvl); }, {passive:true}));
+  };
+  if(document.readyState === 'loading'){ document.addEventListener('DOMContentLoaded', ready); } else { ready(); }
+
+  window.DualLS = { open: openLS, close: closeLS, render: renderAll };
+})();
+</script>
+
+
+<script id="ls-snpt-boot">
+(function(){
+  function ensure(){
+    if(document.getElementById('ls-panel-js') || document.getElementById('lsModal')) return;
+    fetch('lspanel.snpt', {cache:'no-store'}).then(r => r.ok ? r.text(): null).then(txt => {
+      if(!txt) return;
+      document.body.insertAdjacentHTML('beforeend', txt);
+      setTimeout(function(){
+        try{
+          if(window.DualLS && typeof window.DualLS.render==='function'){ window.DualLS.render(); }
+        }catch(e){}
+      }, 50);
+    }).catch(()=>{});
+  }
+  if(document.readyState==='loading'){ document.addEventListener('DOMContentLoaded', ensure); } else { ensure(); }
+})();
+</script>
+
+
+
+<script id="ls-sanitize-old-js">
+(function(){
+  // Remove apenas ids legados conhecidos, preservando #lsModal e #lsPanel
+  const LEGACY = [
+    'modalLS','localStorageModal','lsWindow','lsPopup','modal-localstorage',
+    'local-storage-modal','ls-modal-old','oldLsModal','modalLocalStorage','modal-ls'
+  ];
+  function clean(){
+    try{
+      LEGACY.forEach(id => {
+        const el = document.getElementById(id);
+        if(el) el.remove();
+      });
+      // Opcional: fecha modais legados que venham com classes genéricas
+      document.querySelectorAll('.modal,[role="dialog"]').forEach(el=>{
+        if(el.id && (el.id==='lsModal' || el.id==='lsPanel')) return;
+        if(el.closest('#lsModal')) return;
+        if(/localstorage|modal-ls|ls-?old/i.test(el.id||'') || /localstorage/i.test(el.className||'')){
+          el.remove();
+        }
+      });
+    }catch(e){}
+  }
+  if(document.readyState==='loading'){ document.addEventListener('DOMContentLoaded', clean); } else { clean(); }
+})();
+</script>
+
+
+
+<script id="arch-init-nonatlas">
+(function(){
+  function initArchSelect(){
+    var sel=document.getElementById('arch-select'); if(!sel) return;
+    var saved=(localStorage.getItem('uno:arch')||localStorage.getItem('infodose:arch')||'').replace(/\.html$/i,'');
+    var idx=-1;
+    for(var i=0;i<sel.options.length;i++){
+      var v=sel.options[i].value.replace(/\.html$/i,'');
+      if(saved && v===saved){ idx=i; break; }
+    }
+    sel.selectedIndex = idx; // -1 = nenhum, evita default 'atlas'
+  }
+  if(document.readyState==='loading'){ document.addEventListener('DOMContentLoaded', initArchSelect); } else { initArchSelect(); }
+})();
+</script>
+
+<!-- UNO merge patch · Home simples com orbs + Stack → LS Panel (inline) -->
+<script id="manifest00-boot">
+(function(){
+  function injectOrbs(){
+    const home = document.getElementById('v-home');
+    if(!home || home.dataset.m00Injected) return;
+    const grid = home.querySelector('.grid') || home;
+    const wrap = document.createElement('div'); wrap.id='manifest00'; wrap.className='manifest-orbs fx-trans fx-lift';
+    const make = (i, lab, action)=>{ const o=document.createElement('div'); o.className='orb'; o.title=lab; const t=document.createElement('div'); t.className='label'; t.textContent=lab; o.appendChild(t); if(action) o.addEventListener('click', action, {passive:true}); return o; };
+    wrap.append(
+      make(1, 'Ativar', ()=>{ try{ toast('Campo ativado'); }catch{} }),
+      make(2, 'Apps', ()=>{ try{ document.querySelector('.tab[data-nav="apps"]').click(); } catch{}; }),
+      make(3, 'LS', ()=>{ try{ (window.DualLS||{}).open?.(); }catch{}; })
+    );
+    const anchor = home.querySelector('.arch-container'); 
+    if(anchor) anchor.style.display='none';
+    if(grid.firstElementChild) grid.insertBefore(wrap, grid.firstElementChild); else grid.appendChild(wrap);
+    home.dataset.m00Injected = '1';
+  }
+  function makeHomeDefault(){
+    // Views
+    document.querySelectorAll('section.view').forEach(s => s.classList.remove('active'));
+    const vHome=document.getElementById('v-home'); if(vHome) vHome.classList.add('active');
+    // Tabbar
+    document.querySelectorAll('nav.tabbar .tab').forEach(b => b.classList.remove('active'));
+    const tHome=document.querySelector('nav.tabbar .tab[data-nav="home"]'); if(tHome) tHome.classList.add('active');
+    try{ localStorage.setItem('uno:lastTab','home'); }catch(e){}
+  }
+  function rerouteStackToLS(){
+    // Arch quick menu
+    document.querySelectorAll('#archMenu [data-nav="stack"]').forEach(el=>el.remove());
+    // Tabbar button -> LS
+    const tab = document.querySelector('nav.tabbar .tab[data-nav="stack"]');
+    if(tab){
+      tab.setAttribute('data-nav','ls');
+      const img = tab.querySelector('img'); 
+      if(img){ img.alt='LS'; img.setAttribute('src','icons/database.svg'); }
+      const span = tab.querySelector('span'); if(span) span.textContent='LS';
+      tab.addEventListener('click', function(ev){ ev.preventDefault(); try{ (window.DualLS||{}).open?.(); }catch(e){} }, {passive:false});
+    }
+    // Hide/remove Stack view if present
+    const vStack = document.getElementById('v-stack'); if(vStack) vStack.remove();
+  }
+  // LS panel — Stack manager
+  function ensureLsStackSection(){
+    const panel = document.getElementById('lsPanel'); if(!panel || panel.dataset.stackInit) return;
+    const sec = document.createElement('details'); sec.className='presets'; sec.open = true;
+    sec.innerHTML = '<summary><strong>Sessões (Stack) — Gerir pelo LS</strong></summary>' +
+      '<div id="lsStackCtr" class="row" style="margin:.5rem 0; gap:8px; align-items:center">' +
+      '<button id="lsStackRefresh">Recarregar</button>' +
+      '<button id="lsStackCloseAll">Fechar todas</button>' +
+      '<span class="meta" id="lsStackMeta"></span>' +
+      '</div>' +
+      '<div class="list" id="lsStackList"></div>';
+    panel.appendChild(sec);
+    panel.dataset.stackInit = '1';
+    document.getElementById('lsStackRefresh').addEventListener('click', renderStackList, {passive:true});
+    document.getElementById('lsStackCloseAll').addEventListener('click', closeAllSessionsLS, {passive:true});
+    renderStackList();
+  }
+  function listSessions(){
+    return Array.from(document.querySelectorAll('#stackWrap .session'));
+  }
+  function closeAllSessionsLS(){
+    const list = listSessions();
+    if(!list.length) return;
+    list.forEach(s => s.remove());
+    try{ window.saveStackState?.(); }catch(e){}
+    updateDockLocal();
+    renderStackList();
+    try{ toast('Todas as sessões foram fechadas','warn'); }catch(e){}
+  }
+  function updateDockLocal(){
+    const dock = document.getElementById('dock'); if(!dock) return;
+    dock.innerHTML = '';
+    document.querySelectorAll('.session').forEach(s=>{
+      const meta = JSON.parse(s.dataset.meta||'{}');
+      const b = document.createElement('button'); b.className='badge fx-trans fx-press ring';
+      b.textContent = meta.title || 'App';
+      const rp = document.createElement('span'); rp.className='ripple'; b.appendChild(rp);
+      b.onclick = ()=>{ s.scrollIntoView({behavior:'smooth',block:'center'}); s.classList.remove('min'); };
+      dock.appendChild(b);
+    });
+    try{ updateHomeStatus?.(); }catch(e){}
+  }
+  function renderStackList(){
+    const host = document.getElementById('lsStackList'); if(!host) return;
+    const meta = document.getElementById('lsStackMeta');
+    host.innerHTML='';
+    const sessions = listSessions();
+    if(meta) meta.textContent = sessions.length ? (sessions.length+' sessão(ões) abertas') : 'Nenhuma sessão aberta';
+    if(!sessions.length){ host.innerHTML = '<div class="mut">Abra apps para vê-los aqui.</div>'; return; }
+    sessions.forEach(s=>{
+      const info = JSON.parse(s.dataset.meta||'{}'); const title = info.title || 'App'; const url = info.url || '';
+      const row = document.createElement('div'); row.className='item';
+      row.innerHTML = '<div class="head"><div class="key">'+title+'</div>'+
+        '<div class="seg">'+
+        '<button data-act="go">Abrir</button>'+
+        '<button data-act="min">Min</button>'+
+        '<button data-act="pin">'+(s.classList.contains('pinned')?'Desfixar':'Fixar')+'</button>'+
+        '<button data-act="close">Fechar</button>'+
+        '</div></div>' +
+        '<div class="val">'+(url||'—')+'</div>';
+      row.querySelector('[data-act="go"]').onclick = ()=>{ s.scrollIntoView({behavior:'smooth', block:'center'}); s.classList.remove('min'); };
+      row.querySelector('[data-act="min"]').onclick = ()=>{ s.classList.toggle('min'); updateDockLocal(); try{ window.saveStackState?.(); }catch(e){}; renderStackList(); };
+      row.querySelector('[data-act="close"]').onclick = ()=>{ s.remove(); updateDockLocal(); try{ window.saveStackState?.(); }catch(e){}; renderStackList(); };
+      row.querySelector('[data-act="pin"]').onclick = ()=>{ const md = JSON.parse(s.dataset.meta||'{}'); if(s.classList.contains('pinned')){ s.classList.remove('pinned'); try{ window.removePinnedByMeta?.(md);}catch(e){} }else{ s.classList.add('pinned'); try{ window.addPinned?.(md);}catch(e){} } renderStackList(); };
+      host.appendChild(row);
+    });
+  }
+  // Rede & Ping minimal
+  function initRedePingLS(){
+    const panel = document.getElementById('lsPanel'); if(!panel) return;
+    if(panel.dataset.redeInit) return;
+    const sec = document.createElement('details'); sec.className='presets'; sec.open=false;
+    sec.innerHTML = '<summary><strong>Rede & Ping</strong></summary><div class="row" style="align-items:center;gap:8px"><div class="pill" id="lsNetStatus"><span class="dot" style="width:10px;height:10px;border-radius:50%;background:#8b93a6"></span><span style="margin-left:6px">—</span></div><button id="lsPing">Ping</button></div>';
+    panel.appendChild(sec);
+    panel.dataset.redeInit='1';
+    function update(){ const d = document.getElementById('lsNetStatus'); if(!d) return; const on = navigator.onLine; const dot = d.querySelector('.dot'); const txt = d.querySelector('span:last-child'); if(dot) dot.style.background = on ? '#33e08a' : '#ff6b6b'; if(txt) txt.textContent = on ? 'online' : 'offline'; }
+    update(); window.addEventListener('online', update); window.addEventListener('offline', update);
+    document.getElementById('lsPing').onclick = async ()=>{ const t0 = performance.now(); try{ await fetch(location.origin, {cache:'no-store', mode:'no-cors'}); }catch(e){} const dt = Math.round(performance.now()-t0); try{ toast('Ping ~ '+dt+' ms'); }catch(e){ alert('Ping ~ '+dt+' ms'); } };
+  }
+  function boot(){
+    makeHomeDefault();
+    injectOrbs();
+    rerouteStackToLS();
+    ensureLsStackSection();
+    initRedePingLS();
+    // Remover patches externos para manter tudo inline
+    document.querySelectorAll('link[href*="uno_showcase_patch.css"],script[src*="uno_showcase_patch.js"]').forEach(n=> n.remove());
+  }
+  if(document.readyState==='loading'){ document.addEventListener('DOMContentLoaded', boot); } else { boot(); }
+})();
+</script>
 </body></html>
