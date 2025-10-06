@@ -1227,18 +1227,6 @@ body::after{content:'';position:fixed;inset:0;background:var(--arch-overlay, tra
 
 
 <style id="show-app-title-css">.app-title{display:inline-flex;align-items:center;gap:6px}</style>
-<!-- Manifestado 00 · orbs simples (inline) -->
-<style id="manifest00-inline">
-:root{ --grad-a:#9d7bff; --grad-b:#00c5e5; }
-.manifest-orbs{ display:flex; gap:14px; align-items:center; justify-content:center; padding:16px 0; }
-.manifest-orbs .orb{ width:120px; height:120px; border-radius:50%;
-  background: radial-gradient(circle at 35% 35%, var(--grad-a), var(--grad-b));
-  box-shadow: 0 0 40px rgba(0,197,229,.18), inset 0 0 40px rgba(255,82,229,.18);
-  animation: m00-pulse 2s ease-in-out infinite; cursor:pointer; position:relative; }
-@keyframes m00-pulse { 0%,100%{ transform:scale(1)} 50%{ transform:scale(1.05)} }
-.manifest-orbs .label{ position:absolute; bottom:-26px; left:50%; transform:translateX(-50%); font-weight:800; font-size:12px; opacity:.8 }
-@media (min-width:700px){ .manifest-orbs .orb{ width:160px; height:160px; } }
-</style>
 </head>
 <body>
   <!-- Splash screen displayed on initial load -->
@@ -4629,6 +4617,8 @@ main .row > * + * { margin-top: .5rem; }
 </script>
 
 
+  <link rel="stylesheet" href="uno_showcase_patch.css">
+  <script src="uno_showcase_patch.js" defer></script>
 
 <div id="lsModal" class="ls-modal" aria-hidden="true">
   <div class="ls-panel" id="lsPanel">
@@ -4920,138 +4910,343 @@ main .row > * + * { margin-top: .5rem; }
 })();
 </script>
 
-<!-- UNO merge patch · Home simples com orbs + Stack → LS Panel (inline) -->
-<script id="manifest00-boot">
+
+<!-- === UNO 00 • Inline ORB3D + Menu mínimo + LS Modules (patch) === -->
+<style id="uno00-overrides">
+  /* Esconde seletor “Arc de Arquétipos” e o iframe original */
+  .arch-switcher, #archMenu, .arch-circle iframe { display: none !important; }
+  /* Slot do Orb 3D substituindo o círculo */
+  .arch-circle { display: grid; place-items: center; overflow: hidden; }
+  #orb3dSlot { position: relative; width: min(82vw, 560px); aspect-ratio: 1/1; border-radius: 50%;
+               border: 1px solid rgba(255,255,255,.12); background: radial-gradient(60% 60% at 50% 50%, rgba(0,255,255,.08), rgba(255,255,255,.02));
+               box-shadow: 0 14px 40px rgba(0,0,0,.45); }
+  #orb3dSlot canvas { position:absolute; inset:0; width:100%; height:100%; border-radius:50%; display:block; }
+  /* Pequenas “orbs do Manifestado 00” orbitando (minimal) */
+  .m00 { position:absolute; width:16px; height:16px; border-radius:50%; background: radial-gradient(circle at 35% 35%, #ff52e5, #00c5e5); box-shadow:0 0 16px rgba(0,197,229,.35); }
+  .m00.o1 { animation: orbit1 7s linear infinite; }
+  .m00.o2 { animation: orbit2 9s linear infinite; }
+  .m00.o3 { animation: orbit3 11s linear infinite; }
+  @keyframes orbit1 { from { transform: translate(-50%, -50%) rotate(0deg) translateX(42%); } to { transform: translate(-50%, -50%) rotate(360deg) translateX(42%); } }
+  @keyframes orbit2 { from { transform: translate(-50%, -50%) rotate(0deg) translateX(-46%); } to { transform: translate(-50%, -50%) rotate(-360deg) translateX(-46%); } }
+  @keyframes orbit3 { from { transform: translate(-50%, -50%) rotate(0deg) translateY(-44%); } to { transform: translate(-50%, -50%) rotate(360deg) translateY(-44%); } }
+
+  /* Menu mínimo estilo UNO 00 */
+  .uno00-menu { margin-top: 12px; display: flex; gap: 10px; }
+  .uno00-menu .mini { display:inline-flex; align-items:center; gap:8px; padding:8px 12px; border-radius:12px;
+                      background: rgba(15,17,32,.7); border: 1px solid rgba(255,255,255,.12); font-weight:800; cursor:pointer; }
+  .uno00-menu .mini:hover { box-shadow: 0 10px 24px rgba(0,0,0,.5); }
+  .uno00-menu img { width:16px; height:16px; filter: invert(1) brightness(1.2); }
+
+  /* Esconde a aba Stack em qualquer tabbar existente */
+  nav.tabbar [data-tab="stack"], .tabbar .tab[data-tab="stack"], #v-stack { display: none !important; }
+
+  /* Prévia dentro do LS Panel */
+  #lsInlinePreview { display:grid; gap:12px; }
+  #lsInlinePreview .slot { background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.12); border-radius:12px; padding:10px; }
+  #lsInlinePreview .slot > .mount { position:relative; width:100%; aspect-ratio:1/1; max-width:420px; margin:auto; border-radius:12px; overflow:hidden; }
+  #lsInlinePreview .slot h4 { margin:4px 0 8px; font-weight:900; letter-spacing:.04em }
+  #lsInlinePreview .row { display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
+  #lsInlinePreview .row .pill { padding:6px 10px; border-radius:999px; border:1px solid rgba(255,255,255,.14); background:rgba(255,255,255,.06); font-size:12px; color:var(--mut); }
+</style>
+
+<script id="uno00-orb3d-mod">
 (function(){
-  function injectOrbs(){
-    const home = document.getElementById('v-home');
-    if(!home || home.dataset.m00Injected) return;
-    const grid = home.querySelector('.grid') || home;
-    const wrap = document.createElement('div'); wrap.id='manifest00'; wrap.className='manifest-orbs fx-trans fx-lift';
-    const make = (i, lab, action)=>{ const o=document.createElement('div'); o.className='orb'; o.title=lab; const t=document.createElement('div'); t.className='label'; t.textContent=lab; o.appendChild(t); if(action) o.addEventListener('click', action, {passive:true}); return o; };
-    wrap.append(
-      make(1, 'Ativar', ()=>{ try{ toast('Campo ativado'); }catch{} }),
-      make(2, 'Apps', ()=>{ try{ document.querySelector('.tab[data-nav="apps"]').click(); } catch{}; }),
-      make(3, 'LS', ()=>{ try{ (window.DualLS||{}).open?.(); }catch{}; })
-    );
-    const anchor = home.querySelector('.arch-container'); 
-    if(anchor) anchor.style.display='none';
-    if(grid.firstElementChild) grid.insertBefore(wrap, grid.firstElementChild); else grid.appendChild(wrap);
-    home.dataset.m00Injected = '1';
-  }
-  function makeHomeDefault(){
-    // Views
-    document.querySelectorAll('section.view').forEach(s => s.classList.remove('active'));
-    const vHome=document.getElementById('v-home'); if(vHome) vHome.classList.add('active');
-    // Tabbar
-    document.querySelectorAll('nav.tabbar .tab').forEach(b => b.classList.remove('active'));
-    const tHome=document.querySelector('nav.tabbar .tab[data-nav="home"]'); if(tHome) tHome.classList.add('active');
-    try{ localStorage.setItem('uno:lastTab','home'); }catch(e){}
-  }
-  function rerouteStackToLS(){
-    // Arch quick menu
-    document.querySelectorAll('#archMenu [data-nav="stack"]').forEach(el=>el.remove());
-    // Tabbar button -> LS
-    const tab = document.querySelector('nav.tabbar .tab[data-nav="stack"]');
-    if(tab){
-      tab.setAttribute('data-nav','ls');
-      const img = tab.querySelector('img'); 
-      if(img){ img.alt='LS'; img.setAttribute('src','icons/database.svg'); }
-      const span = tab.querySelector('span'); if(span) span.textContent='LS';
-      tab.addEventListener('click', function(ev){ ev.preventDefault(); try{ (window.DualLS||{}).open?.(); }catch(e){} }, {passive:false});
+  // ---- Helpers
+  const $ = (s, el=document)=>el.querySelector(s);
+  const $$ = (s, el=document)=>Array.from(el.querySelectorAll(s));
+
+  // 1) Cria slot do Orb3D na Home e menu mínimo UNO 00
+  function injectHome() {
+    const archCircle = document.querySelector('.arch-circle');
+    if(!archCircle) return;
+
+    // Cria o slot do orb
+    let slot = document.getElementById('orb3dSlot');
+    if(!slot){
+      slot = document.createElement('div');
+      slot.id = 'orb3dSlot';
+      slot.innerHTML = '<div class="m00 o1" style="left:50%;top:50%"></div><div class="m00 o2" style="left:50%;top:50%"></div><div class="m00 o3" style="left:50%;top:50%"></div>';
+      archCircle.prepend(slot);
     }
-    // Hide/remove Stack view if present
-    const vStack = document.getElementById('v-stack'); if(vStack) vStack.remove();
+
+    // Menu UNO 00 (Home · Apps · Brain)
+    const container = archCircle.parentElement; // .arch-container
+    if(container && !$('#uno00Menu', container)){
+      const menu = document.createElement('div');
+      menu.id = 'uno00Menu';
+      menu.className = 'uno00-menu';
+      menu.innerHTML = `
+        <button class="mini" data-go="home" title="Home">
+          <img src="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6/svgs/solid/house.svg" alt="">
+          <span>Home</span>
+        </button>
+        <button class="mini" data-go="apps" title="Apps">
+          <img src="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6/svgs/solid/folder-open.svg" alt="">
+          <span>Apps</span>
+        </button>
+        <button class="mini" data-go="brain" title="Brain">
+          <img src="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6/svgs/solid/brain.svg" alt="">
+          <span>Brain</span>
+        </button>
+      `;
+      container.append(menu);
+      $$('.mini', menu).forEach(btn=>{
+        btn.addEventListener('click', ()=>{
+          const v = btn.dataset.go;
+          goView(v);
+        }, {passive:true});
+      });
+    }
   }
-  // LS panel — Stack manager
-  function ensureLsStackSection(){
-    const panel = document.getElementById('lsPanel'); if(!panel || panel.dataset.stackInit) return;
-    const sec = document.createElement('details'); sec.className='presets'; sec.open = true;
-    sec.innerHTML = '<summary><strong>Sessões (Stack) — Gerir pelo LS</strong></summary>' +
-      '<div id="lsStackCtr" class="row" style="margin:.5rem 0; gap:8px; align-items:center">' +
-      '<button id="lsStackRefresh">Recarregar</button>' +
-      '<button id="lsStackCloseAll">Fechar todas</button>' +
-      '<span class="meta" id="lsStackMeta"></span>' +
-      '</div>' +
-      '<div class="list" id="lsStackList"></div>';
-    panel.appendChild(sec);
-    panel.dataset.stackInit = '1';
-    document.getElementById('lsStackRefresh').addEventListener('click', renderStackList, {passive:true});
-    document.getElementById('lsStackCloseAll').addEventListener('click', closeAllSessionsLS, {passive:true});
-    renderStackList();
+
+  function goView(key){
+    const id = ({home:'v-home', apps:'v-apps', brain:'v-brain'})[key] || 'v-home';
+    document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+    const tgt = document.getElementById(id); if(tgt) tgt.classList.add('active');
+    // Fecha LS se aberto
+    try{ if(window.DualLS) window.DualLS.close(); }catch(e){}
   }
-  function listSessions(){
-    return Array.from(document.querySelectorAll('#stackWrap .session'));
+
+  // 2) Three.js loader (dinâmico) com fallback 2D simples
+  let THREE_loaded = false;
+  function loadThree(cb){
+    if (window.THREE) { THREE_loaded = true; cb(); return; }
+    const script = document.createElement('script');
+    script.src = 'https://unpkg.com/three@0.160.0/build/three.min.js';
+    script.onload = ()=>{ THREE_loaded = true; cb(); };
+    script.onerror = ()=>{ console.warn('THREE falhou. Usando fallback 2D.'); cb(); };
+    document.head.appendChild(script);
   }
-  function closeAllSessionsLS(){
-    const list = listSessions();
-    if(!list.length) return;
-    list.forEach(s => s.remove());
-    try{ window.saveStackState?.(); }catch(e){}
-    updateDockLocal();
-    renderStackList();
-    try{ toast('Todas as sessões foram fechadas','warn'); }catch(e){}
-  }
-  function updateDockLocal(){
-    const dock = document.getElementById('dock'); if(!dock) return;
-    dock.innerHTML = '';
-    document.querySelectorAll('.session').forEach(s=>{
-      const meta = JSON.parse(s.dataset.meta||'{}');
-      const b = document.createElement('button'); b.className='badge fx-trans fx-press ring';
-      b.textContent = meta.title || 'App';
-      const rp = document.createElement('span'); rp.className='ripple'; b.appendChild(rp);
-      b.onclick = ()=>{ s.scrollIntoView({behavior:'smooth',block:'center'}); s.classList.remove('min'); };
-      dock.appendChild(b);
+
+  // Renderizador 3D básico
+  const renderers = new Map();
+  function initThreeOrb(mount, opts={}){
+    if(!mount) return;
+    const key = mount.id || ('orb_mount_'+Math.random().toString(36).slice(2));
+    mount.id = key;
+
+    // Cleanup anterior
+    if(renderers.has(key)){
+      try{ const old = renderers.get(key); old.renderer.dispose(); old.geo.dispose(); old.mat.dispose(); }catch(e){}
+      renderers.delete(key);
+      mount.innerHTML = '';
+    }
+
+    if(!window.THREE){ // fallback
+      const fallback = document.createElement('div');
+      fallback.style.cssText = 'position:absolute;inset:0;border-radius:50%;background:radial-gradient(circle at 35% 35%, #ff52e5, #00c5e5);box-shadow:inset 0 0 60px rgba(255,255,255,.12), 0 0 40px rgba(0,197,229,.35)';
+      mount.append(fallback);
+      return;
+    }
+
+    const THREE = window.THREE;
+    const scene = new THREE.Scene();
+    const renderer = new THREE.WebGLRenderer({ antialias:true, alpha:true });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio||1, 2));
+    renderer.setSize(mount.clientWidth, mount.clientHeight);
+    mount.appendChild(renderer.domElement);
+
+    const camera = new THREE.PerspectiveCamera(35, mount.clientWidth/mount.clientHeight, 0.1, 100);
+    camera.position.set(0, 0, 3.6);
+    scene.add(camera);
+
+    // Luz ambiente + hemisférica
+    scene.add(new THREE.AmbientLight(0x8ad3ff, 0.55));
+    const hemi = new THREE.HemisphereLight(0xffffff, 0x223344, 0.65);
+    scene.add(hemi);
+
+    // Glow sutil com sprite
+    const glow = new THREE.PointLight(0x00c5e5, 1.2, 6);
+    glow.position.set(1.2, 0.8, 1.2);
+    scene.add(glow);
+
+    // Geometria e material
+    const geo = new THREE.SphereGeometry(1, 96, 96);
+    const mat = new THREE.MeshStandardMaterial({
+      color: 0xffffff,
+      metalness: 0.85,
+      roughness: 0.25,
+      envMapIntensity: 1.2
     });
-    try{ updateHomeStatus?.(); }catch(e){}
+
+    // Fake env via gradient canvas
+    const g = document.createElement('canvas'); g.width = g.height = 128;
+    const ctx = g.getContext('2d');
+    const grd = ctx.createRadialGradient(64,48,10,64,64,64);
+    grd.addColorStop(0,'#ff52e5'); grd.addColorStop(1,'#00c5e5');
+    ctx.fillStyle = grd; ctx.fillRect(0,0,128,128);
+    const tex = new THREE.CanvasTexture(g); tex.mapping = THREE.EquirectangularReflectionMapping;
+    scene.environment = tex;
+
+    const orb = new THREE.Mesh(geo, mat);
+    scene.add(orb);
+
+    // Estrelas discretas
+    const stars = new THREE.Group();
+    const sgeo = new THREE.SphereGeometry(0.005, 8, 8);
+    const smat = new THREE.MeshBasicMaterial({color:0x88ccff});
+    for(let i=0;i<300;i++){
+      const m = new THREE.Mesh(sgeo, smat);
+      const r = 8 + Math.random()*6;
+      const th = Math.random()*Math.PI*2;
+      const ph = Math.acos(2*Math.random()-1);
+      m.position.set(r*Math.sin(ph)*Math.cos(th), r*Math.cos(ph), r*Math.sin(ph)*Math.sin(th));
+      stars.add(m);
+    }
+    scene.add(stars);
+
+    function onResize(){
+      const w = mount.clientWidth, h = mount.clientHeight;
+      renderer.setSize(w,h);
+      camera.aspect = w/h; camera.updateProjectionMatrix();
+    }
+    const ro = new ResizeObserver(onResize); ro.observe(mount);
+
+    let t = 0;
+    function tick(){
+      t += 0.005;
+      orb.rotation.y += 0.002 + 0.0006*Math.sin(t*2.0);
+      orb.rotation.x = 0.15*Math.sin(t*0.6);
+      stars.rotation.y -= 0.0005;
+      renderer.render(scene, camera);
+      anim = requestAnimationFrame(tick);
+    }
+    let anim = requestAnimationFrame(tick);
+
+    renderers.set(key, {renderer, geo, mat, scene, camera, kill:()=>{ cancelAnimationFrame(anim); ro.disconnect(); }});
   }
-  function renderStackList(){
-    const host = document.getElementById('lsStackList'); if(!host) return;
-    const meta = document.getElementById('lsStackMeta');
-    host.innerHTML='';
-    const sessions = listSessions();
-    if(meta) meta.textContent = sessions.length ? (sessions.length+' sessão(ões) abertas') : 'Nenhuma sessão aberta';
-    if(!sessions.length){ host.innerHTML = '<div class="mut">Abra apps para vê-los aqui.</div>'; return; }
-    sessions.forEach(s=>{
-      const info = JSON.parse(s.dataset.meta||'{}'); const title = info.title || 'App'; const url = info.url || '';
-      const row = document.createElement('div'); row.className='item';
-      row.innerHTML = '<div class="head"><div class="key">'+title+'</div>'+
-        '<div class="seg">'+
-        '<button data-act="go">Abrir</button>'+
-        '<button data-act="min">Min</button>'+
-        '<button data-act="pin">'+(s.classList.contains('pinned')?'Desfixar':'Fixar')+'</button>'+
-        '<button data-act="close">Fechar</button>'+
-        '</div></div>' +
-        '<div class="val">'+(url||'—')+'</div>';
-      row.querySelector('[data-act="go"]').onclick = ()=>{ s.scrollIntoView({behavior:'smooth', block:'center'}); s.classList.remove('min'); };
-      row.querySelector('[data-act="min"]').onclick = ()=>{ s.classList.toggle('min'); updateDockLocal(); try{ window.saveStackState?.(); }catch(e){}; renderStackList(); };
-      row.querySelector('[data-act="close"]').onclick = ()=>{ s.remove(); updateDockLocal(); try{ window.saveStackState?.(); }catch(e){}; renderStackList(); };
-      row.querySelector('[data-act="pin"]').onclick = ()=>{ const md = JSON.parse(s.dataset.meta||'{}'); if(s.classList.contains('pinned')){ s.classList.remove('pinned'); try{ window.removePinnedByMeta?.(md);}catch(e){} }else{ s.classList.add('pinned'); try{ window.addPinned?.(md);}catch(e){} } renderStackList(); };
-      host.appendChild(row);
+
+  // 3) LS Panel: adiciona “Módulos Inline”
+  function injectLS(){
+    const panel = document.getElementById('lsPanel');
+    if(!panel || document.getElementById('lsInlineBlock')) return;
+
+    const block = document.createElement('details');
+    block.id = 'lsInlineBlock';
+    block.className = 'presets';
+    block.open = true;
+    block.innerHTML = `
+      <summary><strong>Módulos Inline (UNO 00)</strong> <span class="type" style="opacity:.75">orb3d + picker radial</span></summary>
+      <div class="row">
+        <label class="pill"><input type="checkbox" id="tgHomeOrb3d"> Orb3D na Home</label>
+        <label class="pill"><input type="checkbox" id="tgKxPicker"> Picker radial KOBLLUX</label>
+      </div>
+      <div id="lsInlinePreview">
+        <div class="slot" id="prev-orb3d" style="display:none">
+          <h4>Preview · Orb3D</h4>
+          <div class="mount" id="ls-orb3d-mount"></div>
+        </div>
+        <div class="slot" id="prev-kx" style="display:none">
+          <h4>Preview · Picker Radial</h4>
+          <div class="mount" id="ls-kx-mount" style="max-width:520px;aspect-ratio:1/1"></div>
+        </div>
+      </div>
+    `;
+    panel.append(block);
+
+    // States
+    const K1 = 'uno:feature.orb3dHome';
+    const K2 = 'uno:feature.kxPickerLS';
+    const setChk = (id, key)=>{ const el = document.getElementById(id); if(!el) return; el.checked = localStorage.getItem(key)==='1'; };
+    const save = (key, val)=>{ localStorage.setItem(key, val?'1':'0'); };
+
+    setChk('tgHomeOrb3d', K1);
+    setChk('tgKxPicker', K2);
+
+    function refresh(){
+      // Home mount
+      const wantHome = localStorage.getItem(K1)==='1';
+      $('#prev-orb3d').style.display = wantHome ? 'block' : 'none';
+      if(wantHome){ loadThree(()=> initThreeOrb($('#ls-orb3d-mount'))); }
+
+      // Picker mount
+      const wantPicker = localStorage.getItem(K2)==='1';
+      $('#prev-kx').style.display = wantPicker ? 'block' : 'none';
+      if(wantPicker){ renderKxPicker($('#ls-kx-mount')); }
+      else { const m = $('#ls-kx-mount'); if(m) m.innerHTML=''; }
+    }
+
+    $('#tgHomeOrb3d').addEventListener('change', (e)=>{ save(K1, e.target.checked); injectHomeOrb(); refresh(); });
+    $('#tgKxPicker').addEventListener('change', (e)=>{ save(K2, e.target.checked); refresh(); });
+
+    refresh();
+  }
+
+  // 4) Picker Radial (mínimo, inline) — inspirado no KOBLLUX
+  function renderKxPicker(mount){
+    if(!mount) return;
+    mount.innerHTML = '';
+    const size = Math.min(mount.clientWidth, mount.clientHeight);
+    const cx = size/2, cy = size/2, R = size*0.38;
+    const list = ['Atlas','Nova','Vitalis','Pulse','Artemis','Serena','Kaos','Genus','Lumine','Rhea','Solus','Aion'];
+
+    const wrap = document.createElement('div');
+    wrap.style.cssText = `position:relative;width:${size}px;height:${size}px;margin:auto`;
+    mount.appendChild(wrap);
+
+    // Centro
+    const center = document.createElement('div');
+    center.style.cssText = 'position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:64px;height:64px;border-radius:14px;display:grid;place-items:center;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.16);font-weight:900;letter-spacing:.04em';
+    center.textContent = 'KX';
+    wrap.appendChild(center);
+
+    // Nodes
+    list.forEach((name, i)=>{
+      const a = (i / list.length) * Math.PI * 2;
+      const x = cx + R*Math.cos(a);
+      const y = cy + R*Math.sin(a);
+
+      const node = document.createElement('button');
+      node.className = 'archNode';
+      node.style.cssText = `position:absolute;left:${x-22}px;top:${y-22}px;width:44px;height:44px;border-radius:12px;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.06);color:#fff;font-weight:800;cursor:pointer`;
+      node.innerHTML = name[0];
+      node.title = name;
+      wrap.appendChild(node);
+
+      node.addEventListener('click', ()=>{
+        $$('.archNode', wrap).forEach(n=>n.style.boxShadow='');
+        node.style.boxShadow='0 8px 22px rgba(0,0,0,.35), inset 0 0 0 2px rgba(57,255,182,.45)';
+        localStorage.setItem('uno:arch', name.toLowerCase());
+        // Tinta de overlay conforme arquétipo
+        const colors = {atlas:'#4a90e2', nova:'#ff8a00', vitalis:'#39ffb6', pulse:'#ff4d6d', artemis:'#7ec8ff', serena:'#ffb6e6', kaos:'#fff176', genus:'#b39ddb', lumine:'#ffd166', rhea:'#a0e7e5', solus:'#ff9f1c', aion:'#a0ffa0'};
+        const col = colors[name.toLowerCase()] || '#8a2be2';
+        document.documentElement.style.setProperty('--arch-color', col);
+      }, {passive:true});
     });
   }
-  // Rede & Ping minimal
-  function initRedePingLS(){
-    const panel = document.getElementById('lsPanel'); if(!panel) return;
-    if(panel.dataset.redeInit) return;
-    const sec = document.createElement('details'); sec.className='presets'; sec.open=false;
-    sec.innerHTML = '<summary><strong>Rede & Ping</strong></summary><div class="row" style="align-items:center;gap:8px"><div class="pill" id="lsNetStatus"><span class="dot" style="width:10px;height:10px;border-radius:50%;background:#8b93a6"></span><span style="margin-left:6px">—</span></div><button id="lsPing">Ping</button></div>';
-    panel.appendChild(sec);
-    panel.dataset.redeInit='1';
-    function update(){ const d = document.getElementById('lsNetStatus'); if(!d) return; const on = navigator.onLine; const dot = d.querySelector('.dot'); const txt = d.querySelector('span:last-child'); if(dot) dot.style.background = on ? '#33e08a' : '#ff6b6b'; if(txt) txt.textContent = on ? 'online' : 'offline'; }
-    update(); window.addEventListener('online', update); window.addEventListener('offline', update);
-    document.getElementById('lsPing').onclick = async ()=>{ const t0 = performance.now(); try{ await fetch(location.origin, {cache:'no-store', mode:'no-cors'}); }catch(e){} const dt = Math.round(performance.now()-t0); try{ toast('Ping ~ '+dt+' ms'); }catch(e){ alert('Ping ~ '+dt+' ms'); } };
+
+  // 5) Inicializa o ORB3D na Home se habilitado
+  function injectHomeOrb(){
+    injectHome();
+    const el = document.getElementById('orb3dSlot');
+    if(!el) return;
+    loadThree(()=> initThreeOrb(el));
   }
+
+  // ---- Boot
   function boot(){
-    makeHomeDefault();
-    injectOrbs();
-    rerouteStackToLS();
-    ensureLsStackSection();
-    initRedePingLS();
-    // Remover patches externos para manter tudo inline
-    document.querySelectorAll('link[href*="uno_showcase_patch.css"],script[src*="uno_showcase_patch.js"]').forEach(n=> n.remove());
+    try{
+      // Garantir Home ativa
+      const vhome = document.getElementById('v-home');
+      if(vhome && !vhome.classList.contains('active')){
+        document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+        vhome.classList.add('active');
+      }
+      injectHome();
+      injectLS();
+
+      // Respeita preferências salvas
+      if(localStorage.getItem('uno:feature.orb3dHome')==='1'){
+        injectHomeOrb();
+      } else {
+        injectHome();
+      }
+    }catch(e){ console.error(e); }
   }
+
   if(document.readyState==='loading'){ document.addEventListener('DOMContentLoaded', boot); } else { boot(); }
 })();
 </script>
+<!-- === /UNO 00 patch === -->
+
 </body></html>
