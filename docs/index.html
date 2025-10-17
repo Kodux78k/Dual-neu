@@ -1,7 +1,5 @@
 <!doctype html>
 <html lang="pt-BR" style="--arch-overlay: rgba(64, 158, 255, 0.22);"><head>
-<!-- NOTE: bump your SW cache name to e.g. CACHE_V3 to avoid stale assets after refactor. -->
-
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1, user-scalable=no">
   <title>HUB UNO — PROD (safe)</title>
@@ -68,7 +66,7 @@
       font: 14px/1.45 Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial;
       -webkit-font-smoothing: antialiased;
       text-rendering: optimizeLegibility;
-      overflow-x: hidden; overflow-y: auto; -webkit-overflow-scrolling: touch;
+      overflow: hidden;
   /* Permite que o pseudo-elemento ::after fique posicionado em relação ao corpo */
   position: relative;
     }
@@ -108,9 +106,8 @@ body::after{content:'';position:fixed;inset:0;background:none !important;pointer
     .title small { display: block; color: var(--mut); letter-spacing: .1em }
 
     /* ===== Layout ===== */
-    main { position: relative; height: 100%; padding-top: calc(var(--hdrH) + env(safe-area-inset-top) + var(--hdrOffset)); padding-bottom: calc(var(--tabsH) + env(safe-area-inset-bottom)); overflow: auto; -webkit-overflow-scrolling: touch;}
-    .view { position: absolute; inset: 0; padding: 12px 14px; overflow: auto; display: none; -webkit-overflow-scrolling: touch;
-}
+    main { position: relative; height: 100%; padding-top: calc(var(--hdrH) + env(safe-area-inset-top) + var(--hdrOffset)); padding-bottom: calc(var(--tabsH) + env(safe-area-inset-bottom)); overflow: hidden }
+    .view { position: absolute; inset: 0; padding: 12px 14px; overflow: auto; display: none }
     .view.active {
       display: block;
       /* Animação de transição mais simples: apenas fade com leve zoom. */
@@ -1535,21 +1532,28 @@ body{
 try{ document.documentElement.style.setProperty('--arch-overlay','rgba(64,158,255,.22)'); }catch{}
 </script>
 
+<style id="CHAT13_CSS">
+.chat-wrap{display:grid;gap:12px}
+.chat-pulse{position:relative;height:10px;border-radius:999px;
+  background:linear-gradient(90deg,var(--grad-a),var(--grad-b));opacity:.8;overflow:hidden}
+.chat-pulse::after{content:"";position:absolute;inset:0;
+  background:radial-gradient(60% 120% at 0% 50%, #fff8 0%, #fff0 60%);
+  animation:pulseRun 2.8s cubic-bezier(.22,.61,.36,1) infinite}
+@keyframes pulseRun{0%{transform:translateX(-40%)}50%{transform:translateX(40%)}100%{transform:translateX(140%)}}
 
+.chat-feed{display:grid;gap:10px}
+.msg{background:var(--surface);border:var(--bd);border-radius:14px;padding:10px}
+.msg.role-user{border-color:#ffffff2a}
+.msg.role-assistant{box-shadow:0 10px 32px rgba(0,0,0,.35)}
+.msg h5{margin:.2rem 0 .35rem;font-size:12px;letter-spacing:.08em;color:var(--mut);text-transform:uppercase}
 
-
-
-<style id="OVERSCROLL_GUARD">
-html, body { overscroll-behavior-y: contain; }
+.chat-composer{display:flex;gap:8px;align-items:center;position:sticky;bottom:0;
+  background:linear-gradient(180deg,rgba(0,0,0,0),rgba(0,0,0,.2));
+  padding:10px;border-radius:16px}
+.chat-composer textarea{flex:1;min-height:44px;max-height:36vh;resize:vertical;border-radius:12px;
+  padding:10px 12px;border:var(--bd);background:rgba(255,255,255,.04);color:var(--fg)}
+.chat-composer .btn{white-space:nowrap}
 </style>
-<script id="SCROLL_UNLOCK_GUARD">
-(function(){
-  function unlock(){ try{ document.documentElement.style.overflowY='auto'; document.body.style.overflowY='auto'; }catch(e){} }
-  document.addEventListener('DOMContentLoaded', unlock, {once:true});
-  window.addEventListener('load', unlock, {once:true});
-  window.addEventListener('WindexReady', unlock, {once:true});
-})();
-</script>
 
 <style id="ARCH_FAB_ROUND_FIX">
 .arch-circle{
@@ -1570,17 +1574,117 @@ html, body { overscroll-behavior-y: contain; }
   background:linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.02));
   box-shadow:0 6px 16px rgba(0,0,0,.35), 0 0 0 1px rgba(255,255,255,.06) inset;
 }
-/* failsafe de recorte para camadas do orbe / iframe */
-.arch-circle > canvas,
-.arch-circle #orbWrap,
-.arch-circle .orb-slot,
-.arch-circle iframe#arch-frame{
+/* failsafe de recorte para camadas do orbe */
+.arch-circle > canvas, .arch-circle #orbWrap, .arch-circle .orb-slot, .arch-circle iframe#arch-frame{
   -webkit-clip-path: circle(50% at 50% 50%); clip-path: circle(50% at 50% 50%);
 }
+</style>
 
-/* Display Hiding da frase (callout) */
-.arch-circle .call{ display:none !important; }
-</style> 
+<style id="KODUX_BLOCKS_CSS">
+/* ===== Chat • Kodux Blocks ===== */
+#v-chat { display: none; }
+#v-chat.view.active, #v-chat.active { display: flex; }
+
+#chatFeed {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  background: var(--surface, rgba(15,17,32,.65));
+  border: var(--bd, 1px solid rgba(255,255,255,.12));
+  border-radius: var(--r2, 22px);
+  padding: 12px;
+  box-shadow: var(--shadow, 0 14px 40px rgba(0,0,0,.45));
+  max-height: unset;         /* deixe a página rolar */
+  overflow: visible;         /* evita scroll duplo */
+}
+
+.kx-msg { max-width: 86%; }
+.kx-msg.user { align-self: flex-end; }
+.kx-msg.ai   { align-self: flex-start; }
+
+.kx-bubble {
+  background: rgba(255,255,255,.08);
+  border: 1px solid rgba(255,255,255,.12);
+  border-radius: 16px;
+  padding: 10px 12px;
+}
+.kx-msg.user .kx-bubble { background: rgba(255,255,255,.10); border-radius: 16px 16px 0 16px; }
+.kx-msg.ai   .kx-bubble { background: rgba(57,255,182,.10);  border-radius: 16px 16px 16px 0;  }
+
+.kx-block + .kx-block { margin-top: 10px; }
+
+.kx-text p { margin: 0 0 .6em 0; }
+.kx-text p:last-child { margin-bottom: 0; }
+
+.kx-list { padding-left: 1.1em; }
+.kx-list li { margin: .25em 0; }
+
+.kx-code { position: relative; }
+.kx-code pre {
+  margin: 0;
+  padding: 10px 12px;
+  background: #0b0f14;
+  border: 1px solid rgba(255,255,255,.16);
+  border-radius: 12px;
+  overflow: auto;
+  font: 12px/1.5 ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+  color: #e8f0ff;
+  tab-size: 2;
+  white-space: pre;
+}
+.kx-code .lang {
+  position: absolute;
+  top: 6px; right: 8px;
+  font-size: 10px;
+  opacity: .7;
+}
+.kx-code .copy {
+  position: absolute;
+  top: 6px; right: 40px;
+  font-size: 11px;
+  font-weight: 800;
+  background: rgba(255,255,255,.08);
+  border: 1px solid rgba(255,255,255,.15);
+  border-radius: 8px;
+  padding: 2px 6px;
+  cursor: pointer;
+}
+
+.kx-callout {
+  display: flex; gap: 8px; align-items: flex-start;
+  background: rgba(255,255,255,.06);
+  border: 1px solid rgba(255,255,255,.16);
+  border-radius: 12px;
+  padding: 8px 10px;
+}
+
+/* ===== Composer fix (input + send) ===== */
+.chat-composer {
+  position: sticky;
+  bottom: calc(var(--tabsH, 74px) + 12px);
+  margin-top: 8px;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  background: var(--surface-strong, rgba(15,17,32,.88));
+  border: var(--bd, 1px solid rgba(255,255,255,.12));
+  border-radius: 16px;
+  padding: 10px;
+  box-shadow: var(--shadow, 0 14px 40px rgba(0,0,0,.45));
+  z-index: 5;
+}
+.chat-composer input[type="text"]{
+  flex: 1; border: 0; outline: 0;
+  background: #0f1426; color: var(--fg, #f5f7ff);
+  border-radius: 12px; padding: 10px 12px;
+}
+.chat-composer button{ min-width: 88px; }
+
+/* ===== Scroll safety ===== */
+html, body { overflow-y: auto !important; }
+main { overflow: auto !important; -webkit-overflow-scrolling: touch; }
+.view { overflow: auto !important; -webkit-overflow-scrolling: touch; }
+</style>
 </head>
 <body>
   <!-- Splash screen displayed on initial load -->
@@ -1713,7 +1817,7 @@ html, body { overscroll-behavior-y: contain; }
   <polyline points="15 18 9 12 15 6" stroke="url(#g5)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
 </svg>
             <span class="ripple"></span></button>
-            <select id="arch-select" title="Escolher arquétipo"><option value="./archetypes/atlas.html">atlas.html</option><option value="./archetypes/nova.html">nova.html</option><option value="./archetypes/vitalis.html">vitalis.html</option><option value="./archetypes/pulse.html">pulse.html</option><option value="./archetypes/artemis.html">artemis.html</option><option value="./archetypes/serena.html">serena.html</option><option value="./archetypes/kaos.html">kaos.html</option><option value="./archetypes/genus.html">genus.html</option><option value="./archetypes/lumine.html">lumine.html</option><option value="./archetypes/rhea.html">rhea.html</option><option value="./archetypes/solus.html">solus.html</option><option value="./archetypes/aion.html">aion.html</option></select>
+            <select id="arch-select" title="Escolher arquétipo"><option value="./archetypes3d/value="./archetypes3d/atlas.html">atlas.html</option><option value="./archetypes3d/value="./archetypes3d/nova.html">nova.html</option><option value="./archetypes3d/value="./archetypes3d/vitalis.html">vitalis.html</option><option value="./archetypes3d/value="./archetypes3d/pulse.html">pulse.html</option><option value="./archetypes3d/value="./archetypes3d/artemis.html">artemis.html</option><option value="./archetypes3d/value="./archetypes3d/serena.html">serena.html</option><option value="./archetypes3d/value="./archetypes3d/kaos.html">kaos.html</option><option value="./archetypes3d/value="./archetypes3d/genus.html">genus.html</option><option value="./archetypes3d/value="./archetypes3d/lumine.html">lumine.html</option><option value="./archetypes3d/value="./archetypes3d/rhea.html">rhea.html</option><option value="./archetypes3d/value="./archetypes3d/solus.html">solus.html</option><option value="./archetypes3d/value="./archetypes3d/aion.html">aion.html</option></select>
             <button class="btn fx-trans fx-press ring" id="arch-next" title="Próximo">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
 
@@ -2330,9 +2434,25 @@ html, body { overscroll-behavior-y: contain; }
 
     <!-- CHAT (Dual • Chat) -->
     <section id="v-chat" class="view">
-      <!-- Feed de mensagens do chat -->
-      <div id="chatFeed"><div class="msg user">Você: Essa versão tá daora</div><div class="msg user">Você: Essa versão tá daora</div><div class="msg user">Você: Essa versão tá daora</div><div class="msg user">Você: Dual e aí beleza como está</div><div class="msg user">Você: Dual e aí beleza como está</div><div class="msg user">Você: Dual e aí beleza como está</div><div class="msg user">Você: E aí alô</div><div class="msg user">Você: E aí alô</div><div class="msg user">Você: E aí alô</div><div class="msg user">Você: E aí beleza</div><div class="msg user">Você: E aí beleza</div><div class="msg user">Você: E aí beleza</div><div class="msg user">Você: Essa versão tá daora</div><div class="msg user">Você: Essa versão tá daora</div><div class="msg user">Você: Essa versão tá daora</div><div class="msg user">Você: Dual e aí beleza como está</div><div class="msg user">Você: Dual e aí beleza como está</div><div class="msg user">Você: Dual e aí beleza como está</div><div class="msg user">Você: E aí alô</div><div class="msg user">Você: E aí alô</div><div class="msg user">Você: E aí alô</div><div class="msg user">Você: E aí beleza</div><div class="msg user">Você: E aí beleza</div><div class="msg user">Você: E aí beleza</div></div>
-    </section>
+  <div class="grid">
+    <div class="card">
+      <div style="font-weight:800;margin-bottom:6px">Pulso em Expansão</div>
+      <div class="chat-pulse" id="chatPulse"></div>
+    </div>
+
+    <div class="card">
+      <div class="chat-wrap">
+        <div id="chatFeed" class="chat-feed" aria-live="polite"></div>
+
+        <div class="chat-composer">
+          <textarea id="chatInput" placeholder="Escreva sua intenção... (Shift+Enter quebra linha)"></textarea>
+          <button id="chatSend" class="btn prime">Enviar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
   </main>
 
   <!-- DOCK & TABS -->
@@ -6600,562 +6720,299 @@ document.getElementById('orbWrap')?.addEventListener('click', function(){ try{ w
       ctx.fillStyle=PALETTE.dust; ctx.globalAlpha=0.75; ctx.beginPath(); ctx.arc(x,y,p.size,0,Math.PI*2); ctx.fill(); } ctx.globalAlpha=1;
     requestAnimationFrame(draw); } requestAnimationFrame(draw);
 })();
-</script> <style id="uno-superpatch-css">
-/* === SUPER PATCH — estilos necessários === */
-/* Tabbar glass + alinhamento */
-.tabbar .inner{ background: rgba(255,255,255,.06) !important; border:1px solid rgba(255,255,255,.14) !important; backdrop-filter: blur(10px) !important; }
-.tabbar .tab svg { display:block; margin:0 auto 2px }
-/* Header icon button alignment */
-header.mast .ib svg{ display:block }
-/* Archetype overlay por trás de tudo e sem capturar cliques */
-#archOverlay, .arch-overlay, [data-arch-overlay], body::after, .arch-ring, .arch-overlay::before {
-  z-index: 0 !important;
-  pointer-events: none !important;
+</script>
+<script id="CHAT13_JS">
+(()=>{
+const CHAT_BACKEND = "openrouter";
+const OPENROUTER_CONF = {
+  model: (localStorage.getItem('dual.openrouter.model') || 'openai/gpt-4o-mini'),
+  endpoint: 'https://openrouter.ai/api/v1/chat/completions',
+  key: localStorage.getItem('dual.keys.openrouter') || ''
+};
+
+const BLOCKS = [
+  ["Sinal","Contextualize a intenção do usuário em 1 frase objetiva."],
+  ["Mapa","Liste 3-5 pontos-chave do problema."],
+  ["Hipóteses","Traga 3 hipóteses testáveis."],
+  ["Dados","Quais dados mínimos precisamos coletar?"],
+  ["Ações 10min","Aplique uma micro-ação que cabe em 10 minutos."],
+  ["Riscos","Alerte sobre 2 riscos ou armadilhas."],
+  ["Recursos","Sugira 3 recursos (apps, docs, pessoas)."],
+  ["Sequência","Desenhe a ordem ótima em 4 passos."],
+  ["Expansão","Mostre 2 variações criativas do caminho."],
+  ["Métrica","Defina 1 métrica simples de sucesso."],
+  ["Checkpoint","O que revisar em 24h?"],
+  ["Compromisso","Gere 1 compromisso curto e claro."],
+  ["Fecho","Feche com 1 frase que mantenha o pulso."]
+];
+
+function sanitize(md){
+  const esc = (s)=>s.replace(/[&<>]/g, m=>({ '&':'&amp;','<':'&lt;','>':'&gt;' }[m]));
+  md = md.replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>')
+         .replace(/\*(.+?)\*/g,'<em>$1</em>')
+         .replace(/`([^`]+?)`/g,'<code>$1</code>')
+         .replace(/\[(.+?)\]\((https?:\/\/[^\s)]+)\)/g,'<a href="$2" target="_blank" rel="noopener">$1</a>');
+  return md.split('\n').map(ln=>'<p>'+esc(ln)+'</p>').join('');
 }
-.view, header.mast, .tabbar, #lsModal { position: relative; z-index: 1 }
-/* Pequeno ajuste do LS modal dentro do glass theme */
-#lsModal .panel{ backdrop-filter: blur(8px) }
-</style>
 
-  <script src="./arch_overlay_fix_scoped.js"></script>
-  <script src="./ls_pedal_anti_fps_patch.js"></script>
+const feed = document.getElementById('chatFeed');
+function push(role, title, html){
+  const el = document.createElement('div');
+  el.className = `msg role-${role}`;
+  el.innerHTML = (title ? `<h5>${title}</h5>` : '') + (html||'');
+  feed.appendChild(el);
+  el.scrollIntoView({behavior:'smooth',block:'end'});
+}
+function pushBlock(title){
+  const el = document.createElement('div');
+  el.className = 'msg role-assistant';
+  el.innerHTML = `<h5>${title}</h5><div class="mut">…</div>`;
+  feed.appendChild(el);
+  el.scrollIntoView({behavior:'smooth',block:'end'});
+  return el;
+}
 
-<!-- RESET ALL • Safe Boot + LS/IDB/SW/Caches -->
-<script id="UNO_RESET_ALL">
-(function(){
-  // Expose a single entry point
-  async function resetAll({clearLS=true, clearIDB=true, clearCaches=true, unregisterSW=true}={}){
+async function callOpenRouter(messages){
+  if(!OPENROUTER_CONF.key){ throw new Error('Chave OpenRouter ausente (defina em localStorage: dual.keys.openrouter)'); }
+  const body = { model: OPENROUTER_CONF.model, messages, temperature: 0.7 };
+  const r = await fetch(OPENROUTER_CONF.endpoint, {
+    method:'POST',
+    headers:{
+      'Content-Type':'application/json',
+      'Authorization':`Bearer ${OPENROUTER_CONF.key}`,
+      'HTTP-Referer': location.origin,
+      'X-Title':'HUB UNO Chat13'
+    },
+    body: JSON.stringify(body)
+  });
+  if(!r.ok){ throw new Error('OpenRouter HTTP '+r.status); }
+  const j = await r.json();
+  return j.choices?.[0]?.message?.content || '';
+}
+
+async function chat13Pipeline(userText){
+  const baseSystem = "Você é o Chat13 do HUB UNO. Responda de forma breve, clara e aplicável para cada bloco.";
+  const baseMsgs = [{role:'system', content: baseSystem}, {role:'user', content: userText}];
+  for(const [title, instr] of BLOCKS){
+    const dom = pushBlock(title);
     try{
-      if (clearLS) localStorage.clear();
-      if (clearIDB && 'indexedDB' in window){
-        if (indexedDB.databases){
-          const dbs = await indexedDB.databases();
-          for (const d of (dbs||[])){
-            if (d && d.name){
-              await new Promise(res=>{
-                const req = indexedDB.deleteDatabase(d.name);
-                req.onsuccess = req.onerror = req.onblocked = ()=>res();
-              });
-            }
-          }
-        } else {
-          // common names fallback
-          for (const name of ['dual','uno','app','db','files','store']) {
-            await new Promise(res=>{
-              const req = indexedDB.deleteDatabase(name);
-              req.onsuccess = req.onerror = req.onblocked = ()=>res();
-            });
-          }
-        }
-      }
-      if (clearCaches && window.caches?.keys){
-        const keys = await caches.keys();
-        for (const k of keys) await caches.delete(k);
-      }
-      if (unregisterSW && navigator.serviceWorker?.getRegistrations){
-        const regs = await navigator.serviceWorker.getRegistrations();
-        for (const r of regs) await r.unregister();
-      }
-      // small grace
-      setTimeout(()=>location.reload(), 200);
+      const content = await callOpenRouter([
+        ...baseMsgs,
+        {role:'user', content: `Bloco: ${title}. Instrução: ${instr}.
+Formate com frases curtas, listas quando fizer sentido, e sem rodeios.`}
+      ]);
+      dom.innerHTML = `<h5>${title}</h5>${sanitize(content)}`;
     }catch(e){
-      console.error('ResetAll error', e);
-      alert('Reset falhou: ver Console.');
+      dom.innerHTML = `<h5>${title}</h5><p class="mut">[erro: ${e.message}]</p>`;
     }
   }
-  window.UNO_ResetAll = resetAll;
+}
 
-  // Safe boot via ?safe=1
-  (function safeBoot(){
-    try{
-      const p = new URLSearchParams(location.search);
-      if (p.has('safe')){
-        // minimal: clear LS keys that are ours (prefix uno:/infodose:/dual.)
-        for (let i=localStorage.length-1;i>=0;i--){
-          const k = localStorage.key(i);
-          if (/^(uno:|infodose:|dual\.)/i.test(k)) localStorage.removeItem(k);
+const input = document.getElementById('chatInput');
+document.getElementById('chatSend').addEventListener('click', async ()=>{
+  const text = (input.value||'').trim();
+  if(!text) return;
+  push('user','Você', sanitize(text));
+  input.value = ''; input.focus();
+  try{ await chat13Pipeline(text); }
+  catch(e){ push('assistant','Erro', `<p class="mut">${e.message}</p>`); }
+});
+
+input.addEventListener('keydown',(e)=>{
+  if(e.key==='Enter' && !e.shiftKey){ e.preventDefault(); document.getElementById('chatSend').click(); }
+});
+
+const pulse = document.getElementById('chatPulse');
+function setPulseSpeed(fast){ pulse.style.setProperty('animation-duration', fast?'1.6s':'2.8s'); }
+input.addEventListener('focus', ()=>setPulseSpeed(true));
+input.addEventListener('blur',  ()=>setPulseSpeed(false));
+
+push('assistant','Pronto','<p>Chat 13-Blocos iniciado. Escreva sua intenção e aperte <strong>Enviar</strong>.</p>');
+})();
+</script>
+
+<script id="KODUX_RENDER_JS">
+(function(){
+  const byId = (id) => document.getElementById(id);
+  const feedEl = () => byId('chatFeed') || document.querySelector('#v-chat #chatFeed');
+
+  function ensureComposer(){
+    if (document.getElementById('chatComposer')) return;
+    const vchat = document.getElementById('v-chat') || document.querySelector('[data-view="chat"], #view-chat, .view#v-chat');
+    if (!vchat) return;
+    const composer = document.createElement('div');
+    composer.className = 'chat-composer';
+    composer.id = 'chatComposer';
+    composer.innerHTML = `
+      <input id="chatInput" type="text" placeholder="Digite sua mensagem e pressione Enter" />
+      <button id="chatSend" class="btn prime">Enviar</button>
+    `;
+    vchat.appendChild(composer);
+
+    const input = composer.querySelector('#chatInput');
+    const btn   = composer.querySelector('#chatSend');
+    const send  = () => {
+      const text = input.value.trim();
+      if (!text) return;
+      window.dispatchEvent(new CustomEvent('kodux:send', { detail: { text } }));
+      // Mostra mensagem do usuário imediatamente
+      koduxRender([{type:'text', text}], { role: 'user' });
+      input.value = '';
+    };
+    input.addEventListener('keydown', (e)=>{
+      if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); }
+    });
+    btn.addEventListener('click', send);
+  }
+
+  function scrollBottom(){
+    const f = feedEl();
+    if (!f) return;
+    // se o feed tiver overflow interno, use scroll; caso contrário, scroll da página
+    try { f.scrollTop = f.scrollHeight; } catch(e){}
+    try { window.scrollTo({top: document.body.scrollHeight, behavior: 'smooth'}); } catch(e){}
+  }
+
+  function el(tag, cls){
+    const e = document.createElement(tag);
+    if (cls) e.className = cls;
+    return e;
+  }
+
+  function copyText(text){
+    try { navigator.clipboard.writeText(text); } catch(e){}
+  }
+
+  function renderBlocks(container, blocks){
+    blocks.forEach((b)=>{
+      switch(b.type){
+        case 'text': {
+          const wrap = el('div', 'kx-block kx-text');
+          // simples quebra de linhas em <p>
+          (b.text || '').split(/\n{2,}/).forEach(p=>{
+            const P = el('p'); P.textContent = p; wrap.appendChild(P);
+          });
+          container.appendChild(wrap);
+        } break;
+        case 'list': {
+          const wrap = el('div', 'kx-block kx-list');
+          const ul = el('ul');
+          (b.items || []).forEach(it=>{ const li = el('li'); li.textContent = it; ul.appendChild(li); });
+          wrap.appendChild(ul);
+          container.appendChild(wrap);
+        } break;
+        case 'code': {
+          const wrap = el('div', 'kx-block kx-code');
+          const pre = el('pre');
+          pre.textContent = b.code || '';
+          const copy = el('button', 'copy'); copy.type = 'button'; copy.textContent = 'Copiar';
+          copy.addEventListener('click', ()=> copyText(b.code || ''));
+          const lang = el('span', 'lang'); lang.textContent = (b.lang||'code').toUpperCase();
+          wrap.appendChild(pre); wrap.appendChild(copy); wrap.appendChild(lang);
+          container.appendChild(wrap);
+        } break;
+        case 'callout': {
+          const wrap = el('div', 'kx-block kx-callout');
+          const icon = el('div'); icon.textContent = b.emoji || '💡';
+          const txt  = el('div'); txt.textContent = b.text || '';
+          wrap.appendChild(icon); wrap.appendChild(txt);
+          container.appendChild(wrap);
+        } break;
+        case 'html': {
+          const wrap = el('div', 'kx-block kx-html');
+          wrap.innerHTML = b.html || '';
+          container.appendChild(wrap);
+        } break;
+        default: {
+          const wrap = el('div', 'kx-block kx-text');
+          const P = el('p'); P.textContent = (b.text || JSON.stringify(b));
+          wrap.appendChild(P);
+          container.appendChild(wrap);
         }
       }
-    }catch{}
-  })();
+    });
+  }
 
-  // Storage versioning (bump to force soft reset on incompatible schema)
-  (function versioning(){
-    const VER = '3.1.0';
-    const KEY = 'uno:version';
-    try{
-      const cur = localStorage.getItem(KEY);
-      if (cur !== VER){
-        // Soft migration: drop volatile keys known to corrupt state
-        const DROP = [
-          'unoStackGroups','unoStackSessions','unoPinnedApps',
-          'infodose:locals:v1','infodose:cssCustom','uno:bg'
-        ];
-        DROP.forEach(k=> localStorage.removeItem(k));
-        localStorage.setItem(KEY, VER);
+  // Markdown → blocks (mínimo viável)
+  function mdToBlocks(md){
+    if (Array.isArray(md)) return md;
+    if (typeof md !== 'string') return [{type:'text', text: String(md)}];
+    const lines = md.replace(/\r\n/g, '\n').split('\n');
+    const blocks = [];
+    let i = 0;
+    while (i < lines.length){
+      const line = lines[i];
+      // code fence
+      if (/^```/.test(line)){
+        const lang = line.replace(/^```+/, '').trim().toLowerCase() || 'text';
+        i++;
+        const buf = [];
+        while (i < lines.length && !/^```/.test(lines[i])) { buf.push(lines[i]); i++; }
+        blocks.push({type:'code', lang, code: buf.join('\n')});
+        // skip closing ```
+        if (i < lines.length && /^```/.test(lines[i])) i++;
+        continue;
       }
-    }catch{}
-  })();
+      // list
+      if (/^[-*]\s+/.test(line)){
+        const items = [];
+        while (i < lines.length && /^[-*]\s+/.test(lines[i])){
+          items.push(lines[i].replace(/^[-*]\s+/, ''));
+          i++;
+        }
+        blocks.push({type:'list', items});
+        continue;
+      }
+      // callout > ...
+      if (/^>\s+/.test(line)){
+        const call = [];
+        while (i < lines.length && /^>\s+/.test(lines[i])){
+          call.push(lines[i].replace(/^>\s+/, ''));
+          i++;
+        }
+        blocks.push({type:'callout', text: call.join(' '), emoji: '💬'});
+        continue;
+      }
+      // paragraph
+      const paras = [line];
+      i++;
+      while (i < lines.length && lines[i] && !/^```|^[-*]\s+|^>\s+/.test(lines[i])){
+        paras.push(lines[i]);
+        i++;
+      }
+      const text = paras.join('\n').trim();
+      if (text) blocks.push({type:'text', text});
+    }
+    return blocks;
+  }
 
-  // Add hidden "Reset All" control into LS modal + keyboard shortcut (Ctrl+Alt+Backspace)
+  // API pública
+  function koduxRender(blocksOrMd, opts = {}){
+    const f = feedEl();
+    if (!f) return;
+    const role = (opts.role || 'ai').toLowerCase();
+    const msg  = el('div', `kx-msg ${role}`);
+    const bubble = el('div', 'kx-bubble');
+    msg.appendChild(bubble);
+    f.appendChild(msg);
+
+    const blocks = mdToBlocks(blocksOrMd);
+    renderBlocks(bubble, blocks);
+    requestAnimationFrame(scrollBottom);
+    return msg;
+  }
+
+  // Exponha no window
+  window.koduxRender = koduxRender;
+  window.koduxMdToBlocks = mdToBlocks;
+
+  // hook inicial
   document.addEventListener('DOMContentLoaded', function(){
-    try{
-      const panel = document.querySelector('#lsModal .ls-panel') || document.getElementById('lsPanel');
-      if (panel && !document.getElementById('btnResetAll')){
-        const bar = panel.querySelector('.ls-actions') || panel;
-        const b = document.createElement('button');
-        b.id = 'btnResetAll';
-        b.textContent = 'Reset All (LS+IDB+Cache+SW)';
-        b.style.background = 'rgba(255,92,138,.22)';
-        b.style.borderColor = 'rgba(255,92,138,.38)';
-        b.addEventListener('click', async ()=>{
-          if (confirm('Zerar tudo? (LocalStorage + IndexedDB + Caches + SW)')){
-            await window.UNO_ResetAll({});
-          }
-        });
-        bar && bar.appendChild(b);
-      }
-    }catch(e){}
-  });
-  window.addEventListener('keydown', (e)=>{
-    if ((e.ctrlKey||e.metaKey) && e.altKey && e.key === 'Backspace'){
-      e.preventDefault();
-      if (confirm('Reset All agora?')) window.UNO_ResetAll({});
-    }
+    ensureComposer();
+    // Se existir o banner/preview antigo, oculte‑o no modo chat
+    const msgPreview = document.getElementById('msgPreview');
+    if (msgPreview) msgPreview.style.display = 'none';
   });
 })();
 </script>
-
-
-
-<!-- Δ UNO_PATCH_DELTA (voices sync + scroll unlock + LSPanel accordion + dataURI→IDB + ranges + SW cache) -->
-<style id="UNO_PATCH_DELTA_styles">
-  html,body { overscroll-behavior: contain; }
-  main { overflow: auto; }
-  .view { overscroll-behavior-y: contain; -webkit-overflow-scrolling: touch; }
-  /* Garantir círculo 100% arredondado e sem vazamento de conteúdo */
-  .arch-circle{ border-radius:50%; overflow:hidden; }
-  /* FAB com recorte circular suave para não quadrar o fundo do círculo */
-  .arch-circle>.arch-fab{
-    background-clip: padding-box;
-    -webkit-mask-image: radial-gradient(circle at center, #000 69%, transparent 70%);
-            mask-image: radial-gradient(circle at center, #000 69%, transparent 70%);
-  }
-  /* Acordeão do LS Panel (injeção) */
-  .ls-acc .acc { margin-top:10px; border:1px solid rgba(255,255,255,.12); border-radius:14px; background:rgba(15,17,32,.6); }
-  .ls-acc .acc-hdr{ width:100%; text-align:left; background:transparent; border:0; padding:10px 12px; display:flex; gap:8px; align-items:center; cursor:pointer; }
-  .ls-acc .acc-body{ padding:10px 12px; display:block; }
-  .ls-acc .row{ display:grid; grid-template-columns: 120px 1fr auto; gap:10px; align-items:center; margin:6px 0; }
-  .ls-acc .actions{ display:flex; gap:8px; flex-wrap: wrap; }
-</style>
-<script id="UNO_PATCH_DELTA_voices_sync">
-(() => {
-  if (window.__UNO_VOICE_PATCH__) return; window.__UNO_VOICE_PATCH__ = true;
-  const log=(...a)=>console.debug('[UNO/patch]',...a);
-
-  const CANON_KEY='uno:voice:v1';
-  const CANON_CFG='uno:voice:cfg:v1';
-  const LEGACY_KEYS=['brain:voice','brain:voiceId','brain:voice:settings','arch:voice','arch:voiceId','tts:voice','tts:rate','tts:pitch','tts:volume','uno:voice','uno:voice:rate','uno:voice:pitch','uno:voice:gain','voices:active'];
-
-  const readLS = (k)=>{ try{ return localStorage.getItem(k); }catch(e){ return null; } };
-  const writeLS = (k,v)=>{ try{ localStorage.setItem(k,v); }catch(e){} };
-
-  function latestProfile(){
-    let cand=null, now=Date.now();
-    const c = readLS(CANON_CFG);
-    if (c) { try { const j=JSON.parse(c); if (j && j.id) cand=j; } catch{} }
-    if (!cand) {
-      const b = readLS('brain:voice:settings');
-      if (b) { try {
-        const j=JSON.parse(b);
-        if (j && j.id) cand={id:j.id,name:j.name||j.id,rate:j.rate??1,pitch:j.pitch??0,volume:j.volume??1,provider:j.provider||'brain',savedAt:j.savedAt||now};
-      } catch{} }
-    }
-    if (!cand) {
-      const id = readLS('brain:voiceId')||readLS('arch:voiceId')||readLS('tts:voice')||readLS('uno:voice')||'alloy';
-      const rate = +(readLS('tts:rate')||readLS('uno:voice:rate')||1);
-      const pitch = +(readLS('tts:pitch')||readLS('uno:voice:pitch')||0);
-      const volume = +(readLS('tts:volume')||readLS('uno:voice:gain')||1);
-      cand={id,name:id,rate,pitch,volume,provider:'auto',savedAt:now};
-    }
-    return cand;
-  }
-
-  function applyToModules(profile){
-    try{
-      const w = window;
-      if (w.arch?.setVoice) w.arch.setVoice(profile);
-      if (w.ATOM?.setVoice) w.ATOM.setVoice(profile);
-      const iframe = document.querySelector('.arch-circle iframe');
-      if (iframe?.contentWindow) {
-        try { iframe.contentWindow.postMessage({type:'uno:voice', profile}, '*'); } catch {}
-      }
-    }catch{}
-    try{
-      const w = window;
-      if (w.brain?.setVoice) w.brain.setVoice(profile);
-      if (w.BRAIN?.setVoice) w.BRAIN.setVoice(profile);
-      window.dispatchEvent(new CustomEvent('uno:voice-change', {detail:profile}));
-    }catch{}
-  }
-
-  function saveCanonical(profile){
-    profile = {...profile, savedAt: Date.now()};
-    writeLS(CANON_CFG, JSON.stringify(profile));
-    writeLS(CANON_KEY, profile.id);
-    writeLS('brain:voiceId', profile.id);
-    writeLS('arch:voiceId', profile.id);
-    writeLS('tts:voice', profile.id);
-    writeLS('tts:rate', String(profile.rate ?? 1));
-    writeLS('tts:pitch', String(profile.pitch ?? 0));
-    writeLS('tts:volume', String(profile.volume ?? 1));
-  }
-
-  const current = latestProfile(); saveCanonical(current); applyToModules(current);
-
-  window.addEventListener('storage', (e) => {
-    if (!e.key) return;
-    if (e.key===CANON_CFG || e.key===CANON_KEY || LEGACY_KEYS.includes(e.key)) {
-      const p = latestProfile(); saveCanonical(p); applyToModules(p);
-    }
-  });
-
-  window.UNO_VOICES = {
-    get: () => latestProfile(),
-    set: (p) => { saveCanonical(p); applyToModules(p); }
-  };
-
-  // ===== LS Panel injection (accordion) =====
-  function injectLSPanel(){
-    const panel = document.querySelector('#lsPanel, #ls-panel, [data-ls-panel]');
-    if (!panel || panel.__unoVoiceInjected) return;
-    panel.__unoVoiceInjected = true;
-
-    const sec = document.createElement('section');
-    sec.className='ls-acc';
-    sec.innerHTML = `
-<div class="acc">
-  <button class="acc-hdr" data-acc="voice"><strong>Voz (arch ⇄ brain)</strong><span class="mut">sincronizadas</span></button>
-  <div class="acc-body" id="acc-voice" hidden>
-    <div class="row">
-      <label>Preset</label>
-      <select id="unoVoiceSelect"></select>
-    </div>
-    <div class="row">
-      <label>Velocidade</label>
-      <input id="unoRate" type="range" min="0.5" max="2" step="0.05">
-      <output id="unoRateOut"></output>
-    </div>
-    <div class="row">
-      <label>Tom</label>
-      <input id="unoPitch" type="range" min="-12" max="12" step="1">
-      <output id="unoPitchOut"></output>
-    </div>
-    <div class="row">
-      <label>Volume</label>
-      <input id="unoVol" type="range" min="0" max="1" step="0.05">
-      <output id="unoVolOut"></output>
-    </div>
-    <div class="row actions">
-      <button id="unoTest" class="btn">Testar</button>
-      <button id="unoSave" class="btn prime">Salvar</button>
-      <button id="unoReset" class="btn">Reset</button>
-      <button id="unoClearAll" class="btn" title="Limpa LS, IDB, caches e SW">Reset All</button>
-    </div>
-  </div>
-</div>`;
-
-    panel.appendChild(sec);
-
-    // accord
-    sec.querySelector('.acc-hdr').addEventListener('click',()=>{
-      const body = sec.querySelector('.acc-body'); body.hidden = !body.hidden;
-    });
-
-    // populate voices
-    const select = sec.querySelector('#unoVoiceSelect');
-    const catalog = (() => {
-      try {
-        const c1 = JSON.parse(localStorage.getItem('uno:voices:catalog')||'[]');
-        if (Array.isArray(c1) && c1.length) return c1;
-      } catch {}
-      try {
-        const c2 = JSON.parse(localStorage.getItem('brain:voices')||'[]');
-        if (Array.isArray(c2) && c2.length) return c2;
-      } catch {}
-      return ['alloy','aria','verse','bright','calypso','cobalt','nova','sage'].map(id=>({id,name:id}));
-    })();
-
-    catalog.forEach(v=>{
-      const opt=document.createElement('option');
-      const id = typeof v==='string'? v : (v.id || v.name);
-      opt.value=id; opt.textContent=v.name || id;
-      select.appendChild(opt);
-    });
-
-    function syncUI(p){
-      if(!p) return;
-      select.value = p.id;
-      sec.querySelector('#unoRate').value = p.rate ?? 1;
-      sec.querySelector('#unoPitch').value = p.pitch ?? 0;
-      sec.querySelector('#unoVol').value = p.volume ?? 1;
-      sec.querySelector('#unoRateOut').textContent = (p.rate ?? 1).toFixed(2);
-      sec.querySelector('#unoPitchOut').textContent = (p.pitch ?? 0);
-      sec.querySelector('#unoVolOut').textContent = (p.volume ?? 1).toFixed(2);
-    }
-    syncUI(window.UNO_VOICES.get());
-
-    select.addEventListener('change', () => {
-      const p = {...window.UNO_VOICES.get(), id: select.value, name: select.selectedOptions[0]?.textContent || select.value};
-      window.UNO_VOICES.set(p); syncUI(p);
-    });
-    ['#unoRate','#unoPitch','#unoVol'].forEach(sel=>{
-      const el = sec.querySelector(sel);
-      const out = sec.querySelector(sel+'Out');
-      el.addEventListener('input',()=>{ out.textContent = sel==='#unoPitch' ? el.value : (+el.value).toFixed(2); });
-    });
-    sec.querySelector('#unoSave').addEventListener('click',()=>{
-      const p = {
-        id: select.value,
-        name: select.selectedOptions[0]?.textContent || select.value,
-        rate: +sec.querySelector('#unoRate').value,
-        pitch: +sec.querySelector('#unoPitch').value,
-        volume: +sec.querySelector('#unoVol').value
-      };
-      window.UNO_VOICES.set(p);
-    });
-    sec.querySelector('#unoReset').addEventListener('click',()=>{
-      const p = {id:'alloy', name:'alloy', rate:1, pitch:0, volume:1};
-      window.UNO_VOICES.set(p); syncUI(p);
-    });
-    sec.querySelector('#unoTest').addEventListener('click', async ()=>{
-      const p = window.UNO_VOICES.get();
-      const utter = new SpeechSynthesisUtterance('Nebula pulse');
-      utter.rate = Math.max(0.1, Math.min(10, p.rate || 1));
-      utter.pitch = 1 + (p.pitch || 0)/12;
-      utter.volume = Math.max(0, Math.min(1, p.volume||1));
-      window.speechSynthesis?.speak(utter);
-    });
-    sec.querySelector('#unoClearAll').addEventListener('click', async ()=>{
-      try { localStorage.clear(); } catch {}
-      if (indexedDB?.databases) {
-        const dbs = await indexedDB.databases();
-        for (const d of dbs) if(d?.name) await new Promise(r=>{
-          const req = indexedDB.deleteDatabase(d.name); req.onsuccess=req.onerror=req.onblocked=()=>r();
-        });
-      }
-      if (window.caches?.keys) { const ks = await caches.keys(); for (const k of ks) await caches.delete(k); }
-      if (navigator.serviceWorker?.getRegistrations) { const regs = await navigator.serviceWorker.getRegistrations(); for (const r of regs) await r.unregister(); }
-      location.reload();
-    });
-  }
-
-  function tryInject(){ injectLSPanel(); }
-  tryInject();
-  const mo = new MutationObserver(()=>tryInject());
-  mo.observe(document.documentElement, {subtree:true, childList:true});
-
-  // ===== Overscroll / scroll unlock =====
-  function unlockScroll(){
-    const html = document.documentElement;
-    const body = document.body;
-    [html, body].forEach(el=>{
-      el.style.overscrollBehavior = 'contain';
-      el.style.overflow = '';
-    });
-    document.querySelectorAll('main, .view, [data-scroll], .scroll, .scroll-y').forEach(el=>{
-      el.style.overflowY = 'auto';
-      el.style.overscrollBehaviorY = 'contain';
-      el.style.webkitOverflowScrolling = 'touch';
-      el.style.touchAction = 'pan-y';
-    });
-  }
-  unlockScroll();
-
-  // ===== Data URI → IDB migration =====
-  (function migrateLargeLS(){
-    const TH = 60_000; // ~60KB
-    const storeName='unoLargeBlobs';
-    const req = indexedDB.open('uno-blobs', 1);
-    req.onupgradeneeded = () => req.result.createObjectStore(storeName);
-    req.onsuccess = () => {
-      const db = req.result;
-      const tx = db.transaction(storeName, 'readwrite');
-      const os = tx.objectStore(storeName);
-      for (let i=0;i<localStorage.length;i++){
-        const key = localStorage.key(i); if(!key) continue;
-        const val = localStorage.getItem(key)||'';
-        if (val.startsWith('data:') && val.length > TH){
-          os.put({key, data: val}, key);
-          localStorage.setItem(key, 'idb:uno-blobs:'+key);
-        }
-      }
-      tx.oncomplete = ()=> db.close();
-    };
-  })();
-
-  // ===== Defaults / ranges =====
-  try {
-    if (!localStorage.getItem('uno:arch:folder')) localStorage.setItem('uno:arch:folder','archetypes3d');
-    const fps = document.querySelector('[name=fps],[data-key="fps"]');
-    if (fps?.type==='range'){ fps.min='30'; fps.max='144'; fps.step='1'; }
-    const dens = document.querySelector('[name=density],[data-key="density"]');
-    if (dens?.type==='range'){ dens.min='10'; dens.max='300'; dens.step='1'; }
-  } catch {}
-
-  try { localStorage.setItem('uno:sw:cache', 'CACHE_V3'); } catch {}
-})();
-</script>
-<!-- /Δ -->
-
-<script id="infodose-voices-module">
-(() => {
-  const LS_KEY = "Infodose:voices";
-
-  /** Normaliza chave "Pulse" | "pulse.html" -> "pulse" */
-  function normalizeKey(input) {
-    if (!input) return "";
-    let k = String(input).trim().toLowerCase();
-    if (k.endsWith(".html")) k = k.slice(0, -5);
-    return k;
-  }
-
-  /** Carrega e mescla mapa do localStorage com um fallback mínimo */
-  function loadVoicesMap() {
-    const fallback = {
-      // mínimos pra nunca quebrar:
-      "pulse": "Etienne-FR",
-      "artemis": "Lorenzo-IT",
-      "atlas": "Daniel"
-    };
-    let stored = {};
-    try {
-      stored = JSON.parse(localStorage.getItem(LS_KEY) || "{}");
-    } catch {}
-    // Reindexa por nome normalizado também (aceita duplicidade nome/arquivo)
-    const merged = { ...stored };
-    Object.keys(stored).forEach((k) => {
-      const v = stored[k];
-      const nk = normalizeKey(k);
-      if (nk && !(nk in merged)) merged[nk] = v;
-    });
-    // Garante fallbacks
-    return { ...merged, ...fallback };
-  }
-
-  /** Salva mapa no localStorage (aceita objeto completo) */
-  function saveVoicesMap(mapObj) {
-    if (!mapObj || typeof mapObj !== "object") return;
-    localStorage.setItem(LS_KEY, JSON.stringify(mapObj));
-  }
-
-  /** Extrai locale aproximado do nome da voz (ex.: "Luciana-PT" -> "pt-BR") */
-  function inferLocaleFromVoice(voiceName) {
-    if (!voiceName) return undefined;
-    const n = voiceName.toLowerCase();
-    if (/-pt\b/.test(n)) return "pt-BR";
-    if (/-fr\b/.test(n)) return "fr-FR";
-    if (/-it\b/.test(n)) return "it-IT";
-    if (/-en\b/.test(n)) return "en-US";
-    // extras comuns:
-    if (/joana|luciana/.test(n)) return "pt-PT";
-    if (/shelley|grandpa|reed|rishi|flo|eddy|sandy|moira|daniel|joana/.test(n)) return "en-US"; // ajuste livre
-    return undefined;
-  }
-
-  /** Resolve voz a partir de "Pulse" ou "pulse.html" */
-  function resolveVoice(archetypeOrFile) {
-    const map = loadVoicesMap();
-    const kNorm = normalizeKey(archetypeOrFile);
-    // Prioriza chave exata (nome normalizado), depois busca literal
-    let voice = map[kNorm] ?? map[archetypeOrFile] ?? map[`${kNorm}.html`];
-    // Se não achou, tenta variantes de capitalização
-    if (!voice) {
-      const guess = Object.keys(map).find(k => normalizeKey(k) === kNorm);
-      if (guess) voice = map[guess];
-    }
-    // Último fallback — neutro
-    return voice || "Default";
-  }
-
-  /** API de utilidades para integração com TTS nativo (opcional) */
-  async function speak(text, archetypeOrFile, opts = {}) {
-    if (!("speechSynthesis" in window)) {
-      console.warn("[voices] Web Speech API não disponível. Implemente seu TTS aqui.");
-      return;
-    }
-    const voiceName = resolveVoice(archetypeOrFile);
-    const localeHint = opts.lang || inferLocaleFromVoice(voiceName) || "en-US";
-
-    const utter = new SpeechSynthesisUtterance(String(text));
-    utter.lang = localeHint;
-    utter.rate = opts.rate ?? 1;
-    utter.pitch = opts.pitch ?? 1;
-    utter.volume = opts.volume ?? 1;
-
-    // Tenta escolher uma voz que combine com o hint de idioma
-    const pickVoice = () => {
-      const list = window.speechSynthesis.getVoices() || [];
-      // 1) por lang
-      let v = list.find(v => (v.lang || "").toLowerCase() === localeHint.toLowerCase());
-      // 2) por nome se coincidir parcialmente
-      if (!v && voiceName && typeof voiceName === "string") {
-        v = list.find(v => (v.name || "").toLowerCase().includes(String(voiceName).toLowerCase()));
-      }
-      // 3) fallback primeira voz
-      return v || list[0] || null;
-    };
-
-    let chosen = pickVoice();
-    if (!chosen) {
-      // Em alguns browsers as vozes chegam async
-      await new Promise(res => {
-        window.speechSynthesis.onvoiceschanged = res;
-        setTimeout(res, 300);
-      });
-      chosen = pickVoice();
-    }
-    if (chosen) utter.voice = chosen;
-    window.speechSynthesis.cancel();
-    window.speechSynthesis.speak(utter);
-  }
-
-  /** Helpers públicos: atualizar entrada individual e apagar */
-  function setVoiceFor(key, voiceName) {
-    const map = loadVoicesMap();
-    map[key] = voiceName;
-    // também grava a forma normalizada
-    map[normalizeKey(key)] = voiceName;
-    saveVoicesMap(map);
-    return map;
-  }
-
-  function deleteVoiceFor(key) {
-    const map = loadVoicesMap();
-    delete map[key];
-    delete map[normalizeKey(key)];
-    saveVoicesMap(map);
-    return map;
-  }
-
-  /** Exposição global */
-  window.voiceEngine = {
-    LS_KEY,
-    load: loadVoicesMap,
-    save: saveVoicesMap,
-    resolveVoice,
-    inferLocaleFromVoice,
-    speak,             // opcional (usa Web Speech API local)
-    setVoiceFor,
-    deleteVoiceFor,
-    normalizeKey
-  };
-
-  // Log rápido pra debug:
-  try {
-    console.debug("[voices] pronto:", window.voiceEngine.load());
-  } catch {}
-})();
-</script>
-
 </body></html>
