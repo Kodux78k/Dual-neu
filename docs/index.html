@@ -10182,35 +10182,80 @@ window.kobDemo = () => pushAI(`[INTRO] **Kael Dominus** — núcleo sentiente qu
 })();
 </script>
 
-<!-- PATCH INLINE: Atualiza URLs do APPS_JSON → ./apps/APPS78K/ -->
 <script>
 (function(){
-  const ASSISTANT_SLUG = {
-    kaos:'disruptor', nova:'inspira', genus:'fabricus', pulse:'resona', lumine:'brilhare',
-    serena:'ampara', vitalis:'momentum', atlas:'cartesius', artemis:'naviga',
-    solus:'arcana', rhea:'raizes', aion:'evolutia'
-  };
-  const baseDir = './apps/APPS78K';
+  const SLUG = {kaos:"disruptor",nova:"inspira",genus:"fabricus",pulse:"resona",lumine:"brilhare",serena:"ampara",vitalis:"momentum",atlas:"cartesius",artemis:"naviga",solus:"arcana",rhea:"raizes",aion:"evolutia"};
+  const KEYS = Object.keys(SLUG);
 
-  function patchAppUrls(baseDir){
+  // Candidatos de baseDir relativos ao index atual (cobre raiz, /docs e subpastas)
+  const candidates = [
+    "./apps/APPS78K/",
+    "apps/APPS78K/",
+    "./docs/apps/APPS78K/",
+    "../apps/APPS78K/",
+    "../../apps/APPS78K/"
+  ];
+
+  const cb = () => String(Date.now()); // cache-bust
+  const toast = (m, ok=true) => {
+    const x = document.createElement("div");
+    x.style.cssText = "position:fixed;left:50%;bottom:calc(84px + env(safe-area-inset-bottom,0));transform:translateX(-50%);background:"+(ok?"rgba(18,20,28,.9)":"rgba(80,8,8,.92)")+";color:#eaf1ff;border:1px solid rgba(255,255,255,.12);backdrop-filter:blur(10px);padding:10px 12px;border-radius:12px;font:600 12px/1.1 system-ui;box-shadow:0 8px 24px rgba(0,0,0,.4);z-index:99999;opacity:0;transition:opacity .25s,transform .25s";
+    x.textContent = m; document.body.appendChild(x);
+    requestAnimationFrame(()=>{x.style.opacity=1;x.style.transform="translateX(-50%) translateY(-4px)";});
+    setTimeout(()=>{x.style.opacity=0;x.style.transform="translateX(-50%) translateY(6px)";setTimeout(()=>x.remove(),260)},2000);
+  };
+
+  async function exists(url){
     try{
-      const tag=document.getElementById('APPS_JSON');
-      if(!tag) return console.warn('[78K] APPS_JSON não encontrado.');
-      const data=JSON.parse(tag.textContent.trim());
-      if(!data.apps) return;
-      for(const app of data.apps){
-        const k=(app.key||'').toLowerCase();
-        if(k && ASSISTANT_SLUG[k]){
-          app.url=`${baseDir}/app_${k}_${ASSISTANT_SLUG[k]}.html`;
-        }
-      }
-      tag.textContent=JSON.stringify(data,null,2);
-      window.APPS_JSON=data;
-      console.log('[78K] APPS_JSON atualizado →', baseDir);
-    }catch(e){console.error('[78K] erro patchAppUrls',e);}
+      const r = await fetch(url+"?v="+cb(), {method:"HEAD", cache:"no-store"});
+      return r.ok;
+    }catch{ return false; }
   }
 
-  document.addEventListener('DOMContentLoaded',()=>patchAppUrls(baseDir));
+  async function pickBaseDir(){
+    // testa usando o arquivo mais previsível
+    const probe = "app_kaos_disruptor.html";
+    for (const base of candidates){
+      const url = base.replace(/\/+$/,'/') + probe;
+      if (await exists(url)) return base.replace(/\/?$/,'/'); // normaliza
+    }
+    return null;
+  }
+
+  function patchAppsJSON(base){
+    const tag = document.getElementById("APPS_JSON");
+    if(!tag) throw new Error("Tag <script id='APPS_JSON'> não encontrada.");
+    const data = JSON.parse((tag.textContent||"{}").trim());
+    if(!data || !Array.isArray(data.apps)) throw new Error("APPS_JSON.apps inválido.");
+    for(const it of data.apps){
+      const k = String(it.key||"").toLowerCase();
+      if(k && SLUG[k]){
+        it.url = `${base}app_${k}_${SLUG[k]}.html?v=${cb()}`;
+      }
+    }
+    tag.textContent = JSON.stringify(data, null, 2);
+    window.APPS_JSON = data;
+    if (typeof window.reloadCatalog === "function") {
+      try { window.reloadCatalog(data); } catch {}
+    }
+  }
+
+  document.addEventListener("DOMContentLoaded", async ()=>{
+    const base = await pickBaseDir();
+    if (!base){
+      toast("APPS78K: não encontrei a pasta apps/APPS78K.", false);
+      console.error("[APPS78K] Nenhum baseDir funcionou. Verifique a estrutura: docs/apps/APPS78K/ ou apps/APPS78K/ ao lado do index.");
+      return;
+    }
+    try{
+      patchAppsJSON(base);
+      toast("APPS78K sincronizado");
+      console.log("[APPS78K] baseDir =", base);
+    }catch(e){
+      toast("APPS78K: falha ao aplicar patch.", false);
+      console.error("[APPS78K] Patch error:", e);
+    }
+  });
 })();
 </script>
 
