@@ -3411,25 +3411,25 @@ input[type="file"]::file-selector-button:hover{
 </ul>
 </div>
 </div>
-<!-- ===== Catálogo Embutido (Monólito) ===== -->
+<!-- ===== Catálogo Embutido (Monólito) — ABS URLs (Unouno-) ===== -->
 <script id="APPS_JSON" type="application/json">
-  {
-    "apps": [
-      {"key":"atlas","title":"Atlas · Cartesius","desc":"Planejador estratégico com cronogramas e checklists.","url":"about:blank","icon":"atlas"},
-      {"key":"nova","title":"Nova · Inspira","desc":"Criativa que desbloqueia ideias com mapas mentais e exercícios.","url":"about:blank","icon":"nova"},
-      {"key":"vitalis","title":"Vitalis · Momentum","desc":"Rotinas físicas, hacks biológicos e motivação.","url":"about:blank","icon":"vitalis"},
-      {"key":"pulse","title":"Pulse · Resona","desc":"Trilhas sonoras e ajuste de som emocional.","url":"about:blank","icon":"pulse"},
-      {"key":"artemis","title":"Artemis · Naviga","desc":"Explora conhecimentos e rotas de aprendizado.","url":"about:blank","icon":"artemis"},
-      {"key":"serena","title":"Serena · Ampara","desc":"Acolhimento e suporte emocional.","url":"about:blank","icon":"serena"},
-      {"key":"kaos","title":"Kaos · Disruptor","desc":"Questiona padrões e propõe soluções ousadas.","url":"about:blank","icon":"kaos"},
-      {"key":"genus","title":"Genus · Fabricus","desc":"Protótipos e materialização de ideias.","url":"about:blank","icon":"genus"},
-      {"key":"lumine","title":"Lumine · Brilhare","desc":"Inspiração leve e atividades lúdicas.","url":"about:blank","icon":"lumine"},
-      {"key":"rhea","title":"Rhea · Raízes","desc":"Vínculos e memórias emocionais.","url":"about:blank","icon":"rhea"},
-      {"key":"solus","title":"Solus · Arcana","desc":"Harmonização energética e meditação.","url":"about:blank","icon":"solus"},
-      {"key":"aion","title":"Aion · Evolutia","desc":"Microações estratégicas e evolução.","url":"about:blank","icon":"aion"}
-    ]
-  }
-  </script>
+{
+  "apps": [
+    {"key":"atlas","title":"Atlas · Cartesius","desc":"Planejador estratégico com cronogramas e checklists.","url":"https://kodux78k.github.io/Unouno-/apps/APPS78K/app_atlas_cartesius.html","icon":"atlas"},
+    {"key":"nova","title":"Nova · Inspira","desc":"Criativa que desbloqueia ideias com mapas mentais e exercícios.","url":"https://kodux78k.github.io/Unouno-/apps/APPS78K/app_nova_inspira.html","icon":"nova"},
+    {"key":"vitalis","title":"Vitalis · Momentum","desc":"Rotinas físicas, hacks biológicos e motivação.","url":"https://kodux78k.github.io/Unouno-/apps/APPS78K/app_vitalis_momentum.html","icon":"vitalis"},
+    {"key":"pulse","title":"Pulse · Resona","desc":"Trilhas sonoras e ajuste de som emocional.","url":"https://kodux78k.github.io/Unouno-/apps/APPS78K/app_pulse_resona.html","icon":"pulse"},
+    {"key":"artemis","title":"Artemis · Naviga","desc":"Explora conhecimentos e rotas de aprendizado.","url":"https://kodux78k.github.io/Unouno-/apps/APPS78K/app_artemis_naviga.html","icon":"artemis"},
+    {"key":"serena","title":"Serena · Ampara","desc":"Acolhimento e suporte emocional.","url":"https://kodux78k.github.io/Unouno-/apps/APPS78K/app_serena_ampara.html","icon":"serena"},
+    {"key":"kaos","title":"Kaos · Disruptor","desc":"Questiona padrões e propõe soluções ousadas.","url":"https://kodux78k.github.io/Unouno-/apps/APPS78K/app_kaos_disruptor.html","icon":"kaos"},
+    {"key":"genus","title":"Genus · Fabricus","desc":"Protótipos e materialização de ideias.","url":"https://kodux78k.github.io/Unouno-/apps/APPS78K/app_genus_fabricus.html","icon":"genus"},
+    {"key":"lumine","title":"Lumine · Brilhare","desc":"Inspiração leve e atividades lúdicas.","url":"https://kodux78k.github.io/Unouno-/apps/APPS78K/app_lumine_brilhare.html","icon":"lumine"},
+    {"key":"rhea","title":"Rhea · Raízes","desc":"Vínculos e memórias emocionais.","url":"https://kodux78k.github.io/Unouno-/apps/APPS78K/app_rhea_raizes.html","icon":"rhea"},
+    {"key":"solus","title":"Solus · Arcana","desc":"Harmonização energética e meditação.","url":"https://kodux78k.github.io/Unouno-/apps/APPS78K/app_solus_arcana.html","icon":"solus"},
+    {"key":"aion","title":"Aion · Evolutia","desc":"Microações estratégicas e evolução.","url":"https://kodux78k.github.io/Unouno-/apps/APPS78K/app_aion_evolutia.html","icon":"aion"}
+  ]
+}
+</script>
 <script>
   // Redefine the global toast function to suppress popup messages. If you
   // later decide to re-enable notifications, remove or comment out this line.
@@ -6192,26 +6192,7 @@ window.addEventListener('load', () => {
     }
     renderAll();
   };
-  const ensureActiveConsistency = ()=>{ const list=getWallet(); const anyActive=list.some(x=>x.active); if(!anyActive){ localStorage.setItem('dual.keys.openrouter',''); } };
-  const renderWallet = ()=>{
-    const grid=$('#skGrid'); if(!grid) return; grid.innerHTML='';
-    const list=getWallet(); if(!list.length){ grid.innerHTML='<div class="meta">Nenhuma chave na carteira ainda.</div>'; return; }
-    list.forEach(item=>{
-      const div=document.createElement('div'); div.className='sk-item';
-      const top=document.createElement('div'); top.className='top';
-      const name=document.createElement('div'); name.className='name'; name.textContent=item.name+(item.active?' • ATIVA':'');
-      const act=document.createElement('div');
-      const bUse=document.createElement('button'); bUse.textContent=item.active?'Desativar':'Ativar';
-      bUse.onclick=()=>{ if(item.active){
-          const list2=getWallet().map(x=>({...x, active: x.id===item.id? false: x.active })); setWallet(list2); ensureActiveConsistency(); renderWallet(); renderAll();
-        } else { activateWalletItem(item.id); } };
-      const bDel=document.createElement('button'); bDel.textContent='Apagar'; bDel.onclick=()=>{ if(confirm('Apagar entrada da carteira?')) removeWalletItem(item.id) };
-      act.append(bUse,bDel); top.append(name,act);
-      const key=document.createElement('div'); key.className='key'; key.textContent=item.key;
-      div.append(top,key); grid.append(div);
-    });
-  };
-
+  
   // LS
   const lsEntries = ()=>{ const out=[]; for(let i=0;i<localStorage.length;i++){ const k=localStorage.key(i); const v=localStorage.getItem(k)||''; out.push({key:k,val:v}); } return out.sort((a,b)=>a.key.localeCompare(b.key)); };
   const lsSizeBytes = ()=>{ let sum=0; for(let i=0;i<localStorage.length;i++){ const k=localStorage.key(i); const v=localStorage.getItem(k)||''; sum += k.length + v.length; } return sum; };
@@ -10182,7 +10163,7 @@ window.kobDemo = () => pushAI(`[INTRO] **Kael Dominus** — núcleo sentiente qu
 })();
 </script>
 
-<script>
+<!--script>
 (function(){
   const SLUG = {kaos:"disruptor",nova:"inspira",genus:"fabricus",pulse:"resona",lumine:"brilhare",serena:"ampara",vitalis:"momentum",atlas:"cartesius",artemis:"naviga",solus:"arcana",rhea:"raizes",aion:"evolutia"};
   const KEYS = Object.keys(SLUG);
@@ -10257,9 +10238,102 @@ window.kobDemo = () => pushAI(`[INTRO] **Kael Dominus** — núcleo sentiente qu
     }
   });
 })();
+</script!-->
+
+
+<script>
+(function(){
+  // mapeia sufixo (assistant) por key
+  const SLUG={kaos:"disruptor",nova:"inspira",genus:"fabricus",pulse:"resona",lumine:"brilhare",serena:"ampara",vitalis:"momentum",atlas:"cartesius",artemis:"naviga",solus:"arcana",rhea:"raizes",aion:"evolutia"};
+  const cb=()=>String(Date.now());
+  const toast=(m,ok=true)=>{const x=document.createElement("div");x.style.cssText="position:fixed;left:50%;bottom:calc(84px + env(safe-area-inset-bottom,0));transform:translateX(-50%);background:"+(ok?"rgba(18,20,28,.9)":"rgba(80,8,8,.92)")+";color:#eaf1ff;border:1px solid rgba(255,255,255,.12);backdrop-filter:blur(10px);padding:10px 12px;border-radius:12px;font:600 12px/1.1 system-ui;box-shadow:0 8px 24px rgba(0,0,0,.4);z-index:99999;opacity:0;transition:opacity .25s,transform .25s";x.textContent=m;document.body.appendChild(x);requestAnimationFrame(()=>{x.style.opacity=1;x.style.transform="translateX(-50%) translateY(-4px)";});setTimeout(()=>{x.style.opacity=0;x.style.transform="translateX(-50%) translateY(6px)";setTimeout(()=>x.remove(),260)},2000)};
+  const urlJoin=(a,b)=>a.replace(/\/+$/,'')+'/'+b.replace(/^\/+/,'');
+  const exists=async(u)=>{try{const r=await fetch(u+(u.includes('?')?'&':'?')+'v='+cb(),{method:"HEAD",cache:"no-store"});return r.ok}catch{return false}};
+
+  // 1) Base candidates automáticos (sem precisar saber repo)
+  function makeCandidates(){
+    const O=location.origin, P=location.pathname.replace(/index\.html?$/,'');
+    // ex: /repo/ ou /sub/dir/ → tenta raiz atual, com/sem docs
+    const here = O+P;
+    const root = O + (P.split('/').filter(Boolean)[0] ? '/'+P.split('/').filter(Boolean)[0]+'/' : '/');
+    // Prioridade: override explícito > aqui > /docs
+    const list = [
+      // Override por query (?appsBase=https://.../apps/APPS78K/)
+      new URLSearchParams(location.search).get('appsBase'),
+      // Override global opcional (window.APPS78K_BASE = "https://.../apps/APPS78K/")
+      (typeof window!=="undefined" && window.APPS78K_BASE)||null,
+      // Caminhos relativos (funcionam em qualquer pasta)
+      './apps/APPS78K/', 'apps/APPS78K/',
+      './docs/apps/APPS78K/', 'docs/apps/APPS78K/',
+      // Absolutos inferidos (raiz do repo atual)
+      urlJoin(here,'apps/APPS78K/'),
+      urlJoin(here,'docs/apps/APPS78K/'),
+      urlJoin(root,'apps/APPS78K/'),
+      urlJoin(root,'docs/apps/APPS78K/')
+    ].filter(Boolean);
+    // unifica e mantém ordem
+    return [...new Set(list)];
+  }
+
+  async function pickBase(){
+    const probe='app_kaos_disruptor.html';
+    const C = makeCandidates();
+    for(const base of C){
+      const abs = base.startsWith('http') ? base : new URL(base, location.href).href;
+      if (await exists(urlJoin(abs, probe))) return abs.replace(/\/?$/,'/'); // normaliza com /
+    }
+    return null;
+  }
+
+  function getAPPS(){
+    const tag=document.getElementById('APPS_JSON');
+    if(!tag) throw new Error("Sem <script id='APPS_JSON'>");
+    const data=JSON.parse((tag.textContent||'{}').trim());
+    if(!data || !Array.isArray(data.apps)) throw new Error('APPS_JSON.apps inválido');
+    return {tag,data};
+  }
+
+  function patchAPPS(base){
+    const {tag,data}=getAPPS();
+    const v=cb();
+    for(const it of data.apps){
+      const k=String(it.key||'').toLowerCase();
+      if(k && SLUG[k]) it.url = urlJoin(base, `app_${k}_${SLUG[k]}.html`) + `?v=${v}`;
+    }
+    tag.textContent = JSON.stringify(data,null,2);
+    window.APPS_JSON = data;
+    if(typeof window.reloadCatalog==='function'){ try{ window.reloadCatalog(data); }catch{} }
+    return data;
+  }
+
+  function retargetOpenIframes(data){
+    try{
+      const map = new Map(data.apps.map(a=>[String(a.title||a.key||'').toLowerCase(), a.url]));
+      document.querySelectorAll('.session iframe').forEach(fr=>{
+        try{
+          const card=fr.closest('.session');
+          const meta=card && card.dataset && card.dataset.meta ? JSON.parse(card.dataset.meta) : null;
+          const title=(meta && meta.title ? meta.title : (card && card.querySelector('.title')?.textContent)||'').toLowerCase();
+          const u=map.get(title)||null; if(u){ fr.src=u; }
+        }catch{}
+      });
+    }catch{}
+  }
+
+  document.addEventListener('DOMContentLoaded', async ()=>{
+    const base = await pickBase();
+    if(!base){ toast('APPS78K: não encontrei a pasta dos apps.', false); console.error('[APPS78K] Nenhum baseDir funcionou. Use ?appsBase=https://username.github.io/repo/apps/APPS78K/'); return; }
+    try{
+      const data = patchAPPS(base);
+      retargetOpenIframes(data);
+      toast('APPS78K sincronizado');
+      console.log('[APPS78K] base =', base, data.apps.map(a=>a.url));
+    }catch(e){
+      toast('APPS78K: falha ao aplicar patch.', false);
+      console.error('[APPS78K] Patch error:', e);
+    }
+  });
+})();
 </script>
-
-
-
 </body>
 </html>
